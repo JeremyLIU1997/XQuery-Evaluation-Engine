@@ -2,6 +2,7 @@ import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 import org.w3c.dom.*;
@@ -265,12 +266,27 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
 
     @Override
     public Object visitF_eq(XQueryParser.F_eqContext ctx) {
-        
-        return null;
+        List<Node> list1 = (List<Node>)this.visit(ctx.rp(0));
+        List<Node> list2 = (List<Node>)this.visit(ctx.rp(1));
+
+        for (int i = 0; i < list1.size(); i++)
+            for (int j = 0; j < list2.size(); j++)
+                if (list1.get(i).isEqualNode(list2.get(j)))
+                    return true;
+        return false;
     }
 
+    @Override
+    public Object visitF_is(XQueryParser.F_isContext ctx) {
+        List<Node> list1 = (List<Node>)this.visit(ctx.rp(0));
+        List<Node> list2 = (List<Node>)this.visit(ctx.rp(1));
 
-    @Override public Object visitF_is(XQueryParser.F_isContext ctx) { return visitChildren(ctx); }
+        for (int i = 0; i < list1.size(); i++)
+            for (int j = 0; j < list2.size(); j++)
+                if (list1.get(i).isSameNode(list2.get(j)))
+                    return true;
+        return false;
+    }
 
 }
 
