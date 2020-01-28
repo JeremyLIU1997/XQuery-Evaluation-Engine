@@ -32,14 +32,14 @@ TAGNAME             # rp_tag
 ;
 
 /*
-(pathfilter)     f -> rp|rp1 = rp2 |rp1 eq rp2 |rp1 ==rp2 |rp1 is rp2
-                    | (f) |f1 andf2 |f1 or f2 | not f
+(pathfilter)     f -> rp | rp1 = rp2 | rp1 eq rp2 | rp1 == rp2 | rp1 is rp2
+                    | (f) | f1 andf2 | f1 or f2 | not f
 */
 filter:
-rp '|' rp           # f_or
-| rp '=' rp         # f_eq_alt
+rp                  # f_rp
+| rp '=' rp         # f_eq
 | rp EQ rp          # f_eq
-| rp '==' rp        # f_is_alt
+| rp '==' rp        # f_is
 | rp IS rp          # f_is
 | LPAREN filter RPAREN  # f_paren
 | filter AND filter     # f_and

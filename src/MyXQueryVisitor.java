@@ -192,18 +192,84 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
     @Override
     public Object visitRp_slash(XQueryParser.Rp_slashContext ctx) {
         List<Node> out = new ArrayList<Node>();
+        if (yet_to_visit.isEmpty())
+            return out;
 
-
+        List<Node> intermediate_result = (List<Node>) this.visit(ctx.rp(0));
+        for (int i = 0; i < intermediate_result.size(); i++) {
+            yet_to_visit.add(intermediate_result.get(i));
+            out.addAll( (List<Node>)this.visit(ctx.rp(1)) );
+        }
         return out;
     }
 
-    @Override public Object visitF_not(XQueryParser.F_notContext ctx) { return visitChildren(ctx); }
-    @Override public Object visitF_paren(XQueryParser.F_parenContext ctx) { return visitChildren(ctx); }
-    @Override public Object visitF_or(XQueryParser.F_orContext ctx) { return visitChildren(ctx); }
-    @Override public Object visitF_and(XQueryParser.F_andContext ctx) { return visitChildren(ctx); }
-    @Override public Object visitF_is_alt(XQueryParser.F_is_altContext ctx) { return visitChildren(ctx); }
-    @Override public Object visitF_eq_alt(XQueryParser.F_eq_altContext ctx) { return visitChildren(ctx); }
-    @Override public Object visitF_eq(XQueryParser.F_eqContext ctx) { return visitChildren(ctx); }
+    /* filter methods */
+
+    @Override
+    public Object visitF_not(XQueryParser.F_notContext ctx) {
+        return !(boolean)this.visit(ctx.filter());
+    }
+
+    @Override
+    public Object visitF_rp(XQueryParser.F_rpContext ctx) {
+        // yet_to_visit is guaranteed to be not empty
+        // otherwise this func will not be called
+        // but precautions, let's add them
+        if (yet_to_visit.isEmpty())
+            return false;
+
+        Node node = yet_to_visit.remove(0);
+        return ((List<Node>)this.visit(ctx.rp())).size() != 0;
+    }
+
+    @Override
+    public Object visitF_paren(XQueryParser.F_parenContext ctx) {
+        return this.visit(ctx.filter());
+    }
+
+    @Override
+    public Object visitF_or(XQueryParser.F_orContext ctx) {
+        // yet_to_visit is guaranteed to be not empty
+        // otherwise this func will not be called
+        // but precautions, let's add them
+        if (yet_to_visit.isEmpty())
+            return false;
+
+        Node node = yet_to_visit.get(0);
+
+        if ( ((List<Node>)this.visit(ctx.filter(0))).size() != 0)
+            return true;
+        else {
+            yet_to_visit.add(node);
+            return ((List<Node>)this.visit(ctx.filter(1))).size() != 0;
+        }
+    }
+
+    @Override
+    public Object visitF_and(XQueryParser.F_andContext ctx) {
+        // yet_to_visit is guaranteed to be not empty
+        // otherwise this func will not be called
+        // but precautions, let's add them
+        if (yet_to_visit.isEmpty())
+            return false;
+
+        Node node = yet_to_visit.get(0);
+
+        if ( ((List<Node>)this.visit(ctx.filter(1))).size() == 0 )
+            return false;
+        else {
+            yet_to_visit.add(node);
+            return ((List<Node>)this.visit(ctx.filter(1))).size() != 0;
+        }
+    }
+
+    @Override
+    public Object visitF_eq(XQueryParser.F_eqContext ctx) {
+        
+        return null;
+    }
+
+
     @Override public Object visitF_is(XQueryParser.F_isContext ctx) { return visitChildren(ctx); }
 
 }
