@@ -42,7 +42,8 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         return this.visit(ctx.rp());
     }
 
-    @Override public Object visitAp_double_slash(XQueryParser.Ap_double_slashContext ctx) {
+    @Override
+    public Object visitAp_double_slash(XQueryParser.Ap_double_slashContext ctx) {
         String filename = ctx.FILENAME().getText(); // find file path
         Document doc = openInputFile(filename); // open file
 
@@ -79,8 +80,8 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         if (yet_to_visit.isEmpty())
             return out;
 
-        yet_to_visit.add(yet_to_visit.remove(0).getParentNode());
-        return this.visit(ctx.getParent());
+        out.add(yet_to_visit.remove(0).getParentNode()); // what happens when DOM context is root?
+        return out;
     }
 
     @Override
@@ -166,9 +167,10 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         List<Node> intermediate_result = (List<Node>)this.visit(ctx.rp());
         for (int i = 0; i < intermediate_result.size(); i++) {
             yet_to_visit.add(intermediate_result.get(i));
-            if ((boolean)this.visit(ctx.filter())) // evaluate filter on each node
+            if ( (boolean)this.visit(ctx.filter()) ) // evaluate filter on each node
                 out.add(intermediate_result.get(i));
         }
+        // System.out.println("out.size(): " + out.size());
         return out;
     }
 
@@ -219,8 +221,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         if (yet_to_visit.isEmpty())
             return false;
 
-        Node node = yet_to_visit.remove(0);
-        return ((List<Node>)this.visit(ctx.rp())).size() != 0;
+        return ((List<Node>)this.visit(ctx.rp())).size() > 0;
     }
 
     @Override

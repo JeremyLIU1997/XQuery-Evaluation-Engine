@@ -1,7 +1,12 @@
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
+import org.w3c.dom.Node;
+
+import java.util.*;
+
 import java.io.FileInputStream;
 import java.io.InputStream;
+
 
 
 public class Main {
@@ -23,6 +28,8 @@ public class Main {
         // create my custom visitor
         MyXQueryVisitor visitor = new MyXQueryVisitor();
 
-        visitor.visit(tree);
+        List<Node> result = (List<Node>)visitor.visit(tree);
+        System.out.println("Number of nodes: " + result.size());
+        System.out.println(result);
     }
 }
