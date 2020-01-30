@@ -25,9 +25,9 @@ TAGNAME             # rp_tag
 | 'text()'          # rp_text
 | '@' ATTRINAME     # rp_att
 | LPAREN rp RPAREN  # rp_paren
+| rp '[' filter ']' # rp_filter
 | rp DOUBLESLASH rp # rp_double_slash
 | rp SLASH rp       # rp_slash // should I use slash? here or start another alternative?
-| rp '[' filter ']' # rp_filter
 | rp ',' rp         # rp_comma
 ;
 
@@ -48,6 +48,20 @@ rp                  # f_rp
 ;
 
 /* Lexer rules: */
+
+/* be sure to put this part before tagname/namestring and stuff
+ * otherwise the parser may match to tagname/namestring
+ * before keywords like 'and' and 'or'.
+*/
+UNDERSCORE: '_' ;
+EQ: 'eq' ;
+IS: 'is' ;
+AND: 'and' ;
+OR: 'or' ;
+NOT: 'not' ;
+NEWLINE:'\r'? '\n' ;     // return newlines to parser (is end-statement signal)
+WS  :   [ \t]+ -> skip ; // toss out whitespace
+
 TAGNAME: NAMESTRING ;
 NAMESTRING:
 ( 'a' .. 'z'
@@ -63,12 +77,3 @@ DOUBLESLASH: '//' ;
 SLASH: '/' ;
 
 FILENAME: '"' [a-zA-Z0-9./_]* '"';
-
-UNDERSCORE: '_' ;
-EQ: 'eq' ;
-IS: 'is' ;
-AND: 'and' ;
-OR: 'or' ;
-NOT: 'not' ;
-NEWLINE:'\r'? '\n' ;     // return newlines to parser (is end-statement signal)
-WS  :   [ \t]+ -> skip ; // toss out whitespace

@@ -29,7 +29,7 @@ public class Main {
         MyXQueryVisitor visitor = new MyXQueryVisitor();
 
         List<Node> result = (List<Node>)visitor.visit(tree);
-        System.out.println("Number of nodes: " + result.size());
+        System.out.println("\nNumber of nodes: " + result.size());
         System.out.println(result);
     }
 }
