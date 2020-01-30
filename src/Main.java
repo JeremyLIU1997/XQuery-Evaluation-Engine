@@ -31,5 +31,8 @@ public class Main {
         List<Node> result = (List<Node>)visitor.visit(tree);
         System.out.println("\nNumber of nodes: " + result.size());
         System.out.println(result);
+
     }
 }
+
+

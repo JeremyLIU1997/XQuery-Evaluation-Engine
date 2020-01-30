@@ -58,7 +58,9 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
 
         for (int i = 0; i < nodeList.getLength(); i++) {
             yet_to_visit.add(nodeList.item(i));
-            out.addAll( (List<Node>)this.visit(ctx.rp()));
+            for (Node node : (List<Node>)this.visit(ctx.rp()))
+                if ( ! out.contains(node) )
+                    out.add(node);
         }
         return out;
     }
@@ -89,6 +91,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         return out;
     }
 
+
     @Override
     public Object visitRp_anyTag(XQueryParser.Rp_anyTagContext ctx) {
         List<Node> out = new ArrayList<Node>();
@@ -101,34 +104,45 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         return out;
     }
 
+    @Override
+    public Object visitRp_slash(XQueryParser.Rp_slashContext ctx) {
+        List<Node> out = new ArrayList<Node>();
+        if (yet_to_visit.isEmpty())
+            return out;
+
+        for (Node node1: deduplicate((List<Node>) this.visit(ctx.rp(0))) ) {
+            yet_to_visit.add(node1);
+            for (Node node2: (List<Node>)this.visit(ctx.rp(1)))
+                if ( ! out.contains(node2))
+                    out.add(node2);
+        }
+        return out;
+    }
+
     @Override public Object visitRp_double_slash(XQueryParser.Rp_double_slashContext ctx) {
         List<Node> out = new ArrayList<Node>();
 
-        List<Node> intermediateResult = (List<Node>)this.visit(ctx.rp(0)); // return of the first rp
-        intermediateResult = deduplicate(intermediateResult);
-
-        for (int i = 0; i < intermediateResult.size(); i++) { // for every node in nodeList, do double_slash
+        for ( Node node1: deduplicate((List<Node>)this.visit(ctx.rp(0))) ) { // for every node in nodeList, do double_slash
             /* For every node in nodeList, find self or descendent */
             List<Node> selfOrDescendent = new ArrayList<Node>();
 
-            List<Node> temp = new ArrayList<Node>(); // for traversal
-            temp.add(intermediateResult.get(i)); // add root (the self node)
-            while (!temp.isEmpty())  { // bfs traversal of DOM tree
-                Node node = temp.remove(0);
+            List<Node> queue = new ArrayList<Node>(); // for traversal
+            queue.add(node1); // add root (the self node)
+            while (!queue.isEmpty())  { // bfs traversal of DOM tree
+                Node node = queue.remove(0);
                 selfOrDescendent.add(node);
                 NodeList children = node.getChildNodes();
                 /* add all ELEMENT children to temp */
                 for (int j = 0; j < children.getLength(); j++)
                     if (children.item(j).getNodeType() == Node.ELEMENT_NODE)
-                        temp.add(children.item(j));
+                        queue.add(children.item(j));
             }
             /* Now all self or descendent nodes found, do double slash for each */
             for (int j = 0; j < selfOrDescendent.size(); j++) {
                 yet_to_visit.add(selfOrDescendent.get(j));
-                List<Node> temp2 = (List<Node>)this.visit(ctx.rp(1));
-                for (int k = 0; k < temp2.size(); k++)
-                    if (! out.contains(temp.get(k)))
-                        out.add(temp.get(k));
+                for (Node node2: (List<Node>)this.visit(ctx.rp(1)))
+                    if (! out.contains(node2))
+                        out.add(node2);
             }
         }
         return out;
@@ -138,12 +152,6 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
     public Object visitRp_comma(XQueryParser.Rp_commaContext ctx) {
         Node temp = yet_to_visit.get(0);
         List<Node> out = (List<Node>)this.visit(ctx.rp(0));
-        /* add back the original DOM node for the second visit.
-        * this is special because usually there is only one call
-        * to visit on the same DOM node. In this case, the first
-        * visit() removed the node from yet_to_visit(), we need
-        * to manualy add back for the second visit();
-        */
         yet_to_visit.add(temp);
         out.addAll((List<Node>)this.visit(ctx.rp(1)));
         return out;
@@ -215,25 +223,6 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
             if (reverseMap.containsKey(i))
                 out.add(reverseMap.get(i));
 
-        return out;
-    }
-
-    @Override
-    public Object visitRp_slash(XQueryParser.Rp_slashContext ctx) {
-        List<Node> out = new ArrayList<Node>();
-        if (yet_to_visit.isEmpty())
-            return out;
-
-        List<Node> intermediate_result = (List<Node>) this.visit(ctx.rp(0));
-        intermediate_result = deduplicate(intermediate_result); // deduplicate the intermediate result from the first rp.
-
-        for (int i = 0; i < intermediate_result.size(); i++) {
-            yet_to_visit.add(intermediate_result.get(i));
-            List<Node> temp = (List<Node>)this.visit(ctx.rp(1));
-            for (int j = 0; j < temp.size(); j++)
-                if (! out.contains(temp.get(j)))
-                    out.add(temp.get(j));
-        }
         return out;
     }
 
