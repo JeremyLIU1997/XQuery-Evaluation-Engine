@@ -287,7 +287,9 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
 
     @Override
     public Object visitF_eq(XQueryParser.F_eqContext ctx) {
+        Node node = yet_to_visit.get(0);
         List<Node> list1 = (List<Node>)this.visit(ctx.rp(0));
+        yet_to_visit.add(node);
         List<Node> list2 = (List<Node>)this.visit(ctx.rp(1));
 
         for (int i = 0; i < list1.size(); i++)
@@ -309,6 +311,5 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
                     return true;
         return false;
     }
-
 }
 

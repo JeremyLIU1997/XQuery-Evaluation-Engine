@@ -25,14 +25,21 @@ public class Main {
         XQueryParser parser = new XQueryParser(tokens);
         ParseTree tree = parser.ap();
 
-        // create my custom visitor
+        // create my custom visitor and evaluate query
         MyXQueryVisitor visitor = new MyXQueryVisitor();
-
         List<Node> result = (List<Node>)visitor.visit(tree);
-        System.out.println("\nNumber of nodes: " + result.size());
-        System.out.println(result);
 
+        /* printing results */
+        System.out.println("\nNumber of nodes: " + result.size());
+        TreeNodePrinter printer = new TreeNodePrinter();
+        int i = 1;
+        for (Node node: result) {
+            System.out.println("\n***** Node #" + i++ + "  *****");
+            printer.printNode(node);
+        }
     }
+
+
 }
 
 
