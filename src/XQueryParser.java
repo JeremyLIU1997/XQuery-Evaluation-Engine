@@ -18,8 +18,8 @@ public class XQueryParser extends Parser {
 	public static final int
 		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, T__7=8, T__8=9, 
 		T__9=10, T__10=11, UNDERSCORE=12, EQ=13, IS=14, AND=15, OR=16, NOT=17, 
-		NEWLINE=18, WS=19, TAGNAME=20, NAMESTRING=21, ATTRINAME=22, LPAREN=23, 
-		RPAREN=24, DOUBLESLASH=25, SLASH=26, FILENAME=27;
+		NEWLINE=18, WS=19, NAMESTRING=20, LPAREN=21, RPAREN=22, DOUBLESLASH=23, 
+		SLASH=24, FILENAME=25;
 	public static final int
 		RULE_ap = 0, RULE_rp = 1, RULE_filter = 2;
 	private static String[] makeRuleNames() {
@@ -33,16 +33,15 @@ public class XQueryParser extends Parser {
 		return new String[] {
 			null, "'doc'", "'*'", "'.'", "'..'", "'text()'", "'@'", "'['", "']'", 
 			"','", "'='", "'=='", "'_'", "'eq'", "'is'", "'and'", "'or'", "'not'", 
-			null, null, null, null, null, "'('", "')'", "'//'", "'/'"
+			null, null, null, "'('", "')'", "'//'", "'/'"
 		};
 	}
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();
 	private static String[] makeSymbolicNames() {
 		return new String[] {
 			null, null, null, null, null, null, null, null, null, null, null, null, 
-			"UNDERSCORE", "EQ", "IS", "AND", "OR", "NOT", "NEWLINE", "WS", "TAGNAME", 
-			"NAMESTRING", "ATTRINAME", "LPAREN", "RPAREN", "DOUBLESLASH", "SLASH", 
-			"FILENAME"
+			"UNDERSCORE", "EQ", "IS", "AND", "OR", "NOT", "NEWLINE", "WS", "NAMESTRING", 
+			"LPAREN", "RPAREN", "DOUBLESLASH", "SLASH", "FILENAME"
 		};
 	}
 	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
@@ -238,7 +237,7 @@ public class XQueryParser extends Parser {
 		}
 	}
 	public static class Rp_tagContext extends RpContext {
-		public TerminalNode TAGNAME() { return getToken(XQueryParser.TAGNAME, 0); }
+		public TerminalNode NAMESTRING() { return getToken(XQueryParser.NAMESTRING, 0); }
 		public Rp_tagContext(RpContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
@@ -391,7 +390,7 @@ public class XQueryParser extends Parser {
 		}
 	}
 	public static class Rp_attContext extends RpContext {
-		public TerminalNode ATTRINAME() { return getToken(XQueryParser.ATTRINAME, 0); }
+		public TerminalNode NAMESTRING() { return getToken(XQueryParser.NAMESTRING, 0); }
 		public Rp_attContext(RpContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
@@ -449,14 +448,14 @@ public class XQueryParser extends Parser {
 			setState(32);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
-			case TAGNAME:
+			case NAMESTRING:
 				{
 				_localctx = new Rp_tagContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
 
 				setState(21);
-				match(TAGNAME);
+				match(NAMESTRING);
 				}
 				break;
 			case T__1:
@@ -503,7 +502,7 @@ public class XQueryParser extends Parser {
 				setState(26);
 				match(T__5);
 				setState(27);
-				match(ATTRINAME);
+				match(NAMESTRING);
 				}
 				break;
 			case LPAREN:
@@ -962,27 +961,27 @@ public class XQueryParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\35]\4\2\t\2\4\3\t"+
+		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\33]\4\2\t\2\4\3\t"+
 		"\3\4\4\t\4\3\2\3\2\3\2\3\2\3\2\3\2\3\2\3\2\3\2\3\2\3\2\3\2\5\2\25\n\2"+
 		"\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\5\3#\n\3\3\3\3\3\3\3"+
 		"\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\7\3\63\n\3\f\3\16\3\66\13"+
 		"\3\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4"+
 		"\3\4\3\4\3\4\3\4\3\4\3\4\3\4\5\4P\n\4\3\4\3\4\3\4\3\4\3\4\3\4\7\4X\n\4"+
 		"\f\4\16\4[\13\4\3\4\2\4\4\6\5\2\4\6\2\2\2l\2\24\3\2\2\2\4\"\3\2\2\2\6"+
-		"O\3\2\2\2\b\t\7\3\2\2\t\n\7\31\2\2\n\13\7\35\2\2\13\f\7\32\2\2\f\r\7\33"+
-		"\2\2\r\25\5\4\3\2\16\17\7\3\2\2\17\20\7\31\2\2\20\21\7\35\2\2\21\22\7"+
-		"\32\2\2\22\23\7\34\2\2\23\25\5\4\3\2\24\b\3\2\2\2\24\16\3\2\2\2\25\3\3"+
+		"O\3\2\2\2\b\t\7\3\2\2\t\n\7\27\2\2\n\13\7\33\2\2\13\f\7\30\2\2\f\r\7\31"+
+		"\2\2\r\25\5\4\3\2\16\17\7\3\2\2\17\20\7\27\2\2\20\21\7\33\2\2\21\22\7"+
+		"\30\2\2\22\23\7\32\2\2\23\25\5\4\3\2\24\b\3\2\2\2\24\16\3\2\2\2\25\3\3"+
 		"\2\2\2\26\27\b\3\1\2\27#\7\26\2\2\30#\7\4\2\2\31#\7\5\2\2\32#\7\6\2\2"+
-		"\33#\7\7\2\2\34\35\7\b\2\2\35#\7\30\2\2\36\37\7\31\2\2\37 \5\4\3\2 !\7"+
-		"\32\2\2!#\3\2\2\2\"\26\3\2\2\2\"\30\3\2\2\2\"\31\3\2\2\2\"\32\3\2\2\2"+
-		"\"\33\3\2\2\2\"\34\3\2\2\2\"\36\3\2\2\2#\64\3\2\2\2$%\f\5\2\2%&\7\33\2"+
-		"\2&\63\5\4\3\6\'(\f\4\2\2()\7\34\2\2)\63\5\4\3\5*+\f\3\2\2+,\7\13\2\2"+
+		"\33#\7\7\2\2\34\35\7\b\2\2\35#\7\26\2\2\36\37\7\27\2\2\37 \5\4\3\2 !\7"+
+		"\30\2\2!#\3\2\2\2\"\26\3\2\2\2\"\30\3\2\2\2\"\31\3\2\2\2\"\32\3\2\2\2"+
+		"\"\33\3\2\2\2\"\34\3\2\2\2\"\36\3\2\2\2#\64\3\2\2\2$%\f\5\2\2%&\7\31\2"+
+		"\2&\63\5\4\3\6\'(\f\4\2\2()\7\32\2\2)\63\5\4\3\5*+\f\3\2\2+,\7\13\2\2"+
 		",\63\5\4\3\4-.\f\6\2\2./\7\t\2\2/\60\5\6\4\2\60\61\7\n\2\2\61\63\3\2\2"+
 		"\2\62$\3\2\2\2\62\'\3\2\2\2\62*\3\2\2\2\62-\3\2\2\2\63\66\3\2\2\2\64\62"+
 		"\3\2\2\2\64\65\3\2\2\2\65\5\3\2\2\2\66\64\3\2\2\2\678\b\4\1\28P\5\4\3"+
 		"\29:\5\4\3\2:;\7\f\2\2;<\5\4\3\2<P\3\2\2\2=>\5\4\3\2>?\7\17\2\2?@\5\4"+
 		"\3\2@P\3\2\2\2AB\5\4\3\2BC\7\r\2\2CD\5\4\3\2DP\3\2\2\2EF\5\4\3\2FG\7\20"+
-		"\2\2GH\5\4\3\2HP\3\2\2\2IJ\7\31\2\2JK\5\6\4\2KL\7\32\2\2LP\3\2\2\2MN\7"+
+		"\2\2GH\5\4\3\2HP\3\2\2\2IJ\7\27\2\2JK\5\6\4\2KL\7\30\2\2LP\3\2\2\2MN\7"+
 		"\23\2\2NP\5\6\4\3O\67\3\2\2\2O9\3\2\2\2O=\3\2\2\2OA\3\2\2\2OE\3\2\2\2"+
 		"OI\3\2\2\2OM\3\2\2\2PY\3\2\2\2QR\f\5\2\2RS\7\21\2\2SX\5\6\4\6TU\f\4\2"+
 		"\2UV\7\22\2\2VX\5\6\4\5WQ\3\2\2\2WT\3\2\2\2X[\3\2\2\2YW\3\2\2\2YZ\3\2"+

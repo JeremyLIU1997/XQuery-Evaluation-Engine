@@ -45,11 +45,6 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
     @Override
     public Object visitAp_double_slash(XQueryParser.Ap_double_slashContext ctx) {
 
-        /*
-         * is it possible to reuse visitRp_self and visitRp_slash
-         * to implement this function?
-         */
-
         String filename = ctx.FILENAME().getText(); // find file path
         Document doc = openInputFile(filename); // open file
 
@@ -74,7 +69,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         for (int i = 0; i < nodeList.getLength(); i++) {
             if (nodeList.item(i).getNodeType() == Node.ELEMENT_NODE) {
                 /* if current tag of the context node is equal to the current DOM node name */
-                if ( nodeList.item(i).getNodeName().equals(ctx.TAGNAME().getText()) )
+                if ( nodeList.item(i).getNodeName().equals(ctx.NAMESTRING().getText()) )
                         out.add(nodeList.item(i));
             }
         }
@@ -200,7 +195,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         List<Node> out = new ArrayList<Node>();
         if (yet_to_visit.isEmpty())
             return out;
-        String att = ctx.ATTRINAME().getText();
+        String att = ctx.NAMESTRING().getText();
         Node node = yet_to_visit.remove(0);
         node = node.getAttributes().getNamedItem(att);
         if (node != null)
@@ -259,11 +254,11 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
 
         Node node = yet_to_visit.get(0);
 
-        if ( ((List<Node>)this.visit(ctx.filter(0))).size() != 0)
+        if ( (boolean)this.visit(ctx.filter(0)))
             return true;
         else {
             yet_to_visit.add(node);
-            return ((List<Node>)this.visit(ctx.filter(1))).size() != 0;
+            return (boolean)this.visit(ctx.filter(1));
         }
     }
 
@@ -277,11 +272,11 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
 
         Node node = yet_to_visit.get(0);
 
-        if ( ((List<Node>)this.visit(ctx.filter(1))).size() == 0 )
+        if ( (boolean)this.visit(ctx.filter(1)) )
             return false;
         else {
             yet_to_visit.add(node);
-            return ((List<Node>)this.visit(ctx.filter(1))).size() != 0;
+            return (boolean)this.visit(ctx.filter(1));
         }
     }
 

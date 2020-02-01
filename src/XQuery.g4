@@ -18,12 +18,12 @@ ap:
                 | (rp) | rp1/rp2 | rp1//rp2 | rp[f] | rp1,rp2
 */
 rp:
-TAGNAME             # rp_tag
+NAMESTRING          # rp_tag // NAMESTRING here is meant to represent tag name
 | '*'               # rp_anyTag
 | '.'               # rp_self
 | '..'              # rp_parent
 | 'text()'          # rp_text
-| '@' ATTRINAME     # rp_att
+| '@' NAMESTRING    # rp_att // NAMESTRING here is meant to represent attribute name
 | LPAREN rp RPAREN  # rp_paren
 | rp '[' filter ']' # rp_filter
 | rp DOUBLESLASH rp # rp_double_slash
@@ -62,7 +62,6 @@ NOT: 'not' ;
 NEWLINE:'\r'? '\n' ;     // return newlines to parser (is end-statement signal)
 WS  :   [ \t]+ -> skip ; // toss out whitespace
 
-TAGNAME: NAMESTRING ;
 NAMESTRING:
 ( 'a' .. 'z'
 | 'A' .. 'Z'
@@ -70,7 +69,7 @@ NAMESTRING:
 | UNDERSCORE
 )+        // one or more
 ;
-ATTRINAME: NAMESTRING ;
+
 LPAREN: '(' ;
 RPAREN: ')' ;
 DOUBLESLASH: '//' ;
