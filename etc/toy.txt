@@ -1,1 +1,1 @@
-doc("./etc/modified_j_caesar.xml")//TITLE[@nmb and @cnm]
+doc("./etc/j_caesar.xml")/PLAY/FM/@name/..

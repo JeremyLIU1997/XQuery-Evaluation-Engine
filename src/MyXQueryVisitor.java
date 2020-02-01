@@ -198,6 +198,14 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         String att = ctx.NAMESTRING().getText();
         Node node = yet_to_visit.remove(0);
         node = node.getAttributes().getNamedItem(att);
+
+        /* test */
+        if (node != null)
+            System.out.println(true);
+        else
+            System.out.println(false);
+
+
         if (node != null)
             out.add(node);
         return out;
