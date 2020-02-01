@@ -3,3 +3,14 @@ doc("./etc/j_caesar.xml")//ACT[./TITLE]/*/SPEECH/../TITLE
 doc("./etc/j_caesar.xml")//ACT[./TITLE]/*/SPEECH/../*/.././TITLE
 doc("./etc/j_caesar.xml")//ACT[(./TITLE)==(./TITLE)]/*/SPEECH/../TITLE
 doc("./etc/j_caesar.xml")//ACT[not(./TITLE)==(./TITLE)]/*/SPEECH/../TITLE
+
+
+# my own test cases below
+doc("./etc/j_caesar.xml")//TITLE[@id and @xxx]
+doc("./etc/j_caesar.xml")//PERSONA[@id or @xxx]
+doc("./etc/j_caesar.xml")//LINE[text()]
+doc("./etc/j_caesar.xml")//ACT[(./TITLE) eq (..//TITLE)]/*/SPEECH/../TITLE
+
+doc("./etc/modified_j_caesar.xml")//TITLE[@nmb and @cnm]
+doc("./etc/modified_j_caesar.xml")//TITLE[@nmb or @cnm]
+

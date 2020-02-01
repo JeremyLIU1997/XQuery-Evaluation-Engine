@@ -272,7 +272,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
 
         Node node = yet_to_visit.get(0);
 
-        if ( (boolean)this.visit(ctx.filter(1)) )
+        if ( ! (boolean)this.visit(ctx.filter(1)) )
             return false;
         else {
             yet_to_visit.add(node);
