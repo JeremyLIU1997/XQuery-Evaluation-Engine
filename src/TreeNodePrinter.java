@@ -15,6 +15,27 @@ public class TreeNodePrinter {
         out = new PrintWriter(new OutputStreamWriter(System.out,outputEncoding),true);
     }
 
+    public void prettyPrint(Node node, String tab)
+    {
+        if (node.getNodeType() == Node.TEXT_NODE)
+        {
+            System.out.print(tab);
+            System.out.println(node.getNodeValue());
+        }
+        else if (node.getNodeType() == Node.ELEMENT_NODE)
+        {
+            System.out.print(tab);
+            System.out.println("<" + node.getNodeName() + ">");
+            NodeList kids = node.getChildNodes();
+            for (int i = 0; i < kids.getLength(); i++)
+            {
+                prettyPrint(kids.item(i), tab + "  ");
+            }
+            System.out.print(tab);
+            System.out.println("</" + node.getNodeName() + ">");
+        }
+    }
+
     private void outputIndentation() {
         for (int i = 0; i < indent; i++) {
             out.print(basicIndent);
@@ -140,8 +161,7 @@ public class TreeNodePrinter {
         }
 
         indent++;
-        for (Node child = n.getFirstChild(); child != null;
-             child = child.getNextSibling()) {
+        for (Node child = n.getFirstChild(); child != null; child = child.getNextSibling()) {
             printNode(child);
         }
         indent--;

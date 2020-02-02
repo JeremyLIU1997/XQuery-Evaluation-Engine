@@ -31,7 +31,7 @@ doc("./etc/j_caesar.xml")/PLAY/FM/@name/../..
 
 doc("./etc/j_caesar.xml")/PLAY/FM/@name/../@name
 
-doc("./etc/j_caesar.xml")//PERSONA/
+doc("./etc/j_caesar.xml")//PERSONA
 
 doc("./etc/j_caesar.xml")/PLAY/FM/@nam
 
