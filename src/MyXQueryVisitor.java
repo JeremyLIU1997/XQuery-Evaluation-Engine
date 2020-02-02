@@ -38,21 +38,24 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
     public Object visitAp_slash(XQueryParser.Ap_slashContext ctx) {
         String filename = ctx.FILENAME().getText(); // find file path
         Document doc = openInputFile(filename); // open file
-        yet_to_visit.add(doc.getDocumentElement());  // add the XML root
+        yet_to_visit.add(doc);  // add the XML root
         return this.visit(ctx.rp());
     }
 
     @Override
     public Object visitAp_double_slash(XQueryParser.Ap_double_slashContext ctx) {
-
         String filename = ctx.FILENAME().getText(); // find file path
         Document doc = openInputFile(filename); // open file
 
         List<Node> out = new ArrayList<Node>();
         NodeList nodeList = doc.getElementsByTagName("*");
 
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            yet_to_visit.add(nodeList.item(i));
+        for (int i = -1; i < nodeList.getLength(); i++) {
+            if (i < 0)
+                yet_to_visit.add(doc);
+            else
+                yet_to_visit.add(nodeList.item(i));
+
             for (Node node : (List<Node>)this.visit(ctx.rp()))
                 if ( ! out.contains(node) )
                     out.add(node);

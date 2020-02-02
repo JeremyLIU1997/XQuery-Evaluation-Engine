@@ -61,13 +61,13 @@ doc("./etc/j_caesar.xml")/PLAY/PERSONAE/PGROUP/PERSONA[./text() is text()]/, 27)
 
 doc("./etc/j_caesar.xml")/PLAY/PERSONAE/PGROUP/PERSONA[(./text() is text()) or not (./text() is text())]/, 27);
 
-doc("./etc/j_caesar.xml")//SPEAKER/, 1596 / 2);
+doc("./etc/j_caesar.xml")//SPEAKER
 
-doc("./etc/j_caesar.xml")//SPEECH/, 1590 / 2);
+doc("./etc/j_caesar.xml")//SPEECH
 
-doc("./etc/j_caesar.xml")//LINE/text()/, 5192 / 2);
+doc("./etc/j_caesar.xml")//LINE/text()
 
-doc("./etc/j_caesar.xml")//*[@name]/, 2);
+doc("./etc/j_caesar.xml")//*[@name]
 
 doc("./etc/j_caesar.xml")//(ACT,PERSONAE)/TITLE/, 6);
 
