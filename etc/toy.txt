@@ -1,1 +1,1 @@
-doc("./etc/modified_j_caesar.xml")//@nmb
+doc("./etc/j_caesar.xml")//ACT[not(./TITLE)==(./TITLE)]/*/SPEECH/../TITLE

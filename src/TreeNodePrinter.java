@@ -17,6 +17,9 @@ public class TreeNodePrinter {
 
     public void prettyPrint(Node node, String tab)
     {
+        if (node == null)
+            return;
+
         if (node.getNodeType() == Node.TEXT_NODE)
         {
             System.out.print(tab);

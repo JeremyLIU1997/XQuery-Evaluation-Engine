@@ -39,6 +39,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         String filename = ctx.FILENAME().getText(); // find file path
         Document doc = openInputFile(filename); // open file
         yet_to_visit.add(doc);  // add the XML root
+
         return this.visit(ctx.rp());
     }
 
@@ -68,6 +69,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         List<Node> out = new ArrayList<Node>();
         if (yet_to_visit.isEmpty())
             return out;
+
         NodeList nodeList = yet_to_visit.remove(0).getChildNodes();
         for (int i = 0; i < nodeList.getLength(); i++) {
             if (nodeList.item(i).getNodeType() == Node.ELEMENT_NODE) {
@@ -84,8 +86,12 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         List<Node> out = new ArrayList<Node>();
         if (yet_to_visit.isEmpty())
             return out;
+        if (yet_to_visit.get(0).getParentNode() == null) {
+            yet_to_visit.remove(0);
+            return out;
+        }
 
-        out.add(yet_to_visit.remove(0).getParentNode()); // what happens when DOM context is root?
+        out.add(yet_to_visit.remove(0).getParentNode());
         return out;
     }
 
@@ -201,8 +207,9 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         String att = ctx.NAMESTRING().getText();
 
         Node node = yet_to_visit.remove(0);
+        /* when node == doc, getAttributes() returns null !!! */
         if (node.getAttributes() == null)
-            return out; // when node == doc, getAttributes() returns null!
+            return out;
 
         node = node.getAttributes().getNamedItem(att);
 
