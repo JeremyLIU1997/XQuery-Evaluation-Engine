@@ -199,7 +199,11 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         if (yet_to_visit.isEmpty())
             return out;
         String att = ctx.NAMESTRING().getText();
+
         Node node = yet_to_visit.remove(0);
+        if (node.getAttributes() == null)
+            return out; // when node == doc, getAttributes() returns null!
+
         node = node.getAttributes().getNamedItem(att);
 
         if (node != null)

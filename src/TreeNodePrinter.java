@@ -43,6 +43,8 @@ public class TreeNodePrinter {
             System.out.print(tab);
             System.out.println("</" + node.getNodeName() + ">");
         }
+        else if (node.getNodeType() == Node.ATTRIBUTE_NODE)
+            System.out.println(node);
     }
 
     private void outputIndentation() {
