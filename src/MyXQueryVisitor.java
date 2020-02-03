@@ -268,7 +268,6 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
             return false;
 
         Node node = yet_to_visit.get(0);
-
         if ( (boolean)this.visit(ctx.filter(0)))
             return true;
         else {
@@ -286,8 +285,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
             return false;
 
         Node node = yet_to_visit.get(0);
-
-        if ( ! (boolean)this.visit(ctx.filter(1)) )
+        if ( ! (boolean)this.visit(ctx.filter(0)) )
             return false;
         else {
             yet_to_visit.add(node);
