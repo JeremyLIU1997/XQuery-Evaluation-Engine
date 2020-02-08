@@ -320,5 +320,29 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
                     return true;
         return false;
     }
+
+    @Override public Object visitXq_str(XQueryParser.Xq_strContext ctx) { return visitChildren(ctx); }
+    @Override public Object visitXq_slash_rp(XQueryParser.Xq_slash_rpContext ctx) { return visitChildren(ctx); }
+    @Override public Object visitXq_paren(XQueryParser.Xq_parenContext ctx) { return visitChildren(ctx); }
+    @Override public Object visitXq_double_slash_rp(XQueryParser.Xq_double_slash_rpContext ctx) { return visitChildren(ctx); }
+    @Override public Object visitXq_ap(XQueryParser.Xq_apContext ctx) { return visitChildren(ctx); }
+    @Override public Object visitXq_var(XQueryParser.Xq_varContext ctx) { return visitChildren(ctx); }
+    @Override public Object visitXq_FLWR(XQueryParser.Xq_FLWRContext ctx) { return visitChildren(ctx); }
+    @Override public Object visitXq_constructor(XQueryParser.Xq_constructorContext ctx) { return visitChildren(ctx); }
+    @Override public Object visitXq_let(XQueryParser.Xq_letContext ctx) { return visitChildren(ctx); }
+    @Override public Object visitXq_comma(XQueryParser.Xq_commaContext ctx) { return visitChildren(ctx); }
+    @Override public Object visitForClause(XQueryParser.ForClauseContext ctx) { return visitChildren(ctx); }
+    @Override public Object visitLetClause(XQueryParser.LetClauseContext ctx) { return visitChildren(ctx); }
+    @Override public Object visitWhereClause(XQueryParser.WhereClauseContext ctx) { return visitChildren(ctx); }
+    @Override public Object visitReturnClause(XQueryParser.ReturnClauseContext ctx) { return visitChildren(ctx); }
+    @Override public Object visitCond_and(XQueryParser.Cond_andContext ctx) { return visitChildren(ctx); }
+    @Override public Object visitCond_empty(XQueryParser.Cond_emptyContext ctx) { return visitChildren(ctx); }
+    @Override public Object visitCond_eq(XQueryParser.Cond_eqContext ctx) { return visitChildren(ctx); }
+    @Override public Object visitCond_is(XQueryParser.Cond_isContext ctx) { return visitChildren(ctx); }
+    @Override public Object visitCond_paren(XQueryParser.Cond_parenContext ctx) { return visitChildren(ctx); }
+    @Override public Object visitCond_some(XQueryParser.Cond_someContext ctx) { return visitChildren(ctx); }
+    @Override public Object visitCond_not(XQueryParser.Cond_notContext ctx) { return visitChildren(ctx); }
+    @Override public Object visitCond_or(XQueryParser.Cond_orContext ctx) { return visitChildren(ctx); }
+
 }
 

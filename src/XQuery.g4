@@ -46,7 +46,7 @@ RETURN xq
 ;
 
 /*
-Cond → XQ1 =XQ2 |XQ1 eqXQ2 | XQ1==XQ2|XQ1isXQ2
+Cond → XQ1 = XQ2 | XQ1 eq XQ2 | XQ1==XQ2 | XQ1 is XQ2
 | empty(X Q1 )
 | some Var1 in XQ1,...,Varn in XQn satisfies Cond
 | (Cond1) | Cond1 and Cond2 | Cond1 or Cond2 | not Cond1
