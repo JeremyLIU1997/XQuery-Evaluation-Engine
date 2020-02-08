@@ -2,7 +2,69 @@
 grammar XQuery;
 
 /* Parser rules: */
-/* The start rule ap (absolute path), parsing begins here */
+/* The start rule xq (xquery), parsing begins here */
+
+/*
+XQ → Var | StringConstant | ap
+| (XQ1) | XQ1, XQ2 | XQ1/rp| XQ1//rp
+| ⟨tagName⟩{X Q1 }⟨/tagName⟩
+| forClause letClause whereClause returnClause | letClause XQ1
+*/
+xq:
+  VAR                   # xq_var
+| STRING                # xq_str
+| ap                    # xq_ap
+| '(' xq ')'            # xq_paren
+| xq ',' xq             # xq_comma
+| xq DOUBLESLASH rp     # xq_double_slash_rp
+| xq SLASH rp           # xq_slash_rp
+| '<' NAMESTRING '>' '{' xq '}' '<' SLASH NAMESTRING '>'   # xq_constructor   // NAMESTRING here denotes TAGNAME
+| forClause letClause whereClause returnClause             # xq_FLWR
+| letClause             # xq_let
+;
+
+/* forClause → for Var1 in XQ1,Var2 in XQ2,...,Varn in XQn */
+forClause:
+FOR VAR IN xq (',' FOR VAR IN xq)*
+;
+
+/* letClause → ε | letVarn+1 :=XQn+1,...,Varn+k :=XQn+k */
+letClause:
+             // can be empty
+| LET VAR '=' xq (',' LET VAR '=' xq)*
+;
+
+/* whereClause → ε | where Cond */
+whereClause:
+             // can be empty
+| WHERE condition
+;
+
+/* returnClause → return XQ1 */
+returnClause:
+RETURN xq
+;
+
+/*
+Cond → XQ1 =XQ2 |XQ1 eqXQ2 | XQ1==XQ2|XQ1isXQ2
+| empty(X Q1 )
+| some Var1 in XQ1,...,Varn in XQn satisfies Cond
+| (Cond1) | Cond1 and Cond2 | Cond1 or Cond2 | not Cond1
+*/
+condition:
+  xq '=' xq             # cond_eq
+| xq EQ xq              # cond_eq
+| xq '==' xq            # cond_is
+| xq IS xq              # cond_is
+| EMPTY '(' xq ')'      # cond_empty
+| SOME VAR IN xq (',' VAR IN xq)* SATISFIES condition       # cond_some
+| LPAREN condition RPAREN   # cond_paren
+| condition AND condition   # cond_and
+| condition OR condition    # cond_or
+| NOT condition             # cond_not
+;
+
+
 /*
 (absolute path) ap -> doc(fileName)/rp
                     | doc(fileName)//rp
@@ -53,14 +115,27 @@ rp                  # f_rp
  * otherwise the parser may match to tagname/namestring
  * before keywords like 'and' and 'or'.
 */
-UNDERSCORE: '_' ;
 EQ: 'eq' ;
 IS: 'is' ;
 AND: 'and' ;
 OR: 'or' ;
 NOT: 'not' ;
+
+IN: 'in' ;
+FOR: 'for' ;
+LET: 'let' ;
+WHERE: 'where' ;
+EMPTY: 'empty' ;
+SOME: 'some' ;
+SATISFIES: 'satisfies' ;
+RETURN: 'return' ;
+
+UNDERSCORE: '_' ;
+VAR: '$' NAMESTRING ;
+
 NEWLINE:'\r'? '\n' ;     // return newlines to parser (is end-statement signal)
 WS  :   [ \t]+ -> skip ; // toss out whitespace
+
 
 NAMESTRING:
 ( 'a' .. 'z'
@@ -68,6 +143,10 @@ NAMESTRING:
 | '0' .. '9'
 | UNDERSCORE
 )+        // one or more
+;
+
+STRING:
+'"' [a-zA-Z0-9,:;./_=()&^%$#@!~`\\|?<>]* '"'
 ;
 
 LPAREN: '(' ;

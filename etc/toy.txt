@@ -1,1 +1,1 @@
-doc("./etc/j_caesar.xml")//ACT[not(./TITLE)==(./TITLE)]/*/SPEECH/../TITLE
+doc("./etc/j_caesar.xml")//(ACT,PERSONAE)/TITLE

@@ -14,6 +14,9 @@ doc("./etc/j_caesar.xml")//ACT[(./TITLE) eq (..//TITLE)]/*/SPEECH/../TITLE
 doc("./etc/modified_j_caesar.xml")//TITLE[@nmb and @cnm]
 doc("./etc/modified_j_caesar.xml")//TITLE[@nmb or @cnm]
 
+doc("./etc/j_caesar.xml")//..
+doc("./etc/j_caesar.xml")//../..
+doc("./etc/j_caesar.xml")//..//..
 
 
 

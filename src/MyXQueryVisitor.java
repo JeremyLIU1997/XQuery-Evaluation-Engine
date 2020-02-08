@@ -30,8 +30,9 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         catch (Exception e) {
             System.out.println("File open error, exit.");
             e.printStackTrace();
-            return null;
+            System.exit(1);
         }
+        return null;
     }
 
     @Override
