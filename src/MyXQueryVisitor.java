@@ -407,8 +407,15 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         
     }
 
-    @Override public Object visitWhereClause(XQueryParser.WhereClauseContext ctx) { return visitChildren(ctx); }
-    @Override public Object visitReturnClause(XQueryParser.ReturnClauseContext ctx) { return visitChildren(ctx); }
+    @Override
+    public Object visitWhereClause(XQueryParser.WhereClauseContext ctx) {
+        return (Boolean)this.visit(ctx.condition());
+    }
+
+    @Override
+    public Object visitReturnClause(XQueryParser.ReturnClauseContext ctx) {
+        return this.visit(ctx.xq());
+    }
 
     @Override public Object visitCond_and(XQueryParser.Cond_andContext ctx) {
         return false;
