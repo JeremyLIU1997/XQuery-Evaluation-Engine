@@ -80,7 +80,7 @@ ap:
 ;
 
 /*
-(relative path) rp -> tagName|∗|.|..|text()|@attName
+(relative path) rp -> tagName | ∗ | . | .. | text() | @attName
                 | (rp) | rp1/rp2 | rp1//rp2 | rp[f] | rp1,rp2
 */
 rp:

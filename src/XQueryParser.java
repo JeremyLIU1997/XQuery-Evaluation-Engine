@@ -129,11 +129,6 @@ public class XQueryParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitXq_str(this);
 		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitXq_str(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 	public static class Xq_slash_rpContext extends XqContext {
 		public XqContext xq() {
@@ -152,11 +147,6 @@ public class XQueryParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitXq_slash_rp(this);
 		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitXq_slash_rp(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 	public static class Xq_parenContext extends XqContext {
 		public TerminalNode LPAREN() { return getToken(XQueryParser.LPAREN, 0); }
@@ -172,11 +162,6 @@ public class XQueryParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitXq_paren(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitXq_paren(this);
-			else return visitor.visitChildren(this);
 		}
 	}
 	public static class Xq_double_slash_rpContext extends XqContext {
@@ -196,11 +181,6 @@ public class XQueryParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitXq_double_slash_rp(this);
 		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitXq_double_slash_rp(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 	public static class Xq_apContext extends XqContext {
 		public ApContext ap() {
@@ -215,11 +195,6 @@ public class XQueryParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitXq_ap(this);
 		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitXq_ap(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 	public static class Xq_varContext extends XqContext {
 		public VarContext var() {
@@ -233,11 +208,6 @@ public class XQueryParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitXq_var(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitXq_var(this);
-			else return visitor.visitChildren(this);
 		}
 	}
 	public static class Xq_FLWRContext extends XqContext {
@@ -262,11 +232,6 @@ public class XQueryParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitXq_FLWR(this);
 		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitXq_FLWR(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 	public static class Xq_constructorContext extends XqContext {
 		public List<TagnameContext> tagname() {
@@ -288,11 +253,6 @@ public class XQueryParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitXq_constructor(this);
 		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitXq_constructor(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 	public static class Xq_letContext extends XqContext {
 		public LetClauseContext letClause() {
@@ -306,11 +266,6 @@ public class XQueryParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitXq_let(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitXq_let(this);
-			else return visitor.visitChildren(this);
 		}
 	}
 	public static class Xq_commaContext extends XqContext {
@@ -328,11 +283,6 @@ public class XQueryParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitXq_comma(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitXq_comma(this);
-			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -550,11 +500,6 @@ public class XQueryParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitStringconst(this);
 		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitStringconst(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final StringconstContext stringconst() throws RecognitionException {
@@ -602,11 +547,6 @@ public class XQueryParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitVar(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitVar(this);
-			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -665,11 +605,6 @@ public class XQueryParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitForClause(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitForClause(this);
-			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -752,11 +687,6 @@ public class XQueryParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitLetClause(this);
 		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitLetClause(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final LetClauseContext letClause() throws RecognitionException {
@@ -828,11 +758,6 @@ public class XQueryParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitWhereClause(this);
 		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitWhereClause(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final WhereClauseContext whereClause() throws RecognitionException {
@@ -874,11 +799,6 @@ public class XQueryParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitReturnClause(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitReturnClause(this);
-			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -933,11 +853,6 @@ public class XQueryParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitCond_and(this);
 		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitCond_and(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 	public static class Cond_emptyContext extends ConditionContext {
 		public TerminalNode EMPTY() { return getToken(XQueryParser.EMPTY, 0); }
@@ -954,11 +869,6 @@ public class XQueryParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitCond_empty(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitCond_empty(this);
-			else return visitor.visitChildren(this);
 		}
 	}
 	public static class Cond_eqContext extends ConditionContext {
@@ -978,11 +888,6 @@ public class XQueryParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitCond_eq(this);
 		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitCond_eq(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 	public static class Cond_isContext extends ConditionContext {
 		public List<XqContext> xq() {
@@ -1001,11 +906,6 @@ public class XQueryParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitCond_is(this);
 		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitCond_is(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 	public static class Cond_parenContext extends ConditionContext {
 		public TerminalNode LPAREN() { return getToken(XQueryParser.LPAREN, 0); }
@@ -1021,11 +921,6 @@ public class XQueryParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitCond_paren(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitCond_paren(this);
-			else return visitor.visitChildren(this);
 		}
 	}
 	public static class Cond_someContext extends ConditionContext {
@@ -1059,11 +954,6 @@ public class XQueryParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitCond_some(this);
 		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitCond_some(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 	public static class Cond_notContext extends ConditionContext {
 		public TerminalNode NOT() { return getToken(XQueryParser.NOT, 0); }
@@ -1078,11 +968,6 @@ public class XQueryParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitCond_not(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitCond_not(this);
-			else return visitor.visitChildren(this);
 		}
 	}
 	public static class Cond_orContext extends ConditionContext {
@@ -1101,11 +986,6 @@ public class XQueryParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitCond_or(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitCond_or(this);
-			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1346,11 +1226,6 @@ public class XQueryParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitAp_slash(this);
 		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitAp_slash(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 	public static class Ap_double_slashContext extends ApContext {
 		public TerminalNode LPAREN() { return getToken(XQueryParser.LPAREN, 0); }
@@ -1370,11 +1245,6 @@ public class XQueryParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitAp_double_slash(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitAp_double_slash(this);
-			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1455,11 +1325,6 @@ public class XQueryParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitRp_parent(this);
 		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitRp_parent(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 	public static class Rp_tagContext extends RpContext {
 		public TagnameContext tagname() {
@@ -1474,11 +1339,6 @@ public class XQueryParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitRp_tag(this);
 		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitRp_tag(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 	public static class Rp_anyTagContext extends RpContext {
 		public Rp_anyTagContext(RpContext ctx) { copyFrom(ctx); }
@@ -1489,11 +1349,6 @@ public class XQueryParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitRp_anyTag(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitRp_anyTag(this);
-			else return visitor.visitChildren(this);
 		}
 	}
 	public static class Rp_double_slashContext extends RpContext {
@@ -1513,11 +1368,6 @@ public class XQueryParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitRp_double_slash(this);
 		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitRp_double_slash(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 	public static class Rp_commaContext extends RpContext {
 		public List<RpContext> rp() {
@@ -1535,11 +1385,6 @@ public class XQueryParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitRp_comma(this);
 		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitRp_comma(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 	public static class Rp_selfContext extends RpContext {
 		public Rp_selfContext(RpContext ctx) { copyFrom(ctx); }
@@ -1551,11 +1396,6 @@ public class XQueryParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitRp_self(this);
 		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitRp_self(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 	public static class Rp_textContext extends RpContext {
 		public Rp_textContext(RpContext ctx) { copyFrom(ctx); }
@@ -1566,11 +1406,6 @@ public class XQueryParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitRp_text(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitRp_text(this);
-			else return visitor.visitChildren(this);
 		}
 	}
 	public static class Rp_filterContext extends RpContext {
@@ -1589,11 +1424,6 @@ public class XQueryParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitRp_filter(this);
 		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitRp_filter(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 	public static class Rp_parenContext extends RpContext {
 		public TerminalNode LPAREN() { return getToken(XQueryParser.LPAREN, 0); }
@@ -1610,11 +1440,6 @@ public class XQueryParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitRp_paren(this);
 		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitRp_paren(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 	public static class Rp_attContext extends RpContext {
 		public AttrinameContext attriname() {
@@ -1628,11 +1453,6 @@ public class XQueryParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitRp_att(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitRp_att(this);
-			else return visitor.visitChildren(this);
 		}
 	}
 	public static class Rp_slashContext extends RpContext {
@@ -1651,11 +1471,6 @@ public class XQueryParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitRp_slash(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitRp_slash(this);
-			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1857,11 +1672,6 @@ public class XQueryParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitF_not(this);
 		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitF_not(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 	public static class F_parenContext extends FilterContext {
 		public TerminalNode LPAREN() { return getToken(XQueryParser.LPAREN, 0); }
@@ -1877,11 +1687,6 @@ public class XQueryParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitF_paren(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitF_paren(this);
-			else return visitor.visitChildren(this);
 		}
 	}
 	public static class F_orContext extends FilterContext {
@@ -1901,11 +1706,6 @@ public class XQueryParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitF_or(this);
 		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitF_or(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 	public static class F_andContext extends FilterContext {
 		public List<FilterContext> filter() {
@@ -1924,11 +1724,6 @@ public class XQueryParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitF_and(this);
 		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitF_and(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 	public static class F_rpContext extends FilterContext {
 		public RpContext rp() {
@@ -1942,11 +1737,6 @@ public class XQueryParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitF_rp(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitF_rp(this);
-			else return visitor.visitChildren(this);
 		}
 	}
 	public static class F_eqContext extends FilterContext {
@@ -1966,11 +1756,6 @@ public class XQueryParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitF_eq(this);
 		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitF_eq(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 	public static class F_isContext extends FilterContext {
 		public List<RpContext> rp() {
@@ -1988,11 +1773,6 @@ public class XQueryParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitF_is(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitF_is(this);
-			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -2171,11 +1951,6 @@ public class XQueryParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitFilename(this);
 		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitFilename(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final FilenameContext filename() throws RecognitionException {
@@ -2213,11 +1988,6 @@ public class XQueryParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitTagname(this);
 		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitTagname(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final TagnameContext tagname() throws RecognitionException {
@@ -2254,11 +2024,6 @@ public class XQueryParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitAttriname(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitAttriname(this);
-			else return visitor.visitChildren(this);
 		}
 	}
 

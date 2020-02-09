@@ -1,3 +1,4 @@
+import com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderImpl;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
@@ -10,10 +11,21 @@ import javax.xml.parsers.*;
 import java.io.*;
 
 public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
-    private Map<String, Integer> map = new HashMap<String, Integer>();
-    private List<Node> yet_to_visit = new ArrayList<>(); // to store DOM nodes yet to visit
-    //private Document globalDoc;//now equals the opened file, not sure if we need to create a new document
+    class Value {
+        Object val;
+        public Value(Object val) {
+            this.val = val;
+        }
+        boolean is_List() {
+            return this.val instanceof ArrayList;
+        }
+        boolean is_Node() {
+            return this.val instanceof Node;
+        }
+    }
 
+    private Map<String, Value> bindings = new HashMap<>();
+    private List<Node> yet_to_visit = new ArrayList<>(); // to store DOM nodes yet to visit
 
     private Document openInputFile(String filename) {
         try {
@@ -41,7 +53,6 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
     public Object visitAp_slash(XQueryParser.Ap_slashContext ctx) {
         String filename = ctx.filename().getText(); // find file path
         Document doc = openInputFile(filename); // open file
-        //globalDoc = doc;
         yet_to_visit.add(doc);  // add the XML root
         return this.visit(ctx.rp());
     }
@@ -97,7 +108,6 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         out.add(yet_to_visit.remove(0).getParentNode());
         return out;
     }
-
 
     @Override
     public Object visitRp_anyTag(XQueryParser.Rp_anyTagContext ctx) {
@@ -275,7 +285,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
             return true;
         else {
             yet_to_visit.add(node);
-            return (boolean)this.visit(ctx.filter(1));
+            return this.visit(ctx.filter(1));
         }
     }
 
@@ -323,47 +333,92 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         return false;
     }
 
+    /* Milestone 2 functions */
     @Override
     public Object visitXq_str(XQueryParser.Xq_strContext ctx) {
-        //get string from ctx
-        String StringConstant = ctx.getText().replace("\"", "");//?
-        //create new text node
-        //Node newTextNode = globalDoc.createTextNode(StringConstant);
-        //return newTextNode;
-
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        String StringConstant = ctx.getText();
+        List<Node> out = new ArrayList<Node>();
         try {
-            Document newDoc = dbf.newDocumentBuilder().newDocument();
-            return newDoc.createTextNode(StringConstant);
-        } catch (ParserConfigurationException ex) {
+            out.add( DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument().createTextNode(StringConstant) );
+            return out;
+        } catch (ParserConfigurationException e) {
+            System.out.println("ParserConfigurationException, exit.");
+            System.exit(3);
+            return null;
+        }
+    }
+
+    @Override public Object visitXq_double_slash_rp(XQueryParser.Xq_double_slash_rpContext ctx) { return visitChildren(ctx); }
+
+    @Override public Object visitXq_slash_rp(XQueryParser.Xq_slash_rpContext ctx) {
+        return null;
+    }
+
+    @Override
+    public Object visitXq_paren(XQueryParser.Xq_parenContext ctx) {
+        return (List<Node>)this.visit(ctx.xq());
+    }
+
+    @Override
+    public Object visitXq_ap(XQueryParser.Xq_apContext ctx) {
+        return (List<Node>)this.visit(ctx.ap());
+    }
+
+    @Override public Object visitXq_var(XQueryParser.Xq_varContext ctx) { return visitChildren(ctx); }
+    @Override public Object visitXq_FLWR(XQueryParser.Xq_FLWRContext ctx) { return visitChildren(ctx); }
+
+    private Node makeElem(String tag, List<Node> children) {
+        try {
+            Document newDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+            Node out = newDoc.createElement(tag);
+            for (int i = 0; i < children.size(); i++)
+                out.appendChild(children.get(i));
+            return out;
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+            System.out.println("ParserConfigurationException, exit.");
+            System.exit(1);
             return null;
         }
     }
 
     @Override
-    public Object visitXq_var(XQueryParser.Xq_varContext ctx) {
-        Node node = yet_to_visit.get(0);
-        List<Node> out = new ArrayList<>();
-
-        return visitChildren(ctx);
-
+    public Object visitXq_constructor(XQueryParser.Xq_constructorContext ctx) {
+        if ( ! ctx.tagname(0).getText().equals(ctx.tagname(1).getText())) {
+            System.out.println("Opening and closing tags don't match: "
+                    + ctx.tagname(0).getText() + " != "
+                    + ctx.tagname(1).getText()
+                    + ". Exit.");
+            System.exit(2);
+        }
+        return this.makeElem(ctx.tagname(0).getText(), (List<Node>)this.visit(ctx.xq()));
     }
 
-    @Override public Object visitXq_slash_rp(XQueryParser.Xq_slash_rpContext ctx) { return visitChildren(ctx); }
-    @Override public Object visitXq_paren(XQueryParser.Xq_parenContext ctx) { return visitChildren(ctx); }
-    @Override public Object visitXq_double_slash_rp(XQueryParser.Xq_double_slash_rpContext ctx) { return visitChildren(ctx); }
-    @Override public Object visitXq_ap(XQueryParser.Xq_apContext ctx) { return visitChildren(ctx); }
+    @Override
+    public Object visitXq_let(XQueryParser.Xq_letContext ctx) {
+        return null;
+    }
 
-    @Override public Object visitXq_FLWR(XQueryParser.Xq_FLWRContext ctx) { return visitChildren(ctx); }
-    @Override public Object visitXq_constructor(XQueryParser.Xq_constructorContext ctx) { return visitChildren(ctx); }
-    @Override public Object visitXq_let(XQueryParser.Xq_letContext ctx) { return visitChildren(ctx); }
     @Override public Object visitXq_comma(XQueryParser.Xq_commaContext ctx) { return visitChildren(ctx); }
     @Override public Object visitForClause(XQueryParser.ForClauseContext ctx) { return visitChildren(ctx); }
-    @Override public Object visitLetClause(XQueryParser.LetClauseContext ctx) { return visitChildren(ctx); }
+
+    @Override
+    public Object visitLetClause(XQueryParser.LetClauseContext ctx) {
+        
+    }
+
     @Override public Object visitWhereClause(XQueryParser.WhereClauseContext ctx) { return visitChildren(ctx); }
     @Override public Object visitReturnClause(XQueryParser.ReturnClauseContext ctx) { return visitChildren(ctx); }
-    @Override public Object visitCond_and(XQueryParser.Cond_andContext ctx) { return visitChildren(ctx); }
-    @Override public Object visitCond_empty(XQueryParser.Cond_emptyContext ctx) { return visitChildren(ctx); }
+
+    @Override public Object visitCond_and(XQueryParser.Cond_andContext ctx) {
+        return false;
+    }
+
+    @Override
+    public Object visitCond_empty(XQueryParser.Cond_emptyContext ctx) {
+        return (Boolean)(((List<Node>)this.visit(ctx.xq())).size() == 0);
+    }
+
     @Override public Object visitCond_eq(XQueryParser.Cond_eqContext ctx) { return visitChildren(ctx); }
     @Override public Object visitCond_is(XQueryParser.Cond_isContext ctx) { return visitChildren(ctx); }
     @Override public Object visitCond_paren(XQueryParser.Cond_parenContext ctx) { return visitChildren(ctx); }
