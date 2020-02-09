@@ -137,6 +137,16 @@ public interface XQueryListener extends ParseTreeListener {
 	 */
 	void exitStringconst(XQueryParser.StringconstContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link XQueryParser#var}.
+	 * @param ctx the parse tree
+	 */
+	void enterVar(XQueryParser.VarContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link XQueryParser#var}.
+	 * @param ctx the parse tree
+	 */
+	void exitVar(XQueryParser.VarContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link XQueryParser#forClause}.
 	 * @param ctx the parse tree
 	 */

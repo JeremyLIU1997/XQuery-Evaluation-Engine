@@ -86,6 +86,12 @@ public interface XQueryVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitStringconst(XQueryParser.StringconstContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link XQueryParser#var}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitVar(XQueryParser.VarContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link XQueryParser#forClause}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

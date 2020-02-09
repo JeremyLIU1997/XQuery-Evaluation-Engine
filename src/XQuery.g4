@@ -11,35 +11,38 @@ XQ → Var | StringConstant | ap
 | forClause letClause whereClause returnClause | letClause XQ1
 */
 xq:
-  VAR                   # xq_var
+  var                   # xq_var
 | stringconst           # xq_str
 | ap                    # xq_ap
 | '(' xq ')'            # xq_paren
 | xq ',' xq             # xq_comma
 | xq DOUBLESLASH rp     # xq_double_slash_rp
 | xq SLASH rp           # xq_slash_rp
-| '<' NAMESTRING '>' '{' xq '}' '<' SLASH NAMESTRING '>'   # xq_constructor   // NAMESTRING here denotes TAGNAME
-| forClause letClause whereClause returnClause             # xq_FLWR
+| '<' tagname '>' '{' xq '}' '<' SLASH tagname '>'   # xq_constructor
+| forClause letClause? whereClause? returnClause     # xq_FLWR
 | letClause             # xq_let
 ;
 
-stringconst: STRING ;
+stringconst:
+  STRING
+| FILENAME
+;
+
+var: '$' tagname;
 
 /* forClause → for Var1 in XQ1,Var2 in XQ2,...,Varn in XQn */
 forClause:
-FOR VAR IN xq (',' FOR VAR IN xq)*
+FOR var IN xq (',' FOR var IN xq)*
 ;
 
 /* letClause → ε | letVarn+1 :=XQn+1,...,Varn+k :=XQn+k */
 letClause:
-LET VAR ':=' xq (',' LET VAR ':=' xq)*
-|
+LET var ':=' xq (',' LET var ':=' xq)*
 ;
 
 /* whereClause → ε | where Cond */
 whereClause:
 WHERE condition
-|
 ;
 
 /* returnClause → return XQ1 */
@@ -59,7 +62,7 @@ condition:
 | xq '==' xq            # cond_is
 | xq IS xq              # cond_is
 | EMPTY '(' xq ')'      # cond_empty
-| SOME VAR IN xq (',' VAR IN xq)* SATISFIES condition       # cond_some
+| SOME var IN xq (',' var IN xq)* SATISFIES condition       # cond_some
 | LPAREN condition RPAREN   # cond_paren
 | condition AND condition   # cond_and
 | condition OR condition    # cond_or
@@ -136,17 +139,13 @@ SATISFIES: 'satisfies' ;
 RETURN: 'return' ;
 
 UNDERSCORE: '_' ;
-VAR: '$' NAMESTRING ;
 
-NEWLINE:'\r'? '\n' ;     // return newlines to parser (is end-statement signal)
-WS  :   [ \t]+ -> skip ; // toss out whitespace
+//NEWLINE:'\r'? '\n' ;     // return newlines to parser (is end-statement signal)
+WS  :   [ \t\n]+ -> skip ; // toss out whitespace
 
-FILENAME: '"' [a-zA-Z0-9./_]* '"';
+FILENAME: '"' [a-zA-Z0-9./_]* '"' ;
 STRING: '"' [a-zA-Z0-9./_,:;=()&^%$#@!~`\\|?<>]* '"' ;
-
-NAMESTRING:
-[a-zA-Z0-9_]+    // one or more
-;
+NAMESTRING: [a-zA-Z0-9_]+ ;
 
 DOUBLESLASH: '//' ;
 SLASH: '/' ;
