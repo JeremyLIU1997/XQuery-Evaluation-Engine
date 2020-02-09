@@ -80,6 +80,12 @@ public interface XQueryVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitXq_comma(XQueryParser.Xq_commaContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link XQueryParser#stringconst}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitStringconst(XQueryParser.StringconstContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link XQueryParser#forClause}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -299,4 +305,22 @@ public interface XQueryVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitF_is(XQueryParser.F_isContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link XQueryParser#filename}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFilename(XQueryParser.FilenameContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link XQueryParser#tagname}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitTagname(XQueryParser.TagnameContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link XQueryParser#attriname}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAttriname(XQueryParser.AttrinameContext ctx);
 }

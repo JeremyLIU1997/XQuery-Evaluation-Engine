@@ -127,6 +127,16 @@ public interface XQueryListener extends ParseTreeListener {
 	 */
 	void exitXq_comma(XQueryParser.Xq_commaContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link XQueryParser#stringconst}.
+	 * @param ctx the parse tree
+	 */
+	void enterStringconst(XQueryParser.StringconstContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link XQueryParser#stringconst}.
+	 * @param ctx the parse tree
+	 */
+	void exitStringconst(XQueryParser.StringconstContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link XQueryParser#forClause}.
 	 * @param ctx the parse tree
 	 */
@@ -502,4 +512,34 @@ public interface XQueryListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitF_is(XQueryParser.F_isContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link XQueryParser#filename}.
+	 * @param ctx the parse tree
+	 */
+	void enterFilename(XQueryParser.FilenameContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link XQueryParser#filename}.
+	 * @param ctx the parse tree
+	 */
+	void exitFilename(XQueryParser.FilenameContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link XQueryParser#tagname}.
+	 * @param ctx the parse tree
+	 */
+	void enterTagname(XQueryParser.TagnameContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link XQueryParser#tagname}.
+	 * @param ctx the parse tree
+	 */
+	void exitTagname(XQueryParser.TagnameContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link XQueryParser#attriname}.
+	 * @param ctx the parse tree
+	 */
+	void enterAttriname(XQueryParser.AttrinameContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link XQueryParser#attriname}.
+	 * @param ctx the parse tree
+	 */
+	void exitAttriname(XQueryParser.AttrinameContext ctx);
 }

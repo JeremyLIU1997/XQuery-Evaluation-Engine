@@ -12,7 +12,7 @@ XQ → Var | StringConstant | ap
 */
 xq:
   VAR                   # xq_var
-| STRING                # xq_str
+| stringconst           # xq_str
 | ap                    # xq_ap
 | '(' xq ')'            # xq_paren
 | xq ',' xq             # xq_comma
@@ -23,6 +23,8 @@ xq:
 | letClause             # xq_let
 ;
 
+stringconst: STRING ;
+
 /* forClause → for Var1 in XQ1,Var2 in XQ2,...,Varn in XQn */
 forClause:
 FOR VAR IN xq (',' FOR VAR IN xq)*
@@ -30,14 +32,14 @@ FOR VAR IN xq (',' FOR VAR IN xq)*
 
 /* letClause → ε | letVarn+1 :=XQn+1,...,Varn+k :=XQn+k */
 letClause:
-             // can be empty
-| LET VAR '=' xq (',' LET VAR '=' xq)*
+LET VAR ':=' xq (',' LET VAR ':=' xq)*
+|
 ;
 
 /* whereClause → ε | where Cond */
 whereClause:
-             // can be empty
-| WHERE condition
+WHERE condition
+|
 ;
 
 /* returnClause → return XQ1 */
@@ -69,10 +71,9 @@ condition:
 (absolute path) ap -> doc(fileName)/rp
                     | doc(fileName)//rp
 */
-
 ap:
-    'doc' LPAREN FILENAME RPAREN DOUBLESLASH rp     # ap_double_slash
-|   'doc' LPAREN FILENAME RPAREN SLASH rp           # ap_slash
+    'doc' LPAREN filename RPAREN DOUBLESLASH rp     # ap_double_slash
+|   'doc' LPAREN filename RPAREN SLASH rp           # ap_slash
 ;
 
 /*
@@ -80,12 +81,12 @@ ap:
                 | (rp) | rp1/rp2 | rp1//rp2 | rp[f] | rp1,rp2
 */
 rp:
-NAMESTRING          # rp_tag // NAMESTRING here is meant to represent tag name
+tagname             # rp_tag
 | '*'               # rp_anyTag
 | '.'               # rp_self
 | '..'              # rp_parent
 | 'text()'          # rp_text
-| '@' NAMESTRING    # rp_att // NAMESTRING here is meant to represent attribute name
+| '@' attriname     # rp_att
 | LPAREN rp RPAREN  # rp_paren
 | rp '[' filter ']' # rp_filter
 | rp DOUBLESLASH rp # rp_double_slash
@@ -108,6 +109,10 @@ rp                  # f_rp
 | filter OR filter      # f_or
 | NOT filter            # f_not
 ;
+
+filename: FILENAME ;
+tagname: NAMESTRING ;
+attriname: NAMESTRING ;
 
 /* Lexer rules: */
 
@@ -136,22 +141,16 @@ VAR: '$' NAMESTRING ;
 NEWLINE:'\r'? '\n' ;     // return newlines to parser (is end-statement signal)
 WS  :   [ \t]+ -> skip ; // toss out whitespace
 
+FILENAME: '"' [a-zA-Z0-9./_]* '"';
+STRING: '"' [a-zA-Z0-9./_,:;=()&^%$#@!~`\\|?<>]* '"' ;
 
 NAMESTRING:
-( 'a' .. 'z'
-| 'A' .. 'Z'
-| '0' .. '9'
-| UNDERSCORE
-)+        // one or more
+[a-zA-Z0-9_]+    // one or more
 ;
 
-STRING:
-'"' [a-zA-Z0-9,:;./_=()&^%$#@!~`\\|?<>]* '"'
-;
-
-LPAREN: '(' ;
-RPAREN: ')' ;
 DOUBLESLASH: '//' ;
 SLASH: '/' ;
 
-FILENAME: '"' [a-zA-Z0-9./_]* '"';
+LPAREN: '(' ;
+RPAREN: ')' ;
+

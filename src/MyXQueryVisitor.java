@@ -13,6 +13,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
     private Map<String, Integer> map = new HashMap<String, Integer>();
     private List<Node> yet_to_visit = new ArrayList<>(); // to store DOM nodes yet to visit
 
+
     private Document openInputFile(String filename) {
         try {
             // create DOM document parser and parse input file
@@ -37,16 +38,15 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
 
     @Override
     public Object visitAp_slash(XQueryParser.Ap_slashContext ctx) {
-        String filename = ctx.FILENAME().getText(); // find file path
+        String filename = ctx.filename().getText(); // find file path
         Document doc = openInputFile(filename); // open file
         yet_to_visit.add(doc);  // add the XML root
-
         return this.visit(ctx.rp());
     }
 
     @Override
     public Object visitAp_double_slash(XQueryParser.Ap_double_slashContext ctx) {
-        String filename = ctx.FILENAME().getText(); // find file path
+        String filename = ctx.filename().getText(); // find file path
         Document doc = openInputFile(filename); // open file
 
         List<Node> out = new ArrayList<Node>();
@@ -75,7 +75,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         for (int i = 0; i < nodeList.getLength(); i++) {
             if (nodeList.item(i).getNodeType() == Node.ELEMENT_NODE) {
                 /* if current tag of the context node is equal to the current DOM node name */
-                if ( nodeList.item(i).getNodeName().equals(ctx.NAMESTRING().getText()) )
+                if ( nodeList.item(i).getNodeName().equals(ctx.tagname().getText()) )
                         out.add(nodeList.item(i));
             }
         }
@@ -205,7 +205,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         List<Node> out = new ArrayList<Node>();
         if (yet_to_visit.isEmpty())
             return out;
-        String att = ctx.NAMESTRING().getText();
+        String att = ctx.attriname().getText();
 
         Node node = yet_to_visit.remove(0);
         /* when node == doc, getAttributes() returns null !!! */
