@@ -24,7 +24,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         }
     }
 
-    private Map<String, Value> bindings = new HashMap<>();
+    private Map<String, List<Node>> bindings = new HashMap<>();
     private List<Node> yet_to_visit = new ArrayList<>(); // to store DOM nodes yet to visit
 
     private Document openInputFile(String filename) {
@@ -364,7 +364,10 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         return (List<Node>)this.visit(ctx.ap());
     }
 
-    @Override public Object visitXq_var(XQueryParser.Xq_varContext ctx) { return visitChildren(ctx); }
+    @Override public List<Node> visitXq_var(XQueryParser.Xq_varContext ctx) {
+        return bindings.get(ctx.var().getText());
+    }
+
     @Override public Object visitXq_FLWR(XQueryParser.Xq_FLWRContext ctx) { return visitChildren(ctx); }
 
     private Node makeElem(String tag, List<Node> children) {
@@ -396,15 +399,28 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
 
     @Override
     public Object visitXq_let(XQueryParser.Xq_letContext ctx) {
+        this.visit(ctx.letClause());
         return null;
     }
 
     @Override public Object visitXq_comma(XQueryParser.Xq_commaContext ctx) { return visitChildren(ctx); }
-    @Override public Object visitForClause(XQueryParser.ForClauseContext ctx) { return visitChildren(ctx); }
+
+    @Override
+    public Object visitForClause(XQueryParser.ForClauseContext ctx) {
+        String[] varNames = new String[ctx.var().size()];
+        List<List<Node>> lists = new ArrayList<>();
+        for (int i = 0; i < ctx.xq().size(); i++) {
+            lists.add((List<Node>)this.visit(ctx.xq(i)));
+            varNames[i] = ctx.var(i).getText();
+        }
+        return  new ForIterator(varNames,lists);
+    }
 
     @Override
     public Object visitLetClause(XQueryParser.LetClauseContext ctx) {
-        
+        for (int i = 0; i < ctx.var().size(); i++)
+            bindings.put(ctx.var(i).getText(), (List<Node>)this.visit(ctx.xq(i)));
+        return null;
     }
 
     @Override
