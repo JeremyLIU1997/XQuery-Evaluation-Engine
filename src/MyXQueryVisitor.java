@@ -490,6 +490,43 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         return (Boolean) (((List<Node>) this.visit(ctx.xq())).size() == 0);
     }
 
+
+    @Override
+    public Object visitCond_some(XQueryParser.Cond_someContext ctx) {
+        //1. build local Iterator
+        String[] varNames = new String[ctx.var().size()];
+        List<List<Node>> lists = new ArrayList<>();
+        for (int i = 0; i < ctx.xq().size(); i++) {
+            lists.add((List<Node>)this.visit(ctx.xq(i)));
+            varNames[i] = ctx.var(i).getText();
+        }
+        ForIterator iter =   new ForIterator(varNames,lists);
+
+//        2.Iterate localIterator
+        mem_stack.add(new HashMap<String, List<Node>>()); // push onto stack a new context
+        HashMap<String, List<Node>> context = mem_stack.get(mem_stack.size() - 1);
+        ArrayList<Node> out = new ArrayList<>();
+
+        /* this while loop iterates all the bindings in FOR clause */
+        while (iter.hasNext()) {
+            List<Node> vals = iter.next();
+            /* put bindings in current context */
+            for (int i = 0; i < vals.size(); i++){
+                List<Node> temp = new ArrayList<>();
+                temp.add(vals.get(i));
+                context.put(iter.getVarName(i), temp);
+            }
+            if ((boolean)this.visit(ctx.condition())) return true;
+
+        }
+        /* pop the context from the stack */
+        mem_stack.remove(mem_stack.size() - 1);
+        return false;
+
+
+    }
+
+
     @Override
     public Object visitCond_eq(XQueryParser.Cond_eqContext ctx) {
         return visitChildren(ctx);
@@ -502,11 +539,6 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
 
     @Override
     public Object visitCond_paren(XQueryParser.Cond_parenContext ctx) {
-        return visitChildren(ctx);
-    }
-
-    @Override
-    public Object visitCond_some(XQueryParser.Cond_someContext ctx) {
         return visitChildren(ctx);
     }
 
