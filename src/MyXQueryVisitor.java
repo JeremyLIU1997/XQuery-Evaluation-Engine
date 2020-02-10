@@ -390,8 +390,11 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         while (iter.hasNext()) {
             List<Node> vals = iter.next();
             /* put bindings in current context */
-            for (int i = 0; i < vals.size(); i++)
-                context.put(iter.getVarName(i), vals.get(i));
+            for (int i = 0; i < vals.size(); i++) {
+                List<Node> temp = new ArrayList<>();
+                temp.add(vals.get(i));
+                context.put(iter.getVarName(i), temp);
+            }
 
             if (ctx.letClause() != null)
                 this.visit(ctx.letClause());
