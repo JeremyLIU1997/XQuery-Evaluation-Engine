@@ -358,9 +358,10 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         return null;
     }
 
+
     @Override
     public Object visitXq_paren(XQueryParser.Xq_parenContext ctx) {
-        return (List<Node>) this.visit(ctx.xq());
+        return this.visit(ctx.xq());
     }
 
     @Override
@@ -437,7 +438,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
                     + ". Exit.");
             System.exit(2);
         }
-        out.add( this.makeElem(ctx.tagname(0).getText(), (List<Node>) this.visit(ctx.xq())) );
+        out.add(this.makeElem(ctx.tagname(0).getText(), (List<Node>) this.visit(ctx.xq())));
         return out;
     }
 
@@ -482,12 +483,12 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
 
     @Override
     public Object visitCond_and(XQueryParser.Cond_andContext ctx) {
-        return false;
+        return (boolean) this.visit(ctx.condition(0)) && (boolean) this.visit(ctx.condition(1));
     }
 
     @Override
     public Object visitCond_empty(XQueryParser.Cond_emptyContext ctx) {
-        return (Boolean) (((List<Node>) this.visit(ctx.xq())).size() == 0);
+        return ((List<Node>) this.visit(ctx.xq())).size() == 0;
     }
 
 
@@ -497,13 +498,13 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         String[] varNames = new String[ctx.var().size()];
         List<List<Node>> lists = new ArrayList<>();
         for (int i = 0; i < ctx.xq().size(); i++) {
-            lists.add((List<Node>)this.visit(ctx.xq(i)));
+            lists.add((List<Node>) this.visit(ctx.xq(i)));
             varNames[i] = ctx.var(i).getText();
         }
-        ForIterator iter =   new ForIterator(varNames,lists);
+        ForIterator iter = new ForIterator(varNames, lists);
 
-//        2.Iterate localIterator
-        mem_stack.add(new HashMap<String, List<Node>>()); // push onto stack a new context
+        //        2.Iterate localIterator
+        mem_stack.add(new HashMap<String, List<Node>>());       // push onto stack a new context
         HashMap<String, List<Node>> context = mem_stack.get(mem_stack.size() - 1);
         ArrayList<Node> out = new ArrayList<>();
 
@@ -511,45 +512,60 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         while (iter.hasNext()) {
             List<Node> vals = iter.next();
             /* put bindings in current context */
-            for (int i = 0; i < vals.size(); i++){
+            for (int i = 0; i < vals.size(); i++) {
                 List<Node> temp = new ArrayList<>();
                 temp.add(vals.get(i));
                 context.put(iter.getVarName(i), temp);
             }
-            if ((boolean)this.visit(ctx.condition())) return true;
-
+            if ((boolean) this.visit(ctx.condition())) {
+                mem_stack.remove(mem_stack.size() - 1);
+                return true;
+            }
         }
         /* pop the context from the stack */
         mem_stack.remove(mem_stack.size() - 1);
         return false;
-
 
     }
 
 
     @Override
     public Object visitCond_eq(XQueryParser.Cond_eqContext ctx) {
-        return visitChildren(ctx);
+        List<Node> list1 = (List<Node>) this.visit(ctx.xq(0));
+        List<Node> list2 = (List<Node>) this.visit(ctx.xq(1));
+        for (int i = 0; i < list1.size(); i++)
+            for (int j = 0; j < list2.size(); j++)
+                if (list1.get(i).isEqualNode(list2.get(j)))
+                    return true;
+
+        return false;
     }
 
     @Override
     public Object visitCond_is(XQueryParser.Cond_isContext ctx) {
-        return visitChildren(ctx);
+        List<Node> list1 = (List<Node>) this.visit(ctx.xq(0));
+        List<Node> list2 = (List<Node>) this.visit(ctx.xq(1));
+        for (int i = 0; i < list1.size(); i++)
+            for (int j = 0; j < list2.size(); j++)
+                if (list1.get(i).isSameNode(list2.get(j)))
+                    return true;
+
+        return false;
     }
 
     @Override
     public Object visitCond_paren(XQueryParser.Cond_parenContext ctx) {
-        return visitChildren(ctx);
+        return this.visit(ctx.condition());
     }
 
     @Override
     public Object visitCond_not(XQueryParser.Cond_notContext ctx) {
-        return visitChildren(ctx);
+        return !(boolean) this.visit(ctx.condition());
     }
 
     @Override
     public Object visitCond_or(XQueryParser.Cond_orContext ctx) {
-        return visitChildren(ctx);
+        return (boolean) this.visit(ctx.condition(0)) || (boolean) this.visit(ctx.condition(1));
     }
 
 }
