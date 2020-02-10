@@ -52,7 +52,6 @@ public class ForIterator {
                 out.add(null);
                 continue;
             }
-
             int old = indices[i];
             indices[i] = (indices[i] + 1) % (this.lists.get(i).size());
             if (indices[i] > old)
