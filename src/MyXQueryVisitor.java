@@ -24,7 +24,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
             filename = filename.replace("\"", "");
             File inputFile = new File(filename);
             Document doc = dBuilder.parse(inputFile);
-
+            doc = dBuilder.parse(inputFile);
             doc.getDocumentElement().normalize(); // what does this do?
             return doc;
         } // end of try
@@ -411,19 +411,29 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
             if (ctx.letClause() != null)
                 this.visit(ctx.letClause());
 
+            int stackSizeBeforeReturn = mem_stack.size();
+
             boolean whereReturnVal = true;
             if (ctx.whereClause() != null)
                 whereReturnVal = (boolean) this.visit(ctx.whereClause());
 
-            /* restore the mem_stack */
-            while (mem_stack.size() != oldStackSize)
-                mem_stack.remove(mem_stack.size() - 1);
 
             /* if where condition false, simply continue */
-            if (!whereReturnVal)
+            if (!whereReturnVal) {
+                /* restore the mem_stack */
+                while (mem_stack.size() != oldStackSize)
+                    mem_stack.remove(mem_stack.size() - 1);
                 continue;
+            }
 
+            /* pop stacks pushed in Whereclause */
+            while (mem_stack.size() != stackSizeBeforeReturn)
+                mem_stack.remove(mem_stack.size() - 1);
             out.addAll((List<Node>) this.visit(ctx.returnClause()));
+
+            /* restore the mem_stack to original */
+            while (mem_stack.size() != oldStackSize)
+                mem_stack.remove(mem_stack.size() - 1);
         }
 
         return out;
@@ -434,7 +444,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
             Document newDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
             Node out = newDoc.createElement(tag);
             for (int i = 0; i < children.size(); i++)
-                out.appendChild(children.get(i));
+                out.appendChild(children.get(i).cloneNode(true));
             return out;
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
@@ -484,8 +494,10 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
 
     @Override
     public Object visitLetClause(XQueryParser.LetClauseContext ctx) {
+        HashMap<String,List<Node>> newContext = new HashMap<String, List<Node>>();
         for (int i = 0; i < ctx.var().size(); i++)
-            mem_stack.get(mem_stack.size() - 1).put(ctx.var(i).getText(), (List<Node>) this.visit(ctx.xq(i)));
+            newContext.put(ctx.var(i).getText(), (List<Node>) this.visit(ctx.xq(i)));
+        mem_stack.add(newContext);
         return null;
     }
 
@@ -535,13 +547,9 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
                 temp.add(vals.get(i));
                 context.put(iter.getVarName(i), temp);
             }
-            if ((boolean) this.visit(ctx.condition())) {
-                mem_stack.remove(mem_stack.size() - 1);
+            if ((boolean) this.visit(ctx.condition()))
                 return true;
-            }
         }
-        /* pop the context from the stack */
-        mem_stack.remove(mem_stack.size() - 1);
         return false;
 
     }

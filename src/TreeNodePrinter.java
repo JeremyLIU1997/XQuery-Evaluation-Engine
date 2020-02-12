@@ -28,14 +28,13 @@ public class TreeNodePrinter {
         else if (node.getNodeType() == Node.ELEMENT_NODE)
         {
             System.out.print(tab);
-            System.out.print("<" + node.getNodeName() + " ");
+            System.out.print("<" + node.getNodeName());
 
             /* for printing attributes */
             NamedNodeMap attrs = node.getAttributes();
             for (int i = 0; i < attrs.getLength(); i++) {
+                System.out.print(" ");
                 System.out.print(attrs.item(i));
-                if (i != attrs.getLength()-1)
-                    System.out.print(" ");
             }
             System.out.println(">");
 

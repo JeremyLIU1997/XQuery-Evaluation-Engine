@@ -1,3 +1,41 @@
 for $p in doc("./etc/j_caesar.xml")//(ACT,PERSONAE)/TITLE
 let $b := $p/text()
 return $b
+
+for $p in "123"
+let $p:="789"
+where some $p in "456" satisfies $p="456"
+return $p
+
+doc("./etc/j_caesar.xml")//ACT[./TITLE]/*/SPEECH/../*/.././TITLE
+
+for $p in doc("./etc/j_caesar.xml")//ACT[./TITLE]/*/SPEECH/../*/.././TITLE
+return <cnm> {$p} </cnm>
+
+doc(\"j_caesar.xml\")/PLAY/PERSONAE/PGROUP/PERSONA[./text() is text()]
+
+for $res in
+        for $act in doc("./etc/j_caesar.xml")//ACT
+        where (not ($act/TITLE == $act/TITLE)) or ($act/TITLE == $act/TITLE)
+        return $act
+return $res/*/SPEECH/../TITLE
+
+/* NOT PASSED BELOW */
+
+let $pgroups:=doc("./etc/j_caesar.xml")/PLAY/PERSONAE/PGROUP
+
+let $a:=doc("./etc/j_caesar.xml")/PLAY/PERSONAE/PGROUP
+return $a
+
+for $t in doc("./etc/j_caesar.xml")//PERSONA
+    for $p in doc("./etc/j_caesar.xml")//SPEAKER
+        where $t=$s
+        return $t
+return $t
+
+for $p in "123"
+let $p:="789"
+where some $p in "456" satisfies $p="456"
+return $p
+
+let $a:=doc("./etc/j_caesar.xml")/PLAY/PERSONAE/PGROUP
