@@ -450,7 +450,9 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
 
     @Override
     public Object visitXq_comma(XQueryParser.Xq_commaContext ctx) {
-        return visitChildren(ctx);
+        List<Node> out = (List<Node>) this.visit(ctx.xq(0));
+        out.addAll((List<Node>) this.visit(ctx.xq(1)));
+        return out;
     }
 
     @Override
