@@ -121,7 +121,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitRp_slash(XQueryParser.Rp_slashContext ctx) {
+    public Object visitRp_slash(XQueryParser.Rp_slashContext ctx) { // TO BE REFACTORED
         List<Node> out = new ArrayList<Node>();
         if (yet_to_visit.isEmpty())
             return out;
@@ -135,32 +135,43 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         return out;
     }
 
+    private List<Node> findSelfOrDescendant(Node root) {
+        /* For every node in nodeList, find self or descendent */
+        List<Node> selfOrDescendent = new ArrayList<Node>();
+
+        List<Node> queue = new ArrayList<Node>(); // for traversal
+        queue.add(root);                // add root (the self node)
+        while (!queue.isEmpty()) {      // bfs traversal of DOM tree
+            Node node = queue.remove(0);
+            selfOrDescendent.add(node);
+            NodeList children = node.getChildNodes();
+            /* add all ELEMENT children to temp */
+            for (int j = 0; j < children.getLength(); j++)
+                if (children.item(j).getNodeType() == Node.ELEMENT_NODE)
+                    queue.add(children.item(j));
+        }
+        return selfOrDescendent;
+    }
+
+    private List<Node> evaluateForEach(List<Node> selfOrDescendent, XQueryParser.RpContext ctx) {
+        List<Node> out = new ArrayList<Node>();
+        /* Now all self or descendent nodes found, do double slash for each */
+        for (int j = 0; j < selfOrDescendent.size(); j++) {
+            yet_to_visit.add(selfOrDescendent.get(j));
+            for (Node node2 : (List<Node>) this.visit(ctx))
+                if (!out.contains(node2))
+                    out.add(node2);
+        }
+        return out;
+    }
+
     @Override
     public Object visitRp_double_slash(XQueryParser.Rp_double_slashContext ctx) {
-        List<Node> out = new ArrayList<Node>();
-
+        List<Node> out = new ArrayList<>();
         for (Node node1 : deduplicate((List<Node>) this.visit(ctx.rp(0)))) { // for every node in nodeList, do double_slash
-            /* For every node in nodeList, find self or descendent */
-            List<Node> selfOrDescendent = new ArrayList<Node>();
-
-            List<Node> queue = new ArrayList<Node>(); // for traversal
-            queue.add(node1); // add root (the self node)
-            while (!queue.isEmpty()) { // bfs traversal of DOM tree
-                Node node = queue.remove(0);
-                selfOrDescendent.add(node);
-                NodeList children = node.getChildNodes();
-                /* add all ELEMENT children to temp */
-                for (int j = 0; j < children.getLength(); j++)
-                    if (children.item(j).getNodeType() == Node.ELEMENT_NODE)
-                        queue.add(children.item(j));
-            }
-            /* Now all self or descendent nodes found, do double slash for each */
-            for (int j = 0; j < selfOrDescendent.size(); j++) {
-                yet_to_visit.add(selfOrDescendent.get(j));
-                for (Node node2 : (List<Node>) this.visit(ctx.rp(1)))
-                    if (!out.contains(node2))
-                        out.add(node2);
-            }
+            for (Node node : evaluateForEach(findSelfOrDescendant(node1), ctx.rp(1)))
+                if ( ! out.contains(node))
+                    out.add(node);
         }
         return out;
     }
@@ -350,14 +361,25 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
 
     @Override
     public Object visitXq_double_slash_rp(XQueryParser.Xq_double_slash_rpContext ctx) {
-        return visitChildren(ctx);
+        List<Node> out = new ArrayList<>();
+        for (Node node1 : deduplicate((List<Node>) this.visit(ctx.xq()))) { // for every node in nodeList, do double_slash
+            for (Node node : evaluateForEach(findSelfOrDescendant(node1), ctx.rp()))
+                if ( ! out.contains(node))
+                    out.add(node);
+        }
+        return out;
     }
 
     @Override
     public Object visitXq_slash_rp(XQueryParser.Xq_slash_rpContext ctx) {
-        return null;
-    }
+        List<Node> out = new ArrayList<>();
+        for (Node node: evaluateForEach((List<Node>)this.visit(ctx.xq()),ctx.rp()))
+            if ( ! out.contains(node)) {
+                out.add(node);
+            }
 
+        return out;
+    }
 
     @Override
     public Object visitXq_paren(XQueryParser.Xq_parenContext ctx) {
@@ -366,6 +388,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
 
     @Override
     public Object visitXq_ap(XQueryParser.Xq_apContext ctx) {
+        System.out.println("*");
         return (List<Node>) this.visit(ctx.ap());
     }
 
