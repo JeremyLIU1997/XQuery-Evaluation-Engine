@@ -32,7 +32,7 @@ public class Main {
         XQueryLexer lexer = new XQueryLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         XQueryParser parser = new XQueryParser(tokens);
-        ParseTree tree = parser.ap();
+        ParseTree tree = parser.xq();
 
         // create my custom visitor and evaluate query
         MyXQueryVisitor visitor = new MyXQueryVisitor();

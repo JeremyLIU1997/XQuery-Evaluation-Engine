@@ -12,18 +12,6 @@ import javax.xml.parsers.*;
 import java.io.*;
 
 public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
-    /*class Value {
-        Object val;
-        public Value(Object val) {
-            this.val = val;
-        }
-        boolean is_List() {
-            return this.val instanceof ArrayList;
-        }
-        boolean is_Node() {
-            return this.val instanceof Node;
-        }
-    }*/
 
     private List<HashMap<String, List<Node>>> mem_stack = new ArrayList<>();
     private List<Node> yet_to_visit = new ArrayList<>(); // to store DOM nodes yet to visit
@@ -170,7 +158,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         List<Node> out = new ArrayList<>();
         for (Node node1 : deduplicate((List<Node>) this.visit(ctx.rp(0)))) { // for every node in nodeList, do double_slash
             for (Node node : evaluateForEach(findSelfOrDescendant(node1), ctx.rp(1)))
-                if ( ! out.contains(node))
+                if (!out.contains(node))
                     out.add(node);
         }
         return out;
@@ -364,7 +352,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         List<Node> out = new ArrayList<>();
         for (Node node1 : deduplicate((List<Node>) this.visit(ctx.xq()))) { // for every node in nodeList, do double_slash
             for (Node node : evaluateForEach(findSelfOrDescendant(node1), ctx.rp()))
-                if ( ! out.contains(node))
+                if (!out.contains(node))
                     out.add(node);
         }
         return out;
@@ -373,11 +361,10 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
     @Override
     public Object visitXq_slash_rp(XQueryParser.Xq_slash_rpContext ctx) {
         List<Node> out = new ArrayList<>();
-        for (Node node: evaluateForEach((List<Node>)this.visit(ctx.xq()),ctx.rp()))
-            if ( ! out.contains(node)) {
+        for (Node node : evaluateForEach((List<Node>) this.visit(ctx.xq()), ctx.rp()))
+            if (!out.contains(node)) {
                 out.add(node);
             }
-
         return out;
     }
 
@@ -388,7 +375,6 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
 
     @Override
     public Object visitXq_ap(XQueryParser.Xq_apContext ctx) {
-        System.out.println("*");
         return (List<Node>) this.visit(ctx.ap());
     }
 
@@ -410,6 +396,8 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
 
         ArrayList<Node> out = new ArrayList<>();
         ForIterator iter = (ForIterator) this.visit(ctx.forClause());
+        int oldStackSize = mem_stack.size();
+
         /* this while loop iterates all the bindings in FOR clause */
         while (iter.hasNext()) {
             List<Node> vals = iter.next();
@@ -426,13 +414,18 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
             boolean whereReturnVal = true;
             if (ctx.whereClause() != null)
                 whereReturnVal = (boolean) this.visit(ctx.whereClause());
+
+            /* restore the mem_stack */
+            while (mem_stack.size() != oldStackSize)
+                mem_stack.remove(mem_stack.size() - 1);
+
+            /* if where condition false, simply continue */
             if (!whereReturnVal)
                 continue;
 
             out.addAll((List<Node>) this.visit(ctx.returnClause()));
         }
-        /* pop the context from the stack */
-        mem_stack.remove(mem_stack.size() - 1);
+
         return out;
     }
 

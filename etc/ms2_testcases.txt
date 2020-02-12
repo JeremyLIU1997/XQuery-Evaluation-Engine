@@ -1,2 +1,3 @@
 for $p in doc("./etc/j_caesar.xml")//(ACT,PERSONAE)/TITLE
-return $p
+let $b := $p/text()
+return $b
