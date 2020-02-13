@@ -32,12 +32,12 @@ var: '$' tagname;
 
 /* forClause → for Var1 in XQ1,Var2 in XQ2,...,Varn in XQn */
 forClause:
-FOR var IN xq (',' FOR var IN xq)*
+FOR var IN xq (',' var IN xq)*
 ;
 
 /* letClause → ε | letVarn+1 :=XQn+1,...,Varn+k :=XQn+k */
 letClause:
-LET var ':=' xq (',' LET var ':=' xq)*
+LET var ':=' xq (',' var ':=' xq)*
 ;
 
 /* whereClause → ε | where Cond */
@@ -144,7 +144,7 @@ UNDERSCORE: '_' ;
 WS  :   [ \t\n]+ -> skip ; // toss out whitespace
 
 FILENAME: '"' [a-zA-Z0-9./_]* '"' ;
-STRING: '"' [a-zA-Z0-9./_,:;=()&^%$#@!~`\\|?<>]* '"' ;
+STRING: '"' [a-zA-Z0-9./_,:;=()&^ %"'$#@!~`\\|?<>]* '"' ;
 NAMESTRING: [a-zA-Z0-9_]+ ;
 
 DOUBLESLASH: '//' ;

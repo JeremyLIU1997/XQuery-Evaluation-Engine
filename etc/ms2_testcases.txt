@@ -20,12 +20,84 @@ for $res in
         return $act
 return $res/*/SPEECH/../TITLE
 
-/* NOT PASSED BELOW */
 
-let $pgroups:=doc("./etc/j_caesar.xml")/PLAY/PERSONAE/PGROUP
+XQuery #1
+<acts> { for $a in doc("./etc/j_caesar.xml")//ACT
 
-let $a:=doc("./etc/j_caesar.xml")/PLAY/PERSONAE/PGROUP
-return $a
+              where empty ( for $sp in $a/SCENE/SPEECH/SPEAKER
+
+                                      where $sp/text() = "CASCA"
+
+                                     return <speaker> {$sp/text()}</speaker>
+
+                                     )
+
+              return <act>{$a/TITLE/text()}</act>
+
+}</acts>
+
+
+
+XQuery #2
+<result>{  for $a in (for $s in doc("./etc/j_caesar.xml")//ACT return $s),
+
+                     $sc in (for $t in $a/SCENE return $t),
+
+                     $sp in (for $d in $sc/SPEECH return $d)
+
+                 where $sp/LINE/text() = "Et tu, Brute! Then fall, Caesar."
+
+                 return <who>{$sp/SPEAKER/text()}</who>,
+
+                           <when>{
+
+                                           <act>{$a/TITLE/text()}</act>,
+
+                                           <scene>{$sc/TITLE/text()}</scene>
+
+                           }</when>
+
+}
+
+</result>
+
+
+
+
+
+XQuery #3
+<result>{ for $a in doc("./etc/j_caesar.xml")//PERSONAE, $b in $a/PERSONA
+
+               where ($b/text() = "JULIUS CAESAR") or ($b/text()= "Another Poet")
+
+               return $b
+
+             }
+
+</result>
+
+
+
+
+
+XQuery #4
+<result>
+
+{
+
+for $a in document("./etc/j_caesar.xml")//PERSONAE, $b in $a/PERSONA
+
+where not (($b/text() = "JULIUS CAESAR") or ($b/text() = "Another Poet") )
+
+return $b
+
+}
+
+</result>
+
+***********************************************************
+********************  NOT PASSED BELOW ********************
+***********************************************************
 
 for $t in doc("./etc/j_caesar.xml")//PERSONA
     for $p in doc("./etc/j_caesar.xml")//SPEAKER
@@ -33,9 +105,7 @@ for $t in doc("./etc/j_caesar.xml")//PERSONA
         return $t
 return $t
 
-for $p in "123"
-let $p:="789"
-where some $p in "456" satisfies $p="456"
-return $p
 
-let $a:=doc("./etc/j_caesar.xml")/PLAY/PERSONAE/PGROUP
+for $a in (for $s in doc("./etc/j_caesar.xml")//ACT return $s),
+$sc in (for $t in $a/SCENE return $t)
+return $sc

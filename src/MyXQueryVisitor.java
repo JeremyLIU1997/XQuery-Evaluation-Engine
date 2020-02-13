@@ -134,21 +134,20 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
             selfOrDescendent.add(node);
             NodeList children = node.getChildNodes();
             /* add all ELEMENT children to temp */
-            for (int j = 0; j < children.getLength(); j++)
-                if (children.item(j).getNodeType() == Node.ELEMENT_NODE)
-                    queue.add(children.item(j));
+            for (int i = 0; i < children.getLength(); i++)
+                if (children.item(i).getNodeType() == Node.ELEMENT_NODE)
+                    queue.add(children.item(i));
         }
         return selfOrDescendent;
     }
 
-    private List<Node> evaluateForEach(List<Node> selfOrDescendent, XQueryParser.RpContext ctx) {
+    private List<Node> evaluateForEach(List<Node> contextNodes, XQueryParser.RpContext ctx) {
         List<Node> out = new ArrayList<Node>();
-        /* Now all self or descendent nodes found, do double slash for each */
-        for (int j = 0; j < selfOrDescendent.size(); j++) {
-            yet_to_visit.add(selfOrDescendent.get(j));
-            for (Node node2 : (List<Node>) this.visit(ctx))
-                if (!out.contains(node2))
-                    out.add(node2);
+        for (int i = 0; i < contextNodes.size(); i++) {
+            yet_to_visit.add(contextNodes.get(i));
+            for (Node node : (List<Node>) this.visit(ctx))
+                if (!out.contains(node))
+                    out.add(node);
         }
         return out;
     }
@@ -361,10 +360,10 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
     @Override
     public Object visitXq_slash_rp(XQueryParser.Xq_slash_rpContext ctx) {
         List<Node> out = new ArrayList<>();
+
         for (Node node : evaluateForEach((List<Node>) this.visit(ctx.xq()), ctx.rp()))
-            if (!out.contains(node)) {
+            if (!out.contains(node))
                 out.add(node);
-            }
         return out;
     }
 
@@ -389,6 +388,11 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
     }
 
 
+    private void popStackUntil(int until) {
+        while (mem_stack.size() != until)
+            mem_stack.remove(mem_stack.size() - 1);
+    }
+
     @Override
     public Object visitXq_FLWR(XQueryParser.Xq_FLWRContext ctx) {
         mem_stack.add(new HashMap<String, List<Node>>()); // push onto stack a new context
@@ -401,6 +405,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         /* this while loop iterates all the bindings in FOR clause */
         while (iter.hasNext()) {
             List<Node> vals = iter.next();
+
             /* put bindings in current context */
             for (int i = 0; i < vals.size(); i++) {
                 List<Node> temp = new ArrayList<>();
@@ -408,43 +413,64 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
                 context.put(iter.getVarName(i), temp);
             }
 
+            /* handle let clause */
             if (ctx.letClause() != null)
                 this.visit(ctx.letClause());
 
-            int stackSizeBeforeReturn = mem_stack.size();
-
+            /* handle where clause */
             boolean whereReturnVal = true;
+            int stackSizeBeforeReturn = mem_stack.size();
             if (ctx.whereClause() != null)
                 whereReturnVal = (boolean) this.visit(ctx.whereClause());
+            popStackUntil(stackSizeBeforeReturn);
 
+            if (whereReturnVal)
+                out.addAll((List<Node>) this.visit(ctx.returnClause()));
 
-            /* if where condition false, simply continue */
-            if (!whereReturnVal) {
-                /* restore the mem_stack */
-                while (mem_stack.size() != oldStackSize)
-                    mem_stack.remove(mem_stack.size() - 1);
-                continue;
-            }
-
-            /* pop stacks pushed in Whereclause */
-            while (mem_stack.size() != stackSizeBeforeReturn)
-                mem_stack.remove(mem_stack.size() - 1);
-            out.addAll((List<Node>) this.visit(ctx.returnClause()));
-
-            /* restore the mem_stack to original */
-            while (mem_stack.size() != oldStackSize)
-                mem_stack.remove(mem_stack.size() - 1);
+            /* restore stack */
+            popStackUntil(oldStackSize);
         }
 
         return out;
     }
+
+    @Override
+    public Object visitForClause(XQueryParser.ForClauseContext ctx) {
+        String[] varNames = new String[ctx.var().size()];
+        List<List<Node>> lists = new ArrayList<>();
+        for (int i = 0; i < ctx.xq().size(); i++) {
+            lists.add((List<Node>) this.visit(ctx.xq(i)));
+            varNames[i] = ctx.var(i).getText();
+        }
+        return new ForIterator(varNames, lists);
+    }
+
+    @Override
+    public Object visitLetClause(XQueryParser.LetClauseContext ctx) {
+        HashMap<String,List<Node>> newContext = new HashMap<String, List<Node>>();
+        for (int i = 0; i < ctx.var().size(); i++)
+            newContext.put(ctx.var(i).getText(), (List<Node>) this.visit(ctx.xq(i)));
+        mem_stack.add(newContext);
+        return new ArrayList<Node>(); // dummy return
+    }
+
+    @Override
+    public Object visitWhereClause(XQueryParser.WhereClauseContext ctx) {
+        return (Boolean) this.visit(ctx.condition());
+    }
+
+    @Override
+    public Object visitReturnClause(XQueryParser.ReturnClauseContext ctx) {
+        return this.visit(ctx.xq());
+    }
+
 
     private Node makeElem(String tag, List<Node> children) {
         try {
             Document newDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
             Node out = newDoc.createElement(tag);
             for (int i = 0; i < children.size(); i++)
-                out.appendChild(children.get(i).cloneNode(true));
+                out.appendChild(newDoc.importNode(children.get(i).cloneNode(true), true));
             return out;
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
@@ -471,7 +497,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
     @Override
     public Object visitXq_let(XQueryParser.Xq_letContext ctx) {
         this.visit(ctx.letClause());
-        return null;
+        return new ArrayList<Node>(); // dummy return
     }
 
     @Override
@@ -479,36 +505,6 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         List<Node> out = (List<Node>) this.visit(ctx.xq(0));
         out.addAll((List<Node>) this.visit(ctx.xq(1)));
         return out;
-    }
-
-    @Override
-    public Object visitForClause(XQueryParser.ForClauseContext ctx) {
-        String[] varNames = new String[ctx.var().size()];
-        List<List<Node>> lists = new ArrayList<>();
-        for (int i = 0; i < ctx.xq().size(); i++) {
-            lists.add((List<Node>) this.visit(ctx.xq(i)));
-            varNames[i] = ctx.var(i).getText();
-        }
-        return new ForIterator(varNames, lists);
-    }
-
-    @Override
-    public Object visitLetClause(XQueryParser.LetClauseContext ctx) {
-        HashMap<String,List<Node>> newContext = new HashMap<String, List<Node>>();
-        for (int i = 0; i < ctx.var().size(); i++)
-            newContext.put(ctx.var(i).getText(), (List<Node>) this.visit(ctx.xq(i)));
-        mem_stack.add(newContext);
-        return null;
-    }
-
-    @Override
-    public Object visitWhereClause(XQueryParser.WhereClauseContext ctx) {
-        return (Boolean) this.visit(ctx.condition());
-    }
-
-    @Override
-    public Object visitReturnClause(XQueryParser.ReturnClauseContext ctx) {
-        return this.visit(ctx.xq());
     }
 
     @Override
