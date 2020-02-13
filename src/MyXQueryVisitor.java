@@ -13,7 +13,7 @@ import java.io.*;
 
 public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
 
-    private List<HashMap<String, List<Node>>> mem_stack = new ArrayList<>();
+    protected List<HashMap<String, List<Node>>> mem_stack = new ArrayList<>();
     private List<Node> yet_to_visit = new ArrayList<>(); // to store DOM nodes yet to visit
 
     private Document openInputFile(String filename) {
@@ -48,7 +48,6 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
     public Object visitAp_double_slash(XQueryParser.Ap_double_slashContext ctx) {
         String filename = ctx.filename().getText(); // find file path
         Document doc = openInputFile(filename); // open file
-
         List<Node> out = new ArrayList<Node>();
         NodeList nodeList = doc.getElementsByTagName("*");
 
@@ -395,54 +394,66 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
 
     @Override
     public Object visitXq_FLWR(XQueryParser.Xq_FLWRContext ctx) {
-        mem_stack.add(new HashMap<String, List<Node>>()); // push onto stack a new context
-        HashMap<String, List<Node>> context = mem_stack.get(mem_stack.size() - 1);
+        return this.visit(ctx.forClause());
+    }
 
-        ArrayList<Node> out = new ArrayList<>();
-        ForIterator iter = (ForIterator) this.visit(ctx.forClause());
-        int oldStackSize = mem_stack.size();
-
-        /* this while loop iterates all the bindings in FOR clause */
-        while (iter.hasNext()) {
-            List<Node> vals = iter.next();
-
-            /* put bindings in current context */
-            for (int i = 0; i < vals.size(); i++) {
-                List<Node> temp = new ArrayList<>();
-                temp.add(vals.get(i));
-                context.put(iter.getVarName(i), temp);
-            }
-
-            /* handle let clause */
-            if (ctx.letClause() != null)
-                this.visit(ctx.letClause());
-
-            /* handle where clause */
-            boolean whereReturnVal = true;
-            int stackSizeBeforeReturn = mem_stack.size();
-            if (ctx.whereClause() != null)
-                whereReturnVal = (boolean) this.visit(ctx.whereClause());
-            popStackUntil(stackSizeBeforeReturn);
-
-            if (whereReturnVal)
-                out.addAll((List<Node>) this.visit(ctx.returnClause()));
-
-            /* restore stack */
-            popStackUntil(oldStackSize);
+    /* a wrapper class used for DFS */
+    class NodeWithDepth {
+        int depth;
+        Node node;
+        public NodeWithDepth(Node node, int depth) {
+            this.depth = depth;
+            this.node = node;
         }
-
-        return out;
     }
 
     @Override
     public Object visitForClause(XQueryParser.ForClauseContext ctx) {
-        String[] varNames = new String[ctx.var().size()];
-        List<List<Node>> lists = new ArrayList<>();
-        for (int i = 0; i < ctx.xq().size(); i++) {
-            lists.add((List<Node>) this.visit(ctx.xq(i)));
-            varNames[i] = ctx.var(i).getText();
+        ArrayList<Node> out = new ArrayList<>();
+        XQueryParser.Xq_FLWRContext parent = (XQueryParser.Xq_FLWRContext) ctx.parent;
+        Deque<NodeWithDepth> stack = new ArrayDeque<>();
+
+        List<Node> temp = (List<Node>)this.visit(ctx.xq(0));
+        for (int i = temp.size()-1; i >= 0; i--)
+            stack.push(new NodeWithDepth(temp.get(i),0));
+
+        int originalStackSize = mem_stack.size();
+        mem_stack.add(new HashMap<String,List<Node>>());
+
+        int MAXDEPTH = ctx.xq().size()-1;
+        while (! stack.isEmpty()) {
+            NodeWithDepth cur = stack.pop();
+            ArrayList<Node> dummy = new ArrayList<>();
+            dummy.add(cur.node);
+            HashMap<String,List<Node>> context = mem_stack.get(mem_stack.size()-1); // ???
+            context.put(ctx.var(cur.depth).getText(),dummy);
+
+            if (cur.depth == MAXDEPTH) {
+                /* handle let clause */
+                if (parent.letClause() != null)
+                    this.visit(parent.letClause());
+
+                /* handle where clause */
+                boolean whereReturnVal = true;
+                int stackSizeBeforeReturn = mem_stack.size();
+                if (parent.whereClause() != null)
+                    whereReturnVal = (boolean) this.visit(parent.whereClause());
+                popStackUntil(stackSizeBeforeReturn);
+
+                if (whereReturnVal)
+                    out.addAll((List<Node>) this.visit(parent.returnClause()));
+
+                mem_stack.remove(mem_stack.size()-1);
+                mem_stack.add(new HashMap<String,List<Node>>());
+                continue;
+            }
+
+            temp = (List<Node>)this.visit(ctx.xq(cur.depth+1));
+            for (int i = temp.size()-1; i >= 0; i--)
+                stack.push(new NodeWithDepth(temp.get(i),cur.depth+1));
         }
-        return new ForIterator(varNames, lists);
+        popStackUntil(originalStackSize);
+        return out;
     }
 
     @Override
@@ -520,34 +531,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
 
     @Override
     public Object visitCond_some(XQueryParser.Cond_someContext ctx) {
-        //1. build local Iterator
-        String[] varNames = new String[ctx.var().size()];
-        List<List<Node>> lists = new ArrayList<>();
-        for (int i = 0; i < ctx.xq().size(); i++) {
-            lists.add((List<Node>) this.visit(ctx.xq(i)));
-            varNames[i] = ctx.var(i).getText();
-        }
-        ForIterator iter = new ForIterator(varNames, lists);
-
-        //        2.Iterate localIterator
-        mem_stack.add(new HashMap<String, List<Node>>());       // push onto stack a new context
-        HashMap<String, List<Node>> context = mem_stack.get(mem_stack.size() - 1);
-        ArrayList<Node> out = new ArrayList<>();
-
-        /* this while loop iterates all the bindings in FOR clause */
-        while (iter.hasNext()) {
-            List<Node> vals = iter.next();
-            /* put bindings in current context */
-            for (int i = 0; i < vals.size(); i++) {
-                List<Node> temp = new ArrayList<>();
-                temp.add(vals.get(i));
-                context.put(iter.getVarName(i), temp);
-            }
-            if ((boolean) this.visit(ctx.condition()))
-                return true;
-        }
-        return false;
-
+        return null;
     }
 
 
