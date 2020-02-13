@@ -333,7 +333,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
     /* Milestone 2 functions */
     @Override
     public Object visitXq_str(XQueryParser.Xq_strContext ctx) {
-        String StringConstant = ctx.getText();
+        String StringConstant = ctx.getText().substring(1, ctx.getText().length() - 1);
         List<Node> out = new ArrayList<Node>();
         try {
             out.add(DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument().createTextNode(StringConstant));
@@ -359,7 +359,6 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
     @Override
     public Object visitXq_slash_rp(XQueryParser.Xq_slash_rpContext ctx) {
         List<Node> out = new ArrayList<>();
-
         for (Node node : evaluateForEach((List<Node>) this.visit(ctx.xq()), ctx.rp()))
             if (!out.contains(node))
                 out.add(node);
@@ -388,7 +387,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
 
 
     private void popStackUntil(int until) {
-        while (mem_stack.size() != until)
+        while (mem_stack.size() > until)
             mem_stack.remove(mem_stack.size() - 1);
     }
 
@@ -401,6 +400,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
     class NodeWithDepth {
         int depth;
         Node node;
+
         public NodeWithDepth(Node node, int depth) {
             this.depth = depth;
             this.node = node;
@@ -413,20 +413,20 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         XQueryParser.Xq_FLWRContext parent = (XQueryParser.Xq_FLWRContext) ctx.parent;
         Deque<NodeWithDepth> stack = new ArrayDeque<>();
 
-        List<Node> temp = (List<Node>)this.visit(ctx.xq(0));
-        for (int i = temp.size()-1; i >= 0; i--)
-            stack.push(new NodeWithDepth(temp.get(i),0));
+        List<Node> temp = (List<Node>) this.visit(ctx.xq(0));
+        for (int i = temp.size() - 1; i >= 0; i--)
+            stack.push(new NodeWithDepth(temp.get(i), 0));
 
         int originalStackSize = mem_stack.size();
-        mem_stack.add(new HashMap<String,List<Node>>());
+        mem_stack.add(new HashMap<String, List<Node>>());
 
-        int MAXDEPTH = ctx.xq().size()-1;
-        while (! stack.isEmpty()) {
+        int MAXDEPTH = ctx.xq().size() - 1;
+        while (!stack.isEmpty()) {
             NodeWithDepth cur = stack.pop();
             ArrayList<Node> dummy = new ArrayList<>();
             dummy.add(cur.node);
-            HashMap<String,List<Node>> context = mem_stack.get(mem_stack.size()-1); // ???
-            context.put(ctx.var(cur.depth).getText(),dummy);
+            HashMap<String, List<Node>> context = mem_stack.get(mem_stack.size() - 1); // ???
+            context.put(ctx.var(cur.depth).getText(), dummy);
 
             if (cur.depth == MAXDEPTH) {
                 /* handle let clause */
@@ -443,14 +443,12 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
                 if (whereReturnVal)
                     out.addAll((List<Node>) this.visit(parent.returnClause()));
 
-                mem_stack.remove(mem_stack.size()-1);
-                mem_stack.add(new HashMap<String,List<Node>>());
                 continue;
             }
 
-            temp = (List<Node>)this.visit(ctx.xq(cur.depth+1));
-            for (int i = temp.size()-1; i >= 0; i--)
-                stack.push(new NodeWithDepth(temp.get(i),cur.depth+1));
+            temp = (List<Node>) this.visit(ctx.xq(cur.depth + 1));
+            for (int i = temp.size() - 1; i >= 0; i--)
+                stack.push(new NodeWithDepth(temp.get(i), cur.depth + 1));
         }
         popStackUntil(originalStackSize);
         return out;
@@ -458,7 +456,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
 
     @Override
     public Object visitLetClause(XQueryParser.LetClauseContext ctx) {
-        HashMap<String,List<Node>> newContext = new HashMap<String, List<Node>>();
+        HashMap<String, List<Node>> newContext = new HashMap<String, List<Node>>();
         for (int i = 0; i < ctx.var().size(); i++)
             newContext.put(ctx.var(i).getText(), (List<Node>) this.visit(ctx.xq(i)));
         mem_stack.add(newContext);
@@ -528,10 +526,40 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         return ((List<Node>) this.visit(ctx.xq())).size() == 0;
     }
 
-
     @Override
     public Object visitCond_some(XQueryParser.Cond_someContext ctx) {
-        return null;
+        Deque<NodeWithDepth> stack = new ArrayDeque<>();
+
+        List<Node> temp = (List<Node>) this.visit(ctx.xq(0));
+        for (int i = temp.size() - 1; i >= 0; i--)
+            stack.push(new NodeWithDepth(temp.get(i), 0));
+
+        int originalStackSize = mem_stack.size();
+        mem_stack.add(new HashMap<String, List<Node>>());
+
+        int MAXDEPTH = ctx.xq().size() - 1;
+        while (!stack.isEmpty()) {
+            NodeWithDepth cur = stack.pop();
+            ArrayList<Node> dummy = new ArrayList<>();
+            dummy.add(cur.node);
+            HashMap<String, List<Node>> context = mem_stack.get(mem_stack.size() - 1); // ???
+            context.put(ctx.var(cur.depth).getText(), dummy);
+
+            if (cur.depth == MAXDEPTH) {
+                if ((boolean)this.visit(ctx.condition())) {
+                    popStackUntil(originalStackSize);
+                    return true;
+                }
+                continue;
+            }
+
+            System.out.println(ctx.xq(cur.depth+1));
+            temp = (List<Node>) this.visit(ctx.xq(cur.depth + 1));
+            for (int i = temp.size() - 1; i >= 0; i--)
+                stack.push(new NodeWithDepth(temp.get(i), cur.depth + 1));
+        }
+        popStackUntil(originalStackSize);
+        return false;
     }
 
 

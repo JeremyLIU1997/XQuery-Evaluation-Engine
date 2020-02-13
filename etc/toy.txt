@@ -1,9 +1,9 @@
-for $a in (for $s in doc("./etc/j_caesar.xml")//ACT return $s),
+<result> { for $a in doc("./etc/j_caesar.xml")//PERSONAE, $b in $a/PERSONA
 
-                     $sc in (for $t in $a/SCENE return $t),
+            where not (($b/text() = "JULIUS CAESAR") or ($b/text() = "Another Poet") )
 
-                     $sp in (for $d in $sc/SPEECH return $d)
+            return $b
 
-                 where $sp/LINE/text() = "Et tu, Brute! Then fall, Caesar."
+}
 
-                 return "123"
+</result>

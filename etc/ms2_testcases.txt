@@ -62,9 +62,6 @@ XQuery #2
 </result>
 
 
-
-
-
 XQuery #3
 <result>{ for $a in doc("./etc/j_caesar.xml")//PERSONAE, $b in $a/PERSONA
 
@@ -77,19 +74,12 @@ XQuery #3
 </result>
 
 
-
-
-
 XQuery #4
-<result>
+<result> { for $a in doc("./etc/j_caesar.xml")//PERSONAE, $b in $a/PERSONA
 
-{
+            where not (($b/text() = "JULIUS CAESAR") or ($b/text() = "Another Poet") )
 
-for $a in document("./etc/j_caesar.xml")//PERSONAE, $b in $a/PERSONA
-
-where not (($b/text() = "JULIUS CAESAR") or ($b/text() = "Another Poet") )
-
-return $b
+            return $b
 
 }
 
