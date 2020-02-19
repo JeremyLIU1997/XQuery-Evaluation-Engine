@@ -424,7 +424,8 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         while (!stack.isEmpty()) {
             NodeWithDepth cur = stack.pop();
             ArrayList<Node> dummy = new ArrayList<>();
-            dummy.add(cur.node);
+            if (cur.node != null) // ignore placeholder node
+                dummy.add(cur.node);
             HashMap<String, List<Node>> context = mem_stack.get(mem_stack.size() - 1); // ???
             context.put(ctx.var(cur.depth).getText(), dummy);
 
@@ -449,6 +450,9 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
             temp = (List<Node>) this.visit(ctx.xq(cur.depth + 1));
             for (int i = temp.size() - 1; i >= 0; i--)
                 stack.push(new NodeWithDepth(temp.get(i), cur.depth + 1));
+            /* create a placeholder node to make sure the evaluations go all the way down */
+            if (temp.size() == 0)
+                stack.push(new NodeWithDepth(null,cur.depth+1));
         }
         popStackUntil(originalStackSize);
         return out;
@@ -541,7 +545,8 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         while (!stack.isEmpty()) {
             NodeWithDepth cur = stack.pop();
             ArrayList<Node> dummy = new ArrayList<>();
-            dummy.add(cur.node);
+            if (cur.node != null) // ignore placeholder node
+                dummy.add(cur.node);
             HashMap<String, List<Node>> context = mem_stack.get(mem_stack.size() - 1); // ???
             context.put(ctx.var(cur.depth).getText(), dummy);
 
@@ -553,10 +558,12 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
                 continue;
             }
 
-            System.out.println(ctx.xq(cur.depth+1));
             temp = (List<Node>) this.visit(ctx.xq(cur.depth + 1));
             for (int i = temp.size() - 1; i >= 0; i--)
                 stack.push(new NodeWithDepth(temp.get(i), cur.depth + 1));
+            /* create a placeholder node to make sure the evaluations go all the way down */
+            if (temp.size() == 0)
+                stack.push(new NodeWithDepth(null,cur.depth+1));
         }
         popStackUntil(originalStackSize);
         return false;
