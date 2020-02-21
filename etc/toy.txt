@@ -1,3 +1,0 @@
-for $a in doc("./etc/j_caesar.xml")//PERSONAE, $b in doc("./etc/j_caesar.xml")//SPEAKER
-let $p:= <cnm>{$b//text()}</sdk>
-return $p

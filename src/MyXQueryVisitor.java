@@ -382,7 +382,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
             if (temp != null)
                 return temp;
         }
-        return null;
+        return new ArrayList<>();
     }
 
 

@@ -1,6 +1,6 @@
 <result>
 {
-for	$a	in	doc("../etc/j_caesar.xml")//ACT
+for	$a	in	doc("./etc/j_caesar.xml")//ACT
 let	$sc:=	$a/SCENE,	$sp:=$sc/SPEECH
 where	$sp/LINE/text() ="No worthier than the dust!"
 return	<speaks>{

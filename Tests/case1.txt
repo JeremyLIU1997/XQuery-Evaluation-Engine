@@ -1,4 +1,4 @@
-<acts> { for $a in doc("./etc/j_caesar.xml")//ACT
+<acts> { for $a in doc("../etc/j_caesar.xml")//ACT
 
               where empty ( for $sp in $a/SCENE/SPEECH/SPEAKER
 

@@ -19,7 +19,11 @@ if __name__ == '__main__':
 	faillist = []
 	total = 0
 	for case in cases:
-		if case.endswith(".py") or case.startswith(".") or "join" in case.lower() or not os.path.isfile(testdir + "/" + case):
+		if case.endswith(".py") \
+		or case.startswith(".") \
+		or "join" in case.lower() \
+		or not os.path.isfile(testdir + "/" + case) \
+		or case == "toy.txt":
 			continue
 		total += 1
 		print(separator)
