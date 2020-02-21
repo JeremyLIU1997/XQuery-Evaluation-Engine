@@ -1,4 +1,4 @@
-<result>{  for $a in (for $s in doc("j_caesar.xml")//ACT
+<result>{  for $a in (for $s in doc("../etc/j_caesar.xml")//ACT
 return $s),
        $sc in (for $t in $a/SCENE
 return $t),

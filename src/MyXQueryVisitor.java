@@ -452,7 +452,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
                 stack.push(new NodeWithDepth(temp.get(i), cur.depth + 1));
             /* create a placeholder node to make sure the evaluations go all the way down */
             if (temp.size() == 0)
-                stack.push(new NodeWithDepth(null,cur.depth+1));
+                stack.push(new NodeWithDepth(null, cur.depth + 1));
         }
         popStackUntil(originalStackSize);
         return out;
@@ -498,8 +498,13 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         List<Node> out = new ArrayList<>();
         if (!ctx.tagname(0).getText().equals(ctx.tagname(1).getText())) {
             System.out.println("Opening and closing tags don't match: "
-                    + ctx.tagname(0).getText() + " != "
+                    + "\'"
+                    + ctx.tagname(0).getText()
+                    + "\'"
+                    + " != "
+                    + "\'"
                     + ctx.tagname(1).getText()
+                    + "\'"
                     + ". Exit.");
             System.exit(2);
         }
@@ -551,7 +556,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
             context.put(ctx.var(cur.depth).getText(), dummy);
 
             if (cur.depth == MAXDEPTH) {
-                if ((boolean)this.visit(ctx.condition())) {
+                if ((boolean) this.visit(ctx.condition())) {
                     popStackUntil(originalStackSize);
                     return true;
                 }
@@ -563,7 +568,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
                 stack.push(new NodeWithDepth(temp.get(i), cur.depth + 1));
             /* create a placeholder node to make sure the evaluations go all the way down */
             if (temp.size() == 0)
-                stack.push(new NodeWithDepth(null,cur.depth+1));
+                stack.push(new NodeWithDepth(null, cur.depth + 1));
         }
         popStackUntil(originalStackSize);
         return false;

@@ -1,5 +1,5 @@
 <acts>
-{for $a in doc("j_caesar.xml")//ACT
+{for $a in doc("../etc/j_caesar.xml")//ACT
 
    return <a> {$a/TITLE/text()}</a>
 }

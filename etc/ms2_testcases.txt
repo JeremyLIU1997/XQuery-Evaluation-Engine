@@ -89,13 +89,6 @@ XQuery #4
 ********************  NOT PASSED BELOW ********************
 ***********************************************************
 
-for $t in doc("./etc/j_caesar.xml")//PERSONA
-    for $p in doc("./etc/j_caesar.xml")//SPEAKER
-        where $t=$s
-        return $t
-return $t
-
-
 for $a in (for $s in doc("./etc/j_caesar.xml")//ACT return $s),
 $sc in (for $t in $a/SCENE return $t)
 return $sc

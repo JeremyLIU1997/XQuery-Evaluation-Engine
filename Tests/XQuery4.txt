@@ -1,5 +1,5 @@
 <result>{
-for $a in doc("j_caesar.xml")//PERSONAE, $b in $a/PERSONA
+for $a in doc("../etc/j_caesar.xml")//PERSONAE, $b in $a/PERSONA
   where not (($b/text() = "JULIUS CAESAR") or ($b/text() = "Another Poet") )
    return $b
 }
