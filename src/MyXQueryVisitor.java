@@ -418,7 +418,8 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
             stack.push(new NodeWithDepth(temp.get(i), 0));
 
         int originalStackSize = mem_stack.size();
-        mem_stack.add(new HashMap<String, List<Node>>());
+        HashMap<String, List<Node>> forcontext = new HashMap<String, List<Node>>();
+        mem_stack.add(forcontext);
 
         int MAXDEPTH = ctx.xq().size() - 1;
         while (!stack.isEmpty()) {
@@ -430,20 +431,22 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
             context.put(ctx.var(cur.depth).getText(), dummy);
 
             if (cur.depth == MAXDEPTH) {
+                int stackSizeBeforeLet = mem_stack.size();
                 /* handle let clause */
                 if (parent.letClause() != null)
                     this.visit(parent.letClause());
 
                 /* handle where clause */
+                int stackSizeBeforeWhere = mem_stack.size();
                 boolean whereReturnVal = true;
-                int stackSizeBeforeReturn = mem_stack.size();
                 if (parent.whereClause() != null)
                     whereReturnVal = (boolean) this.visit(parent.whereClause());
-                popStackUntil(stackSizeBeforeReturn);
+                popStackUntil(stackSizeBeforeWhere);
 
                 if (whereReturnVal)
                     out.addAll((List<Node>) this.visit(parent.returnClause()));
 
+                popStackUntil(stackSizeBeforeLet);
                 continue;
             }
 
@@ -461,9 +464,9 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
     @Override
     public Object visitLetClause(XQueryParser.LetClauseContext ctx) {
         HashMap<String, List<Node>> newContext = new HashMap<String, List<Node>>();
+        mem_stack.add(newContext);
         for (int i = 0; i < ctx.var().size(); i++)
             newContext.put(ctx.var(i).getText(), (List<Node>) this.visit(ctx.xq(i)));
-        mem_stack.add(newContext);
         return new ArrayList<Node>(); // dummy return
     }
 
