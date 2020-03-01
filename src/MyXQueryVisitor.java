@@ -523,7 +523,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
 
     @Override
     public Object visitXq_comma(XQueryParser.Xq_commaContext ctx) {
-        List<Node> out = (List<Node>) this.visit(ctx.xq(0));
+        List<Node> out = new ArrayList<>((List<Node>) this.visit(ctx.xq(0)));
         out.addAll((List<Node>) this.visit(ctx.xq(1)));
         return out;
     }
@@ -615,6 +615,129 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
     @Override
     public Object visitCond_or(XQueryParser.Cond_orContext ctx) {
         return (boolean) this.visit(ctx.condition(0)) || (boolean) this.visit(ctx.condition(1));
+    }
+
+    @Override
+    public Object visitAttributeList(XQueryParser.AttributeListContext ctx) {
+        String out[] = new String[ctx.attriname().size()];
+        for (int i = 0; i < ctx.attriname().size(); i++)
+            out[i] = ctx.attriname(i).getText();
+        return out;
+    }
+
+    @Override
+    public Object visitXq_join(XQueryParser.Xq_joinContext ctx) {
+        return this.visit(ctx.joinClause());
+    }
+
+    private int getHashKey(Node tuple, HashMap<String,Integer> attris) {
+        NodeList children = tuple.getChildNodes();
+        int key = 0;
+        for (int i = 0; i < children.getLength(); i++)
+            if (attris.containsKey(children.item(i).getNodeName()))
+                key += children.item(i).hashCode();
+
+        return key;
+    }
+
+    @Override
+    public Object visitJoinClause(XQueryParser.JoinClauseContext ctx) {
+        List<Node> smallist = (List<Node>)this.visit(ctx.xq(0));
+        List<Node> biglist = (List<Node>)this.visit(ctx.xq(1));
+        String[] smallattri = (String[])this.visitAttributeList(ctx.attributeList(0));
+        String[] bigattri = (String[])this.visitAttributeList(ctx.attributeList(1));
+
+        List<Node> swap1;
+        String[] swap2;
+        if (smallist.size() > biglist.size()) {
+            swap1 = smallist;
+            smallist = biglist;
+            biglist = swap1;
+
+            swap2 = smallattri;
+            smallattri = bigattri;
+            bigattri = swap2;
+        }
+
+        /* construct attribute map for biglist */
+        HashMap<String, Integer> bigattrimap = new HashMap<>();
+        for (int i = 0; i < bigattri.length; i++)
+            bigattrimap.put(bigattri[i],i);
+
+        /* construct hashmap for biglist */
+        HashMap<Integer, List<Node>> joinmap = new HashMap<>();
+        for (int i = 0; i < biglist.size(); i++) {
+            Node tuple = biglist.get(i);
+
+            int key = getHashKey(tuple, bigattrimap);
+            if (joinmap.containsKey(key))
+                joinmap.get(key).add(tuple);
+            else {
+                joinmap.put(key,new ArrayList<>());
+                joinmap.get(key).add(tuple);
+            }
+        }
+
+        List<Node> out = new ArrayList<>();
+        /* construct attribute map for smallist */
+        HashMap<String, Integer> smallattrimap = new HashMap<>();
+        for (int i = 0; i < smallattri.length; i++)
+            smallattrimap.put(smallattri[i],i);
+
+        /* join process */
+        for (int i = 0; i < smallist.size(); i++) {
+            Node smalltuple = smallist.get(i);
+            int key = getHashKey(smalltuple,smallattrimap);
+            List<Node> bucket = joinmap.get(key);
+            if (bucket == null)
+                continue;
+
+            for (Node bigtuple: bucket) {
+                NodeList children = bigtuple.getChildNodes();
+                HashMap<Integer, Node> tupleCompareMap = new HashMap<>();
+                Node child;
+                String tag;
+                /* construct tupleCompareMap for bigtuple */
+                for (int j = 0; j < children.getLength(); j++) {
+                    child = children.item(j);
+                    tag = child.getNodeName();
+                    if (bigattrimap.containsKey(tag))
+                        tupleCompareMap.put(bigattrimap.get(tag), child);
+                }
+
+                /* test if smalltuple and bigtuple are equal */
+                boolean breakflag = false;
+                children = smalltuple.getChildNodes();
+                for (int j = 0; j < children.getLength(); j++) {
+                    child = children.item(j);
+                    tag = child.getNodeName();
+                    if (smallattrimap.containsKey(tag))
+                        if ( ! child.isEqualNode( tupleCompareMap.get(smallattrimap.get(tag)) )) {
+                            breakflag = true;
+                            break;
+                        }
+                }
+                /* test passes, join the tuples and add to output */
+                if (!breakflag) {
+                    try {
+                        Document newDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+                        Node newElem = newDoc.createElement("tuple");
+                        for (int j = 0; j < smalltuple.getChildNodes().getLength(); j++)
+                            newElem.appendChild( newDoc.importNode(smalltuple.getChildNodes().item(j).cloneNode(true),true) );
+                        for (int j = 0; j < bigtuple.getChildNodes().getLength(); j++)
+                            newElem.appendChild( newDoc.importNode(bigtuple.getChildNodes().item(j).cloneNode(true),true) );
+                        out.add(newElem);
+                    } catch (ParserConfigurationException e) {
+                        e.printStackTrace();
+                        System.out.println("ParserConfigurationException in join(), exit.");
+                        System.exit(1);
+                        return null;
+                    }
+                }
+            } // for every bigtuple (in the bucket)
+        } // for every smalltuple
+
+        return out;
     }
 
 }

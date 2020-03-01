@@ -21,7 +21,13 @@ xq:
 | '<' tagname '>' '{' xq '}' '<' SLASH tagname '>'   # xq_constructor
 | forClause letClause? whereClause? returnClause     # xq_FLWR
 | letClause             # xq_let
+| joinClause            # xq_join
 ;
+
+joinClause:
+JOIN LPAREN xq ',' xq ',' attributeList ',' attributeList RPAREN;
+
+attributeList: '[' attriname (',' attriname)* ']' ;
 
 stringconst:
   STRING
@@ -128,6 +134,7 @@ IS: 'is' ;
 AND: 'and' ;
 OR: 'or' ;
 NOT: 'not' ;
+JOIN: 'join';
 
 IN: 'in' ;
 FOR: 'for' ;
@@ -153,3 +160,5 @@ SLASH: '/' ;
 LPAREN: '(' ;
 RPAREN: ')' ;
 
+LSQBRACKET: '[';
+RSQBRACKET: ']';
