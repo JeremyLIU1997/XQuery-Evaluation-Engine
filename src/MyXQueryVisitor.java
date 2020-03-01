@@ -630,13 +630,19 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         return this.visit(ctx.joinClause());
     }
 
+    private int stringToInt(String s) {
+        int code = 0;
+        for (int i = 0; i < s.length(); i++)
+            code += s.charAt(i) * (i+1);
+        return code;
+    }
+
     private int getHashKey(Node tuple, HashMap<String,Integer> attris) {
         NodeList children = tuple.getChildNodes();
         int key = 0;
         for (int i = 0; i < children.getLength(); i++)
-            if (attris.containsKey(children.item(i).getNodeName()))
-                key += children.item(i).hashCode();
-
+                if (attris.containsKey(children.item(i).getNodeName()))
+                    key += stringToInt(children.item(i).getChildNodes().item(0).getNodeName()) + children.item(i).getChildNodes().item(0).getChildNodes().getLength();
         return key;
     }
 
@@ -673,7 +679,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
             if (joinmap.containsKey(key))
                 joinmap.get(key).add(tuple);
             else {
-                joinmap.put(key,new ArrayList<>());
+                joinmap.put(key, new ArrayList<>());
                 joinmap.get(key).add(tuple);
             }
         }
@@ -712,7 +718,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
                     child = children.item(j);
                     tag = child.getNodeName();
                     if (smallattrimap.containsKey(tag))
-                        if ( ! child.isEqualNode( tupleCompareMap.get(smallattrimap.get(tag)) )) {
+                        if ( ! child.getChildNodes().item(0).isEqualNode( tupleCompareMap.get(smallattrimap.get(tag)).getChildNodes().item(0) )) {
                             breakflag = true;
                             break;
                         }

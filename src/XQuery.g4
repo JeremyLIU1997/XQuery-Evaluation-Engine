@@ -152,7 +152,7 @@ WS  :   [ \t\n]+ -> skip ; // toss out whitespace
 
 FILENAME: '"' [a-zA-Z0-9./_]* '"' ;
 STRING: '"' [a-zA-Z0-9./_,:;=()&^ %"'$#@!~`\\|?<>]* '"' ;
-NAMESTRING: [a-zA-Z0-9_]+ ;
+NAMESTRING: [a-zA-Z0-9_-]+ ;
 
 DOUBLESLASH: '//' ;
 SLASH: '/' ;
