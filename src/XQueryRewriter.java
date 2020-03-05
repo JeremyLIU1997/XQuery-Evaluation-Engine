@@ -198,7 +198,7 @@ public class XQueryRewriter extends XQueryBaseVisitor<Object> {
                 tmpRes.put("count",count);
             }
             else{
-                res = res + tmpRes.get("for") + ",\n";
+                res = res + tmpRes.get("for") + ",\n" + "where" + tmpRes.get("where") + ",\n";
             }
         }
         return res.substring(0,res.length()-2);
