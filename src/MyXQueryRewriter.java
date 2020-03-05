@@ -11,13 +11,13 @@ import java.util.*;
 
 //TODO: modify main function
 
-public class XQueryRewriter extends XQueryBaseVisitor<Object> {
+public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
 
-    private HashMap<String, List<String>> tree = new HashMap<>(); //parent -> child
-    private HashMap<String, String> tableIDMap = new HashMap<>(); //var -> tableID
-    private List<String> rootVarList = new ArrayList<>(); //store root variables for each tree
-    private HashMap<String,HashMap<String,String>> resCodeMap = new HashMap<>(); //tableID -> code
-    private HashMap<Pair<String, String>, List<Pair<String,String>>> equationsMap = new HashMap<>(); // (groupID, groupID) -> (var, var)
+    private HashMap<String, List<String>> tree = new HashMap<>(); // parent -> child
+    private HashMap<String, String> tableIDMap = new HashMap<>(); // var -> tableID
+    private List<String> rootVarList = new ArrayList<>(); // store root variables for each tree
+    private HashMap<String, HashMap<String, String>> resCodeMap = new HashMap<>(); // tableID -> code
+    private HashMap<Pair<String, String>, List<Pair<String, String>>> equationsMap = new HashMap<>(); // (groupID, groupID) -> (var, var)
 
     @Override
     public Object visitAp_slash(XQueryParser.Ap_slashContext ctx) {
@@ -43,8 +43,8 @@ public class XQueryRewriter extends XQueryBaseVisitor<Object> {
 
     @Override
     public Object visitXq_FLWR(XQueryParser.Xq_FLWRContext ctx) {
-        this.visitForClause(ctx.forClause());
-        this.visitWhereClause(ctx.whereClause());
+        this.visit(ctx.forClause());
+        this.visit(ctx.whereClause());
 
         //join
         //0. deal with equations within one component and contains constant string //TODO: how to deal with (-1,-1)
@@ -55,41 +55,43 @@ public class XQueryRewriter extends XQueryBaseVisitor<Object> {
         Set keySet = equationsMap.keySet();
         Set<Pair> tmpKeySet = new HashSet(keySet);
         //0. deal with equations that contain constant string
-        for (Pair k : tmpKeySet){
-            if (k.a.toString().equals("-1")){
+        for (Pair k : tmpKeySet) {
+            if (k.a.toString().equals("-1")) {
                 int tableID = Integer.parseInt(k.b.toString());
-                HashMap<String,String> tmpResCodeMap = resCodeMap.get(tableID+"");
+                HashMap<String, String> tmpResCodeMap = resCodeMap.get(tableID + "");
                 if (!tmpResCodeMap.containsKey("where"))
-                    tmpResCodeMap.put("where","\"" + k.a.toString() + "\" eq "+ k.b.toString());
-                else tmpResCodeMap.put("where", tmpResCodeMap.get("where")+ ", \"" + k.a.toString() + "\" eq "+ k.b.toString());//note ','
+                    tmpResCodeMap.put("where", "\"" + k.a.toString() + "\" eq " + k.b.toString());
+                else
+                    tmpResCodeMap.put("where", tmpResCodeMap.get("where") + ", \"" + k.a.toString() + "\" eq " + k.b.toString());//note ','
                 keySet.remove(k);
             }
         }
         //0. deal with equations within one component
-        for (Pair k : tmpKeySet){
-            if (k.a.toString().equals(k.b.toString())){
+        for (Pair k : tmpKeySet) {
+            if (k.a.toString().equals(k.b.toString())) {
                 int tableID = Integer.parseInt(k.b.toString());
-                HashMap<String,String> tmpResCodeMap = resCodeMap.get(tableID+"");
+                HashMap<String, String> tmpResCodeMap = resCodeMap.get(tableID + "");
                 if (!tmpResCodeMap.containsKey("where"))
-                    tmpResCodeMap.put("where",k.a.toString() + " eq "+ k.b.toString());
-                else tmpResCodeMap.put("where", tmpResCodeMap.get("where")+ ", " + k.a.toString() + " eq "+ k.b.toString());//note ','
+                    tmpResCodeMap.put("where", k.a.toString() + " eq " + k.b.toString());
+                else
+                    tmpResCodeMap.put("where", tmpResCodeMap.get("where") + ", " + k.a.toString() + " eq " + k.b.toString());//note ','
                 keySet.remove(k);
             }
         }
 
-        while (!keySet.isEmpty()){//one join each loop
+        while (!keySet.isEmpty()) {//one join each loop
             //1. 2. 3.
             Iterator it = keySet.iterator();
             Pair tableIDPair = (Pair) it.next();
 
             String leftTableID = (String) tableIDPair.a;
             String rightTableID = (String) tableIDPair.b;
-            String newTableID = leftTableID + ","+rightTableID;
+            String newTableID = leftTableID + "," + rightTableID;
 
             //modify variable groupID (traverse all variable)
-            tableIDMap.forEach((k,v) -> {
-                if (v.equals(leftTableID) || v.equals(rightTableID)){
-                    tableIDMap.put(k,newTableID);
+            tableIDMap.forEach((k, v) -> {
+                if (v.equals(leftTableID) || v.equals(rightTableID)) {
+                    tableIDMap.put(k, newTableID);
                 }
             });
 
@@ -98,7 +100,7 @@ public class XQueryRewriter extends XQueryBaseVisitor<Object> {
 
             //2. merge the related keys
             tmpKeySet = new HashSet(keySet);
-            for (Pair k:tmpKeySet) {
+            for (Pair k : tmpKeySet) {
                 boolean tobeMerge = false;
                 Pair<String, String> newPair = null;
                 if (k.a.equals(leftTableID) || k.a.equals(rightTableID)) {
@@ -128,34 +130,36 @@ public class XQueryRewriter extends XQueryBaseVisitor<Object> {
         //return clause
         String returnClause = (String) this.visitReturnClause(ctx.returnClause());
 
-        System.out.println(res + "\n" + returnClause);
         return res + "\n" + returnClause;
     }
 
     //merge the code (join two groups)
-    private void mergeCode(Pair tableIDPair, String newTableID){
+    private void mergeCode(Pair tableIDPair, String newTableID) {
         String leftTableID = (String) tableIDPair.a;
         String rightTableID = (String) tableIDPair.b;
-        List<Pair<String,String>> tmpEquations = equationsMap.get(tableIDPair);
+        List<Pair<String, String>> tmpEquations = equationsMap.get(tableIDPair);
         //contact first & second table
+        System.out.println("----------");
+        System.out.println(leftTableID);
+        System.out.println(rightTableID);
         concatCode(leftTableID);
         concatCode(rightTableID);
         //merge them and save to the new key
         HashMap<String, String> tmpRes = new HashMap<>();
-        tmpRes.put("joinArg1",resCodeMap.get(leftTableID).get("res"));
-        tmpRes.put("joinArg2",resCodeMap.get(rightTableID).get("res"));
+        tmpRes.put("joinArg1", resCodeMap.get(leftTableID).get("res"));
+        tmpRes.put("joinArg2", resCodeMap.get(rightTableID).get("res"));
         String joinArg3 = "[";
         String joinArg4 = "[";
-        for (Pair equation : tmpEquations){
+        for (Pair equation : tmpEquations) {
             joinArg3 += equation.a + ", ";
             joinArg4 += equation.b + ", ";
         }
-        joinArg3 = joinArg3.substring(0,joinArg3.length()-2) + "]";
-        joinArg4 = joinArg4.substring(0,joinArg4.length()-2) + "]";
-        tmpRes.put("joinArg3",joinArg3);
-        tmpRes.put("joinArg4",joinArg4);
+        joinArg3 = joinArg3.substring(0, joinArg3.length() - 2) + "]";
+        joinArg4 = joinArg4.substring(0, joinArg4.length() - 2) + "]";
+        tmpRes.put("joinArg3", joinArg3);
+        tmpRes.put("joinArg4", joinArg4);
 
-        resCodeMap.put(newTableID,tmpRes);
+        resCodeMap.put(newTableID, tmpRes);
         resCodeMap.remove(leftTableID);
         resCodeMap.remove(rightTableID);
     }
@@ -163,36 +167,36 @@ public class XQueryRewriter extends XQueryBaseVisitor<Object> {
     //before: codes saved as "for" -> "...", "where" -> "...",
     //In this function we concat these key-value pairs in each group
     //and save them as "res" -> result code string
-    private String concatCode(String key){
+    private String concatCode(String key) {
         HashMap<String, String> tmpResCode = resCodeMap.get(key);
-        String res="";
+        String res = "";
         //for the first type
-        if (tmpResCode.containsKey("for")){
-            res = res + "for "+ tmpResCode.get("for");
-            if (tmpResCode.containsKey("where")) res = res + "\nwhere "+ tmpResCode.get("where");
-            res = res + "\nreturn <tuple> \n"+ tmpResCode.get("return") + "\n </tuple>";
+        if (tmpResCode.containsKey("for")) {
+            res = res + "for " + tmpResCode.get("for");
+            if (tmpResCode.containsKey("where")) res = res + "\nwhere " + tmpResCode.get("where");
+            res = res + "\nreturn <tuple> \n" + tmpResCode.get("return") + "\n </tuple>";
         }
         //for the second type
-        else{
+        else {
             res = res + "join (";
             res = res + tmpResCode.containsKey("joinArg1") + ",\n\n"
-                    +tmpResCode.containsKey("joinArg2") + ",\n\n"
-                    +tmpResCode.containsKey("joinArg3") + ", "
-                    +tmpResCode.containsKey("joinArg4") + ",\n\n";
+                    + tmpResCode.containsKey("joinArg2") + ",\n\n"
+                    + tmpResCode.containsKey("joinArg3") + ", "
+                    + tmpResCode.containsKey("joinArg4") + ",\n\n";
             res = res + "\n)";
         }
-        tmpResCode.put("res",res);
+        tmpResCode.put("res", res);
         return res;
     }
 
-    //formulate the output (traverse rescodes keyset)
-    //Note that we store count in resCodeMap
-    private String formOutput(){
-        String res="for ";
-        int count=0;
-        for (String k:resCodeMap.keySet()){
+    // formulate the output (traverse rescodes keyset)
+    // Note that we store count in resCodeMap
+    private String formOutput() {
+        String res = "for ";
+        int count = 0;
+        for (String k : resCodeMap.keySet()) {
             HashMap tmpRes = resCodeMap.get(k);
-            if (tmpRes.containsKey("joinArg1")){ //this group was joined before
+            if (tmpRes.containsKey("joinArg1")) { //this group was joined before
                 res = res + "$tuple" + count + " in " + concatCode(k) + ",\n";
                 count++;
                 tmpRes.put("count",count);
@@ -201,39 +205,39 @@ public class XQueryRewriter extends XQueryBaseVisitor<Object> {
                 res = res + tmpRes.get("for") + ",\n" + "where" + tmpRes.get("where") + ",\n";
             }
         }
-        return res.substring(0,res.length()-2);
+        return res.substring(0, res.length() - 2);
     }
 
     @Override
     public Object visitReturnClause(XQueryParser.ReturnClauseContext ctx) {
-        Set<Character> endOfVar = new HashSet<>(Arrays.asList('/','<', ','));
+        Set<Character> endOfVar = new HashSet<>(Arrays.asList('/', '<', ','));
         String text = ctx.xq().getText();
-        String res="";
-        int startInd=0;
-        while (text.indexOf('$',startInd) != -1){
-            int ind  = text.indexOf('$',startInd);
+        String res = "";
+        int startInd = 0;
+        while (text.indexOf('$', startInd) != -1) {
+            int ind = text.indexOf('$', startInd);
             //modify result
-            res += text.substring(startInd,ind);
+            res += text.substring(startInd, ind);
             //update pointer
-            startInd =  ind + 1;
+            startInd = ind + 1;
             //locate the variable
-            int i=ind+1;
-            while (!endOfVar.contains(text.charAt(i))){
+            int i = ind + 1;
+            while (!endOfVar.contains(text.charAt(i))) {
                 i++;
             }
-            String var = text.substring(ind,i);
+            String var = text.substring(ind, i);
             //formulate the new variable
             if (!tableIDMap.containsKey(var)) {
                 res += var;
                 continue;// not existing variable
             }
             HashMap tmpResCode = resCodeMap.get(tableIDMap.get(var));
-            String count = (String) tmpResCode.getOrDefault("count","-1");
+            String count = (String) tmpResCode.getOrDefault("count", "-1");
             if (count.equals("-1")) {
                 res += var;
                 continue; //this group didn't join
             }
-            String newVar = "$tuple"+ count + "/"+ var.substring(1) + "/*";
+            String newVar = "$tuple" + count + "/" + var.substring(1) + "/*";
             res += newVar;
         }
         return res;
@@ -242,37 +246,38 @@ public class XQueryRewriter extends XQueryBaseVisitor<Object> {
     @Override
     public Object visitForClause(XQueryParser.ForClauseContext ctx) {
         int tableID = -1;
-        for (int i=0; i<ctx.var().size(); ++i){
+        for (int i = 0; i < ctx.var().size(); ++i) {
             String child = ctx.var(i).getText();
             String parent = (String) this.visit(ctx.xq(i));
-            String returnClause = "<"+child.substring(1)
-                    +">{"+child+"}</"+child.substring(1)+">";
+            String returnClause = "<" + child.substring(1)
+                    + ">{" + child + "}</" + child.substring(1) + ">";
             String forClause = child + " in " + ctx.xq(i).getText();
             //if parent is root: tableID++
-            if (parent != null){  //parent is not root
+            if (parent != null) {  //parent is not root
                 //add parent-child pair to tree
 //                if (!tree.containsKey(parent)){ //parent must have appeared before
 //                    tree.put(parent,new ArrayList<String>());
 //                }
                 String tmpTableID = tableIDMap.get(parent);
-                tree.get(parent).add(child); //TODO: deduplicate
+                if (!tree.containsKey(parent)) tree.put(parent, new ArrayList<>());
+                tree.get(parent).add(child); // TODO: deduplicate
                 //add child to tableIDMap
-                tableIDMap.put(child,tmpTableID);
+                tableIDMap.put(child, tmpTableID);
                 //update the corresponding code in resCodeList
-                resCodeMap.get(tmpTableID+"").put("for",
-                        resCodeMap.get(tmpTableID+"").get("for") + ",\n " + forClause);
-                resCodeMap.get(tmpTableID+"").put("return",
-                        resCodeMap.get(tmpTableID+"").get("return") + ",\n" + returnClause);
-            }
-            else{
+                resCodeMap.get(tmpTableID + "").put("for",
+                        resCodeMap.get(tmpTableID + "").get("for") + ",\n " + forClause);
+                resCodeMap.get(tmpTableID + "").put("return",
+                        resCodeMap.get(tmpTableID + "").get("return") + ",\n" + returnClause);
+            } else {
                 tableID++;
                 //add node to rootVarList
                 rootVarList.add(child);
-                tableIDMap.put(child,tableID+"");
+                tableIDMap.put(child, tableID + "");
+                tree.put(child, new ArrayList<>());
                 //add a new string to result code list
-                resCodeMap.put(tableID+"", new HashMap<>());
-                resCodeMap.get(tableID+"").put("for", forClause);
-                resCodeMap.get(tableID+"").put("return", returnClause);
+                resCodeMap.put(tableID + "", new HashMap<>());
+                resCodeMap.get(tableID + "").put("for", forClause);
+                resCodeMap.get(tableID + "").put("return", returnClause);
 
             }
         }
@@ -292,13 +297,13 @@ public class XQueryRewriter extends XQueryBaseVisitor<Object> {
         int rightTableID = Integer.parseInt(tableIDMap.getOrDefault(rightVar, "-1"));
 
         //put the smaller one in the front
-        Pair<String, String> val= leftTableID < rightTableID?
+        Pair<String, String> val = leftTableID < rightTableID ?
                 new Pair<>(leftVar, rightVar) : new Pair<>(rightVar, leftVar);
 
-        Pair<String, String> key= leftTableID < rightTableID?
-                new Pair<>(leftTableID+"", rightTableID+"") : new Pair<>(rightTableID+"", leftTableID+"");
+        Pair<String, String> key = leftTableID < rightTableID ?
+                new Pair<>(leftTableID + "", rightTableID + "") : new Pair<>(rightTableID + "", leftTableID + "");
 
-        if (!equationsMap.containsKey(key)) equationsMap.put(key,new ArrayList<>());
+        if (!equationsMap.containsKey(key)) equationsMap.put(key, new ArrayList<>());
         equationsMap.get(key).add(val);
 
         return "ABC";

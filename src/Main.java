@@ -22,9 +22,16 @@ public class Main {
         }
 
         boolean xmlOutput = false;
+        boolean rewriteFlag = false;
+
         for (int i = 1; i < args.length; i++)
-            if (args[i].charAt(0) == '-' && args[i].contains("x"))
-                xmlOutput = true;
+            if (args[i].charAt(0) == '-') {
+                if (args[i].contains("x"))
+                    xmlOutput = true;
+                if (args[i].contains("r"))
+                    rewriteFlag = true;
+            }
+
 
         // reading input and lexing/parsing
         InputStream is = new FileInputStream(inputFile); // throws FileNotFound
@@ -34,7 +41,14 @@ public class Main {
         XQueryParser parser = new XQueryParser(tokens);
         ParseTree tree = parser.xq();
 
-        // create my custom visitor and evaluate query
+        // if rewriter
+        if (rewriteFlag) {
+            MyXQueryRewriter rewriter = new MyXQueryRewriter();
+            System.out.println(rewriter.visit(tree));
+            return;
+        }
+
+        // if evaluate query
         MyXQueryVisitor visitor = new MyXQueryVisitor();
         List<Node> result = (List<Node>)visitor.visit(tree);
 
@@ -50,8 +64,6 @@ public class Main {
                 printer.printNode(node);
         }
     }
-
-
 }
 
 
