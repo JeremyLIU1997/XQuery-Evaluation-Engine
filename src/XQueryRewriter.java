@@ -40,292 +40,13 @@ public class XQueryRewriter extends XQueryBaseVisitor<Object> {
         return null;
     }
 
-//    @Override
-//    public Object visitAp_double_slash(XQueryParser.Ap_double_slashContext ctx) {
-//       return null;
-//    }
-//
-//    @Override
-//    public Object visitRp_tag(XQueryParser.Rp_tagContext ctx) {
-//        List<Node> out = new ArrayList<Node>();
-//        if (yet_to_visit.isEmpty())
-//            return out;
-//
-//        NodeList nodeList = yet_to_visit.remove(0).getChildNodes();
-//        for (int i = 0; i < nodeList.getLength(); i++) {
-//            if (nodeList.item(i).getNodeType() == Node.ELEMENT_NODE) {
-//                /* if current tag of the context node is equal to the current DOM node name */
-//                if (nodeList.item(i).getNodeName().equals(ctx.tagname().getText()))
-//                    out.add(nodeList.item(i));
-//            }
-//        }
-//        return out;
-//    }
-//
-//    @Override
-//    public Object visitRp_parent(XQueryParser.Rp_parentContext ctx) {
-//        List<Node> out = new ArrayList<Node>();
-//        if (yet_to_visit.isEmpty())
-//            return out;
-//        if (yet_to_visit.get(0).getParentNode() == null) {
-//            yet_to_visit.remove(0);
-//            return out;
-//        }
-//
-//        out.add(yet_to_visit.remove(0).getParentNode());
-//        return out;
-//    }
-//
-//    @Override
-//    public Object visitRp_anyTag(XQueryParser.Rp_anyTagContext ctx) {
-//        List<Node> out = new ArrayList<Node>();
-//        if (yet_to_visit.isEmpty())
-//            return out;
-//        NodeList nodeList = yet_to_visit.remove(0).getChildNodes();
-//        for (int i = 0; i < nodeList.getLength(); i++)
-//            if (nodeList.item(i).getNodeType() == Node.ELEMENT_NODE)
-//                out.add(nodeList.item(i));
-//        return out;
-//    }
-//
-//    @Override
-//    public Object visitRp_slash(XQueryParser.Rp_slashContext ctx) { // TO BE REFACTORED
-//        List<Node> out = new ArrayList<Node>();
-//        if (yet_to_visit.isEmpty())
-//            return out;
-//
-//        for (Node node1 : deduplicate((List<Node>) this.visit(ctx.rp(0)))) {
-//            yet_to_visit.add(node1);
-//            for (Node node2 : (List<Node>) this.visit(ctx.rp(1)))
-//                if (!out.contains(node2))
-//                    out.add(node2);
-//        }
-//        return out;
-//    }
-//
-//    private List<Node> findSelfOrDescendant(Node root) {
-//        /* For every node in nodeList, find self or descendent */
-//        List<Node> selfOrDescendent = new ArrayList<Node>();
-//
-//        List<Node> queue = new ArrayList<Node>(); // for traversal
-//        queue.add(root);                // add root (the self node)
-//        while (!queue.isEmpty()) {      // bfs traversal of DOM tree
-//            Node node = queue.remove(0);
-//            selfOrDescendent.add(node);
-//            NodeList children = node.getChildNodes();
-//            /* add all ELEMENT children to temp */
-//            for (int i = 0; i < children.getLength(); i++)
-//                if (children.item(i).getNodeType() == Node.ELEMENT_NODE)
-//                    queue.add(children.item(i));
-//        }
-//        return selfOrDescendent;
-//    }
-//
-//    private List<Node> evaluateForEach(List<Node> contextNodes, XQueryParser.RpContext ctx) {
-//        List<Node> out = new ArrayList<Node>();
-//        for (int i = 0; i < contextNodes.size(); i++) {
-//            yet_to_visit.add(contextNodes.get(i));
-//            for (Node node : (List<Node>) this.visit(ctx))
-//                if (!out.contains(node))
-//                    out.add(node);
-//        }
-//        return out;
-//    }
-//
-//    @Override
-//    public Object visitRp_double_slash(XQueryParser.Rp_double_slashContext ctx) {
-//        List<Node> out = new ArrayList<>();
-//        for (Node node1 : deduplicate((List<Node>) this.visit(ctx.rp(0)))) { // for every node in nodeList, do double_slash
-//            for (Node node : evaluateForEach(findSelfOrDescendant(node1), ctx.rp(1)))
-//                if (!out.contains(node))
-//                    out.add(node);
-//        }
-//        return out;
-//    }
-//
-//    @Override
-//    public Object visitRp_comma(XQueryParser.Rp_commaContext ctx) {
-//        Node temp = yet_to_visit.get(0);
-//        List<Node> out = (List<Node>) this.visit(ctx.rp(0));
-//        yet_to_visit.add(temp);
-//        out.addAll((List<Node>) this.visit(ctx.rp(1)));
-//        return out;
-//    }
-//
-//    @Override
-//    public Object visitRp_self(XQueryParser.Rp_selfContext ctx) {
-//        List<Node> out = new ArrayList<Node>();
-//        if (yet_to_visit.isEmpty())
-//            return out;
-//        out.add(yet_to_visit.remove(0));
-//        return out;
-//    }
-//
-//    @Override
-//    public Object visitRp_text(XQueryParser.Rp_textContext ctx) {
-//        List<Node> out = new ArrayList<Node>();
-//        if (yet_to_visit.isEmpty())
-//            return out;
-//        NodeList children = yet_to_visit.remove(0).getChildNodes();
-//        for (int i = 0; i < children.getLength(); i++)
-//            if (children.item(i).getNodeType() == Node.TEXT_NODE)
-//                out.add(children.item(i));
-//        return out;
-//    }
-
-    @Override
-    public Object visitRp_filter(XQueryParser.Rp_filterContext ctx) {
-        List<Node> out = new ArrayList<Node>();
-        List<Node> intermediate_result = (List<Node>) this.visit(ctx.rp());
-        for (int i = 0; i < intermediate_result.size(); i++) {
-            yet_to_visit.add(intermediate_result.get(i));
-            if ((boolean) this.visit(ctx.filter())) // evaluate filter on each node
-                out.add(intermediate_result.get(i));
-        }
-        return out;
-    }
-
-//    @Override
-//    public Object visitRp_paren(XQueryParser.Rp_parenContext ctx) {
-//        return this.visit(ctx.rp());
-//    }
-//
-//    @Override
-//    public Object visitRp_att(XQueryParser.Rp_attContext ctx) {
-//        List<Node> out = new ArrayList<Node>();
-//        if (yet_to_visit.isEmpty())
-//            return out;
-//        String att = ctx.attriname().getText();
-//
-//        Node node = yet_to_visit.remove(0);
-//        /* when node == doc, getAttributes() returns null !!! */
-//        if (node.getAttributes() == null)
-//            return out;
-//
-//        node = node.getAttributes().getNamedItem(att);
-//
-//        if (node != null)
-//            out.add(node);
-//        return out;
-//    }
-//
-//    /* used to deduplicate list of DOM nodes */
-//    private List<Node> deduplicate(List<Node> list) {
-//        List<Node> out = new ArrayList<Node>();
-//        HashMap<Node, Integer> map = new HashMap<Node, Integer>();
-//        HashMap<Integer, Node> reverseMap = new HashMap<Integer, Node>();
-//        for (int i = 0; i < list.size(); i++)
-//            if (!map.containsKey(list.get(i))) {
-//                map.put(list.get(i), i);
-//                reverseMap.put(i, list.get(i));
-//            }
-//
-//        for (int i = 0; i < list.size(); i++)
-//            if (reverseMap.containsKey(i))
-//                out.add(reverseMap.get(i));
-//
-//        return out;
-//    }
 //
 //    /* filter methods */
 
-    @Override
-    public Object visitF_not(XQueryParser.F_notContext ctx) {
-        return !(boolean) this.visit(ctx.filter());
-    }
 
-    @Override
-    public Object visitF_rp(XQueryParser.F_rpContext ctx) {
-        // yet_to_visit is guaranteed to be not empty
-        // otherwise this func will not be called
-        // but precautions, let's add them
-        if (yet_to_visit.isEmpty())
-            return false;
-
-        return ((List<Node>) this.visit(ctx.rp())).size() > 0;
-    }
-
-    @Override
-    public Object visitF_paren(XQueryParser.F_parenContext ctx) {
-        return this.visit(ctx.filter());
-    }
-
-    @Override
-    public Object visitF_or(XQueryParser.F_orContext ctx) {
-        // yet_to_visit is guaranteed to be not empty
-        // otherwise this func will not be called
-        // but precautions, let's add them
-        if (yet_to_visit.isEmpty())
-            return false;
-
-        Node node = yet_to_visit.get(0);
-        if ((boolean) this.visit(ctx.filter(0)))
-            return true;
-        else {
-            yet_to_visit.add(node);
-            return this.visit(ctx.filter(1));
-        }
-    }
-
-    @Override
-    public Object visitF_and(XQueryParser.F_andContext ctx) {
-        // yet_to_visit is guaranteed to be not empty
-        // otherwise this func will not be called
-        // but precautions, let's add them
-        if (yet_to_visit.isEmpty())
-            return false;
-
-        Node node = yet_to_visit.get(0);
-        if (!(boolean) this.visit(ctx.filter(0)))
-            return false;
-        else {
-            yet_to_visit.add(node);
-            return (boolean) this.visit(ctx.filter(1));
-        }
-    }
-
-    @Override
-    public Object visitF_eq(XQueryParser.F_eqContext ctx) {
-        Node node = yet_to_visit.get(0);
-        List<Node> list1 = (List<Node>) this.visit(ctx.rp(0));
-        yet_to_visit.add(node);
-        List<Node> list2 = (List<Node>) this.visit(ctx.rp(1));
-
-        for (int i = 0; i < list1.size(); i++)
-            for (int j = 0; j < list2.size(); j++)
-                if (list1.get(i).isEqualNode(list2.get(j)))
-                    return true;
-        return false;
-    }
-
-    @Override
-    public Object visitF_is(XQueryParser.F_isContext ctx) {
-        Node node = yet_to_visit.get(0);
-        List<Node> list1 = (List<Node>) this.visit(ctx.rp(0));
-        yet_to_visit.add(node);
-        List<Node> list2 = (List<Node>) this.visit(ctx.rp(1));
-        for (int i = 0; i < list1.size(); i++)
-            for (int j = 0; j < list2.size(); j++)
-                if (list1.get(i).isSameNode(list2.get(j)))
-                    return true;
-        return false;
-    }
 
     /* Milestone 2 functions */
-    //?
-    @Override
-    public Object visitXq_str(XQueryParser.Xq_strContext ctx) {
-        String StringConstant = ctx.getText().substring(1, ctx.getText().length() - 1);
-        List<Node> out = new ArrayList<Node>();
-        try {
-            out.add(DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument().createTextNode(StringConstant));
-            return out;
-        } catch (ParserConfigurationException e) {
-            System.out.println("ParserConfigurationException, exit.");
-            System.exit(3);
-            return null;
-        }
-    }
+
 
     @Override
     //TODO: see if xq_slash only contains a situation "var/rp"
@@ -340,18 +61,8 @@ public class XQueryRewriter extends XQueryBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitXq_paren(XQueryParser.Xq_parenContext ctx) {
-        return this.visit(ctx.xq());
-    }
-
-    @Override
     public Object visitXq_ap(XQueryParser.Xq_apContext ctx) {
         return this.visit(ctx.ap());
-    }
-
-    @Override
-    public Object visitXq_var(XQueryParser.Xq_varContext ctx) {
-        return ctx.var().getText();
     }
 
 
@@ -359,11 +70,12 @@ public class XQueryRewriter extends XQueryBaseVisitor<Object> {
         while (mem_stack.size() > until)
             mem_stack.remove(mem_stack.size() - 1);
     }
+
     private HashMap<String, List<String>> tree = new HashMap<>(); //parent -> child
-    private HashMap<String, Integer> tableIDMap = new HashMap<>(); //var -> tableID
+    private HashMap<String, String> tableIDMap = new HashMap<>(); //var -> tableID
     private List<String> rootVarList = new ArrayList<>(); //store root variables for each tree
-    private HashMap<Integer,String> resCodeMap = new HashMap<>(); //tableID -> code
-    private HashMap<Pair<String, String>, List<Pair<String,String>>> equationsMap = new  HashMap<>(); // (groupID, groupID) -> (var, var)
+    private HashMap<String,HashMap<String,String>> resCodeMap = new HashMap<>(); //tableID -> code
+    private HashMap<Pair<String, String>, List<Pair<String,String>>> equationsMap = new HashMap<>(); // (groupID, groupID) -> (var, var)
 
     @Override
     public Object visitXq_FLWR(XQueryParser.Xq_FLWRContext ctx) {
@@ -376,22 +88,159 @@ public class XQueryRewriter extends XQueryBaseVisitor<Object> {
         //2. every time join two group, delete the key and merge related keys
         //3. loop until all the key are deleted
 
-        Set<String> tmpKeySet = new HashSet(equationsMap.keySet());
+        Set keySet = equationsMap.keySet();
+        Set<Pair> tmpKeySet = new HashSet(keySet);
         //deal with equations that contain constant string
-        for (Pair k : equationsMap.keySet()){
-            if (k.a.equals("-1")){
-
+        for (Pair k : tmpKeySet){
+            if (k.a.toString().equals("-1")){
+                int tableID = Integer.parseInt(k.b.toString());
+                HashMap<String,String> tmpResCodeMap = resCodeMap.get(tableID+"");
+                if (!tmpResCodeMap.containsKey("where"))
+                    tmpResCodeMap.put("where","\"" + k.a.toString() + "\" eq "+ k.b.toString());
+                else tmpResCodeMap.put("where", tmpResCodeMap.get("where")+ ", \"" + k.a.toString() + "\" eq "+ k.b.toString());//note ','
+                keySet.remove(k);
+            }
+        }
+        //deal with equations within one component
+        for (Pair k : tmpKeySet){
+            if (k.a.toString().equals(k.b.toString())){
+                int tableID = Integer.parseInt(k.b.toString());
+                HashMap<String,String> tmpResCodeMap = resCodeMap.get(tableID+"");
+                if (!tmpResCodeMap.containsKey("where"))
+                    tmpResCodeMap.put("where",k.a.toString() + " eq "+ k.b.toString());
+                else tmpResCodeMap.put("where", tmpResCodeMap.get("where")+ ", " + k.a.toString() + " eq "+ k.b.toString());//note ','
+                keySet.remove(k);
             }
         }
 
-        while (!equationsMap.keySet().isEmpty()){
-            //0.
+        while (!keySet.isEmpty()){//one join each loop
+            //1.
+            Iterator it = keySet.iterator();
+            Pair tableIDPair = (Pair) it.next();
+
+            String leftTableID = (String) tableIDPair.a;
+            String rightTableID = (String) tableIDPair.b;
+            String newTableID = leftTableID + ","+rightTableID;
+
+            //modify variable groupID (traverse all variable)
+            tableIDMap.forEach((k,v) -> {
+                if (v.equals(leftTableID) || v.equals(rightTableID)){
+                    tableIDMap.put(k,newTableID);
+                }
+            });
+
+            //merge the code
+            mergeCode(tableIDPair, newTableID);
+
+            //merge the related keys
+            tmpKeySet = new HashSet(keySet);
+            for (Pair k:tmpKeySet) {
+                boolean tobeMerge = false;
+                Pair<String, String> newPair = null;
+                if (k.a.equals(leftTableID) || k.a.equals(rightTableID)) {
+                    tobeMerge = true;
+                    newPair = newTableID.compareTo((String) k.b) < 0 ?
+                            new Pair<>(newTableID, (String) k.b) : new Pair<>((String) k.b, newTableID);
+                } else if (k.b.equals(leftTableID) || k.b.equals(rightTableID)) {
+                    tobeMerge = true;
+                    newPair = newTableID.compareTo((String) k.a) < 0 ?
+                            new Pair<>(newTableID, (String) k.a) : new Pair<>((String) k.a, newTableID);
+                }
+                if (tobeMerge) {
+                    if (!keySet.contains(newPair))
+                        equationsMap.put(newPair, equationsMap.get(k));
+                    else {//concat two list
+                        equationsMap.get(newPair).addAll(equationsMap.get(k));
+                    }
+                    keySet.remove(k);
+                }
+            }
+            keySet.remove(tableIDPair);
 
         }
+        //formulate the output (traverse rescodes keyset)
+        String res = formOutput();
+
         //return clause
-        //formulate the output
+        String returnClause = (String) this.visitReturnClause(ctx.returnClause());
+
+        System.out.println(res + "\n" + returnClause);
+        return res + "\n" + returnClause;
+    }
+
+    //merge the code (join two groups)
+    private Object mergeCode(Pair tableIDPair, String newTableID){
+        String leftTableID = (String) tableIDPair.a;
+        String rightTableID = (String) tableIDPair.b;
+        List<Pair<String,String>> tmpEquations = equationsMap.get(tableIDPair);
+        //contact first & second table
+        concatCode(leftTableID);
+        concatCode(rightTableID);
+        //merge them and save to the new key
+        HashMap<String, String> tmpRes = new HashMap<>();
+        tmpRes.put("joinArg1",resCodeMap.get(leftTableID).get("res"));
+        tmpRes.put("joinArg2",resCodeMap.get(rightTableID).get("res"));
+        String joinArg3 = "[";
+        String joinArg4 = "[";
+        for (Pair equation : tmpEquations){
+            joinArg3 += equation.a + ", ";
+            joinArg4 += equation.b + ", ";
+        }
+        joinArg3 = joinArg3.substring(0,joinArg3.length()-2) + "]";
+        joinArg4 = joinArg4.substring(0,joinArg4.length()-2) + "]";
+        tmpRes.put("joinArg3",joinArg3);
+        tmpRes.put("joinArg4",joinArg4);
+
+        resCodeMap.put(newTableID,tmpRes);
+        resCodeMap.remove(leftTableID);
+        resCodeMap.remove(rightTableID);
         return "ABC";
     }
+
+    //before: codes saved as "for" -> "...", "where" -> "...",
+    //In this function we concat these key-value pairs in each group
+    //and save them as "res" -> result code string
+    private String concatCode(String key){
+        HashMap<String, String> tmpResCode = resCodeMap.get(key);
+        String res="";
+        //for the first type
+        if (tmpResCode.containsKey("for")){
+            res = res + "for "+ tmpResCode.get("for");
+            if (tmpResCode.containsKey("where")) res = res + "\nwhere "+ tmpResCode.get("where");
+            res = res + "\nreturn <tuple> \n"+ tmpResCode.get("return") + "\n </tuple>";
+        }
+        //for the second type
+        else{
+            res = res + "join (";
+            res = res + tmpResCode.containsKey("joinArg1") + ",\n\n"
+                    +tmpResCode.containsKey("joinArg2") + ",\n\n"
+                    +tmpResCode.containsKey("joinArg3") + ", "
+                    +tmpResCode.containsKey("joinArg4") + ",\n\n";
+            res = res + "\n)";
+        }
+        tmpResCode.put("res",res);
+        return res;
+    }
+
+    //formulate the output (traverse rescodes keyset)
+    //Note that we store count in resCodeMap
+    private String formOutput(){
+        String res="for ";
+        int count=0;
+        for (String k:resCodeMap.keySet()){
+            HashMap tmpRes = resCodeMap.get(k);
+            if (tmpRes.containsKey("joinArg1")){ //this group was joined before
+                res = res + "$tuple" + count + " in " + concatCode(k) + ",\n";
+                count++;
+                tmpRes.put("count",count);
+            }
+            else{
+                res = res + tmpRes.get("for") + ",\n";
+            }
+        }
+        return res.substring(0,res.length()-2);
+    }
+
 
     /* a wrapper class used for DFS */
     class NodeWithDepth {
@@ -405,33 +254,76 @@ public class XQueryRewriter extends XQueryBaseVisitor<Object> {
     }
 
     @Override
+    public Object visitReturnClause(XQueryParser.ReturnClauseContext ctx) {
+        Set<Character> endOfVar = new HashSet<>(Arrays.asList('/','<', ','));
+        String text = ctx.xq().getText();
+        String res="";
+        int startInd=0;
+        while (text.indexOf('$',startInd) != -1){
+            int ind  = text.indexOf('$',startInd);
+            //modify result
+            res += text.substring(startInd,ind);
+            //update pointer
+            startInd =  ind + 1;
+            //locate the variable
+            int i=ind+1;
+            while (!endOfVar.contains(text.charAt(i))){
+                i++;
+            }
+            String var = text.substring(ind,i);
+            //formulate the new variable
+            if (!tableIDMap.containsKey(var)) {
+                res += var;
+                continue;// not existing variable
+            }
+            HashMap tmpResCode = resCodeMap.get(tableIDMap.get(var));
+            String count = (String) tmpResCode.getOrDefault("count","-1");
+            if (count.equals("-1")) {
+                res += var;
+                continue; //this group didn't join
+            }
+            String newVar = "$tuple"+ count + "/"+ var.substring(1) + "/*";
+            res += newVar;
+        }
+        return res;
+    }
+
+    @Override
+    //TODO: initialize return clause
     public Object visitForClause(XQueryParser.ForClauseContext ctx) {
         int tableID = -1;
-        for (int i=0; i<ctx.depth(); ++i){
+        for (int i=0; i<ctx.var().size(); ++i){
             String child = ctx.var(i).getText();
             String parent = (String) this.visit(ctx.xq(i));
+            String returnClause = "<"+child.substring(1)
+                    +">{"+child+"}</"+child.substring(1)+">";
+            String forClause = child + " in " + ctx.xq(i).getText();
             //if parent is root: tableID++
-            //TODO: identify if parent is root
             if (parent != null){  //parent is not root
                 //add parent-child pair to tree
 //                if (!tree.containsKey(parent)){ //parent must have appeared before
 //                    tree.put(parent,new ArrayList<String>());
 //                }
-                int tmpTableID = tableIDMap.get(parent);
+                String tmpTableID = tableIDMap.get(parent);
                 tree.get(parent).add(child); //TODO: deduplicate
                 //add child to tableIDMap
                 tableIDMap.put(child,tmpTableID);
                 //update the corresponding code in resCodeList
-
-                resCodeMap.put(tmpTableID, resCodeMap.get(tmpTableID) + ", " + child + " in " + ctx.xq(i).getText());
+                resCodeMap.get(tmpTableID+"").put("for",
+                        resCodeMap.get(tmpTableID+"").get("for") + ",\n " + forClause);
+                resCodeMap.get(tmpTableID+"").put("return",
+                        resCodeMap.get(tmpTableID+"").get("return") + ",\n" + returnClause);
             }
             else{
                 tableID++;
                 //add node to rootVarList
                 rootVarList.add(child);
+                tableIDMap.put(child,tableID+"");
                 //add a new string to result code list
-                resCodeMap.put(tableID, child + " in " +ctx.xq(i).getText());
-                tableIDMap.put(child,tableID);
+                resCodeMap.put(tableID+"", new HashMap<>());
+                resCodeMap.get(tableID+"").put("for", forClause);
+                resCodeMap.get(tableID+"").put("return", returnClause);
+
             }
         }
 
@@ -448,8 +340,8 @@ public class XQueryRewriter extends XQueryBaseVisitor<Object> {
         String leftVar = ctx.xq(0).getText();
         String rightVar = ctx.xq(1).getText();
         //TODO: if constant string begin with $
-        int leftTableID = tableIDMap.getOrDefault(leftVar, -1);
-        int rightTableID = tableIDMap.getOrDefault(rightVar, -1);
+        int leftTableID = Integer.parseInt(tableIDMap.getOrDefault(leftVar, "-1"));
+        int rightTableID = Integer.parseInt(tableIDMap.getOrDefault(rightVar, "-1"));
 
         //put the smaller one in the front
         Pair<String, String> val= leftTableID < rightTableID?
@@ -464,45 +356,6 @@ public class XQueryRewriter extends XQueryBaseVisitor<Object> {
         return "ABC";
     }
 
-    @Override
-    public Object visitReturnClause(XQueryParser.ReturnClauseContext ctx) {
-        return this.visit(ctx.xq());
-    }
-
-
-    private Node makeElem(String tag, List<Node> children) {
-        try {
-            Document newDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-            Node out = newDoc.createElement(tag);
-            for (int i = 0; i < children.size(); i++)
-                out.appendChild(newDoc.importNode(children.get(i).cloneNode(true), true));
-            return out;
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-            System.out.println("ParserConfigurationException, exit.");
-            System.exit(1);
-            return null;
-        }
-    }
-
-    @Override
-    public Object visitXq_constructor(XQueryParser.Xq_constructorContext ctx) {
-        List<Node> out = new ArrayList<>();
-        if (!ctx.tagname(0).getText().equals(ctx.tagname(1).getText())) {
-            System.out.println("Opening and closing tags don't match: "
-                    + "\'"
-                    + ctx.tagname(0).getText()
-                    + "\'"
-                    + " != "
-                    + "\'"
-                    + ctx.tagname(1).getText()
-                    + "\'"
-                    + ". Exit.");
-            System.exit(2);
-        }
-        out.add(this.makeElem(ctx.tagname(0).getText(), (List<Node>) this.visit(ctx.xq())));
-        return out;
-    }
 
 
     @Override
@@ -518,150 +371,6 @@ public class XQueryRewriter extends XQueryBaseVisitor<Object> {
         this.visit(ctx.condition(0));
         this.visit(ctx.condition(1));
         return "ABC";
-    }
-
-
-
-
-    @Override
-    public Object visitCond_not(XQueryParser.Cond_notContext ctx) {
-        return !(boolean) this.visit(ctx.condition());
-    }
-
-    @Override
-    public Object visitCond_or(XQueryParser.Cond_orContext ctx) {
-        return (boolean) this.visit(ctx.condition(0)) || (boolean) this.visit(ctx.condition(1));
-    }
-
-    @Override
-    public Object visitAttributeList(XQueryParser.AttributeListContext ctx) {
-        String out[] = new String[ctx.attriname().size()];
-        for (int i = 0; i < ctx.attriname().size(); i++)
-            out[i] = ctx.attriname(i).getText();
-        return out;
-    }
-
-
-    //Milestone 3
-    @Override
-    public Object visitXq_join(XQueryParser.Xq_joinContext ctx) {
-        return this.visit(ctx.joinClause());
-    }
-
-    private int stringToInt(String s) {
-        int code = 0;
-        for (int i = 0; i < s.length(); i++)
-            code += s.charAt(i) * (i+1);
-        return code;
-    }
-
-    private int getHashKey(Node tuple, HashMap<String,Integer> attris) {
-        NodeList children = tuple.getChildNodes();
-        int key = 0;
-        for (int i = 0; i < children.getLength(); i++)
-                if (attris.containsKey(children.item(i).getNodeName()))
-                    key += stringToInt(children.item(i).getChildNodes().item(0).getNodeName()) + children.item(i).getChildNodes().item(0).getChildNodes().getLength();
-        return key;
-    }
-
-    @Override
-    public Object visitJoinClause(XQueryParser.JoinClauseContext ctx) {
-        List<Node> smallist = (List<Node>)this.visit(ctx.xq(0));
-        List<Node> biglist = (List<Node>)this.visit(ctx.xq(1));
-        String[] smallattri = (String[])this.visitAttributeList(ctx.attributeList(0));
-        String[] bigattri = (String[])this.visitAttributeList(ctx.attributeList(1));
-
-        List<Node> swap1;
-        String[] swap2;
-        if (smallist.size() > biglist.size()) {
-            swap1 = smallist;
-            smallist = biglist;
-            biglist = swap1;
-
-            swap2 = smallattri;
-            smallattri = bigattri;
-            bigattri = swap2;
-        }
-
-        /* construct attribute map for biglist */
-        HashMap<String, Integer> bigattrimap = new HashMap<>();
-        for (int i = 0; i < bigattri.length; i++)
-            bigattrimap.put(bigattri[i],i);
-
-        /* construct hashmap for biglist */
-        HashMap<Integer, List<Node>> joinmap = new HashMap<>();
-        for (int i = 0; i < biglist.size(); i++) {
-            Node tuple = biglist.get(i);
-
-            int key = getHashKey(tuple, bigattrimap);
-            if (joinmap.containsKey(key))
-                joinmap.get(key).add(tuple);
-            else {
-                joinmap.put(key, new ArrayList<>());
-                joinmap.get(key).add(tuple);
-            }
-        }
-
-        List<Node> out = new ArrayList<>();
-        /* construct attribute map for smallist */
-        HashMap<String, Integer> smallattrimap = new HashMap<>();
-        for (int i = 0; i < smallattri.length; i++)
-            smallattrimap.put(smallattri[i],i);
-
-        /* join process */
-        for (int i = 0; i < smallist.size(); i++) {
-            Node smalltuple = smallist.get(i);
-            int key = getHashKey(smalltuple,smallattrimap);
-            List<Node> bucket = joinmap.get(key);
-            if (bucket == null)
-                continue;
-
-            for (Node bigtuple: bucket) {
-                NodeList children = bigtuple.getChildNodes();
-                HashMap<Integer, Node> tupleCompareMap = new HashMap<>();
-                Node child;
-                String tag;
-                /* construct tupleCompareMap for bigtuple */
-                for (int j = 0; j < children.getLength(); j++) {
-                    child = children.item(j);
-                    tag = child.getNodeName();
-                    if (bigattrimap.containsKey(tag))
-                        tupleCompareMap.put(bigattrimap.get(tag), child);
-                }
-
-                /* test if smalltuple and bigtuple are equal */
-                boolean breakflag = false;
-                children = smalltuple.getChildNodes();
-                for (int j = 0; j < children.getLength(); j++) {
-                    child = children.item(j);
-                    tag = child.getNodeName();
-                    if (smallattrimap.containsKey(tag))
-                        if ( ! child.getChildNodes().item(0).isEqualNode( tupleCompareMap.get(smallattrimap.get(tag)).getChildNodes().item(0) )) {
-                            breakflag = true;
-                            break;
-                        }
-                }
-                /* test passes, join the tuples and add to output */
-                if (!breakflag) {
-                    try {
-                        Document newDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-                        Node newElem = newDoc.createElement("tuple");
-                        for (int j = 0; j < smalltuple.getChildNodes().getLength(); j++)
-                            newElem.appendChild( newDoc.importNode(smalltuple.getChildNodes().item(j).cloneNode(true),true) );
-                        for (int j = 0; j < bigtuple.getChildNodes().getLength(); j++)
-                            newElem.appendChild( newDoc.importNode(bigtuple.getChildNodes().item(j).cloneNode(true),true) );
-                        out.add(newElem);
-                    } catch (ParserConfigurationException e) {
-                        e.printStackTrace();
-                        System.out.println("ParserConfigurationException in join(), exit.");
-                        System.exit(1);
-                        return null;
-                    }
-                }
-            } // for every bigtuple (in the bucket)
-        } // for every smalltuple
-
-        return out;
     }
 
 }
