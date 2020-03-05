@@ -99,6 +99,7 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
             mergeCode(tableIDPair, newTableID);
 
             //2. merge the related keys
+            keySet.remove(tableIDPair);
             tmpKeySet = new HashSet(keySet);
             for (Pair k : tmpKeySet) {
                 boolean tobeMerge = false;
@@ -121,7 +122,6 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
                     keySet.remove(k);
                 }
             }
-            keySet.remove(tableIDPair);
 
         }
         //formulate the output (traverse resCodeMap keySet)
