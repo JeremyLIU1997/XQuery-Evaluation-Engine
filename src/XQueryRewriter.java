@@ -9,44 +9,20 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.util.*;
 
+//TODO: modify main function
+
 public class XQueryRewriter extends XQueryBaseVisitor<Object> {
 
-    protected List<HashMap<String, List<Node>>> mem_stack = new ArrayList<>();
-    private List<Node> yet_to_visit = new ArrayList<>(); // to store DOM nodes yet to visit
-
-    private Document openInputFile(String filename) {
-        try {
-            // create DOM document parser and parse input file
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            filename = filename.replace("\"", "");
-            File inputFile = new File(filename);
-            Document doc = dBuilder.parse(inputFile);
-            doc = dBuilder.parse(inputFile);
-            doc.getDocumentElement().normalize(); // what does this do?
-            return doc;
-        } // end of try
-        catch (Exception e) {
-            System.out.println("File open error, exit.");
-            e.printStackTrace();
-            System.exit(1);
-        }
-        return null;
-    }
-
+    private HashMap<String, List<String>> tree = new HashMap<>(); //parent -> child
+    private HashMap<String, String> tableIDMap = new HashMap<>(); //var -> tableID
+    private List<String> rootVarList = new ArrayList<>(); //store root variables for each tree
+    private HashMap<String,HashMap<String,String>> resCodeMap = new HashMap<>(); //tableID -> code
+    private HashMap<Pair<String, String>, List<Pair<String,String>>> equationsMap = new HashMap<>(); // (groupID, groupID) -> (var, var)
 
     @Override
     public Object visitAp_slash(XQueryParser.Ap_slashContext ctx) {
         return null;
     }
-
-//
-//    /* filter methods */
-
-
-
-    /* Milestone 2 functions */
-
 
     @Override
     //TODO: see if xq_slash only contains a situation "var/rp"
@@ -65,18 +41,6 @@ public class XQueryRewriter extends XQueryBaseVisitor<Object> {
         return this.visit(ctx.ap());
     }
 
-
-    private void popStackUntil(int until) {
-        while (mem_stack.size() > until)
-            mem_stack.remove(mem_stack.size() - 1);
-    }
-
-    private HashMap<String, List<String>> tree = new HashMap<>(); //parent -> child
-    private HashMap<String, String> tableIDMap = new HashMap<>(); //var -> tableID
-    private List<String> rootVarList = new ArrayList<>(); //store root variables for each tree
-    private HashMap<String,HashMap<String,String>> resCodeMap = new HashMap<>(); //tableID -> code
-    private HashMap<Pair<String, String>, List<Pair<String,String>>> equationsMap = new HashMap<>(); // (groupID, groupID) -> (var, var)
-
     @Override
     public Object visitXq_FLWR(XQueryParser.Xq_FLWRContext ctx) {
         this.visitForClause(ctx.forClause());
@@ -90,7 +54,7 @@ public class XQueryRewriter extends XQueryBaseVisitor<Object> {
 
         Set keySet = equationsMap.keySet();
         Set<Pair> tmpKeySet = new HashSet(keySet);
-        //deal with equations that contain constant string
+        //0. deal with equations that contain constant string
         for (Pair k : tmpKeySet){
             if (k.a.toString().equals("-1")){
                 int tableID = Integer.parseInt(k.b.toString());
@@ -101,7 +65,7 @@ public class XQueryRewriter extends XQueryBaseVisitor<Object> {
                 keySet.remove(k);
             }
         }
-        //deal with equations within one component
+        //0. deal with equations within one component
         for (Pair k : tmpKeySet){
             if (k.a.toString().equals(k.b.toString())){
                 int tableID = Integer.parseInt(k.b.toString());
@@ -114,7 +78,7 @@ public class XQueryRewriter extends XQueryBaseVisitor<Object> {
         }
 
         while (!keySet.isEmpty()){//one join each loop
-            //1.
+            //1. 2. 3.
             Iterator it = keySet.iterator();
             Pair tableIDPair = (Pair) it.next();
 
@@ -129,10 +93,10 @@ public class XQueryRewriter extends XQueryBaseVisitor<Object> {
                 }
             });
 
-            //merge the code
+            //2. merge the code
             mergeCode(tableIDPair, newTableID);
 
-            //merge the related keys
+            //2. merge the related keys
             tmpKeySet = new HashSet(keySet);
             for (Pair k:tmpKeySet) {
                 boolean tobeMerge = false;
@@ -158,7 +122,7 @@ public class XQueryRewriter extends XQueryBaseVisitor<Object> {
             keySet.remove(tableIDPair);
 
         }
-        //formulate the output (traverse rescodes keyset)
+        //formulate the output (traverse resCodeMap keySet)
         String res = formOutput();
 
         //return clause
@@ -169,7 +133,7 @@ public class XQueryRewriter extends XQueryBaseVisitor<Object> {
     }
 
     //merge the code (join two groups)
-    private Object mergeCode(Pair tableIDPair, String newTableID){
+    private void mergeCode(Pair tableIDPair, String newTableID){
         String leftTableID = (String) tableIDPair.a;
         String rightTableID = (String) tableIDPair.b;
         List<Pair<String,String>> tmpEquations = equationsMap.get(tableIDPair);
@@ -194,7 +158,6 @@ public class XQueryRewriter extends XQueryBaseVisitor<Object> {
         resCodeMap.put(newTableID,tmpRes);
         resCodeMap.remove(leftTableID);
         resCodeMap.remove(rightTableID);
-        return "ABC";
     }
 
     //before: codes saved as "for" -> "...", "where" -> "...",
@@ -241,18 +204,6 @@ public class XQueryRewriter extends XQueryBaseVisitor<Object> {
         return res.substring(0,res.length()-2);
     }
 
-
-    /* a wrapper class used for DFS */
-    class NodeWithDepth {
-        int depth;
-        Node node;
-
-        public NodeWithDepth(Node node, int depth) {
-            this.depth = depth;
-            this.node = node;
-        }
-    }
-
     @Override
     public Object visitReturnClause(XQueryParser.ReturnClauseContext ctx) {
         Set<Character> endOfVar = new HashSet<>(Arrays.asList('/','<', ','));
@@ -289,7 +240,6 @@ public class XQueryRewriter extends XQueryBaseVisitor<Object> {
     }
 
     @Override
-    //TODO: initialize return clause
     public Object visitForClause(XQueryParser.ForClauseContext ctx) {
         int tableID = -1;
         for (int i=0; i<ctx.var().size(); ++i){
@@ -326,7 +276,6 @@ public class XQueryRewriter extends XQueryBaseVisitor<Object> {
 
             }
         }
-
         return "ABC";
     }
 
@@ -339,7 +288,6 @@ public class XQueryRewriter extends XQueryBaseVisitor<Object> {
     public Object visitCond_eq(XQueryParser.Cond_eqContext ctx) {
         String leftVar = ctx.xq(0).getText();
         String rightVar = ctx.xq(1).getText();
-        //TODO: if constant string begin with $
         int leftTableID = Integer.parseInt(tableIDMap.getOrDefault(leftVar, "-1"));
         int rightTableID = Integer.parseInt(tableIDMap.getOrDefault(rightVar, "-1"));
 
@@ -355,16 +303,6 @@ public class XQueryRewriter extends XQueryBaseVisitor<Object> {
 
         return "ABC";
     }
-
-
-
-    @Override
-    public Object visitXq_comma(XQueryParser.Xq_commaContext ctx) {
-        List<Node> out = new ArrayList<>((List<Node>) this.visit(ctx.xq(0)));
-        out.addAll((List<Node>) this.visit(ctx.xq(1)));
-        return out;
-    }
-
 
     @Override
     public Object visitCond_and(XQueryParser.Cond_andContext ctx) {
