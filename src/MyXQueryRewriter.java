@@ -54,9 +54,9 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
 
         Set keySet = equationsMap.keySet();
         Set<Pair> tmpKeySet = new HashSet(keySet);
-        //0. deal with equations that contain constant string
+        //0. deal with equations that contain constant string or within one component
         for (Pair k : tmpKeySet) {
-            if (k.a.toString().equals("-1")) {
+            if (k.a.toString().equals("-1") || k.a.toString().equals(k.b.toString())) {
                 int tableID = Integer.parseInt(k.b.toString());
                 HashMap<String, String> tmpResCodeMap = resCodeMap.get(tableID + "");
                 List<Pair<String,String>> tmpEquations = equationsMap.get(k);
@@ -68,18 +68,6 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
                 tmpResCodeMap.put("where", tmpResCodeMap.get("where").substring(1));//delete the first ','
                 keySet.remove(k);
 
-            }
-        }
-        //0. deal with equations within one component
-        for (Pair k : tmpKeySet) {
-            if (k.a.toString().equals(k.b.toString())) {
-                int tableID = Integer.parseInt(k.b.toString());
-                HashMap<String, String> tmpResCodeMap = resCodeMap.get(tableID + "");
-                if (!tmpResCodeMap.containsKey("where"))
-                    tmpResCodeMap.put("where", k.a.toString() + " eq " + k.b.toString());
-                else
-                    tmpResCodeMap.put("where", tmpResCodeMap.get("where") + ", " + k.a.toString() + " eq " + k.b.toString());//note ','
-                keySet.remove(k);
             }
         }
 
@@ -206,7 +194,8 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
                 count++;
             }
             else{
-                res = res + tmpRes.get("for") + ",\n" + "where" + tmpRes.get("where") + ",\n";
+                res = res + tmpRes.get("for") + ",\n";
+                if (tmpRes.containsKey("where")) res = res  + "where" + tmpRes.get("where") + ",\n";
             }
         }
         return res.substring(0, res.length() - 2);
@@ -323,6 +312,5 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
         this.visit(ctx.condition(1));
         return "ABC";
     }
-
 }
 
