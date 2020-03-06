@@ -166,7 +166,7 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
         if (tmpResCode.containsKey("for")) {
             res = res + "for " + tmpResCode.get("for");
             if (tmpResCode.containsKey("where")) res = res + "\nwhere " + tmpResCode.get("where");
-            res = res + "\nreturn <tuple> \n" + tmpResCode.get("return") + "\n </tuple>";
+            res = res + "\nreturn <tuple>{ \n" + tmpResCode.get("return") + "\n }</tuple>";
         }
         //for the second type
         else {
