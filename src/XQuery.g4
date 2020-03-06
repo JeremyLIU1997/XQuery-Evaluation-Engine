@@ -31,7 +31,7 @@ attributeList: '[' attriname (',' attriname)* ']' ;
 
 stringconst:
   STRING
-| FILENAME
+  | FILENAME
 ;
 
 var: '$' tagname;
@@ -99,7 +99,7 @@ tagname             # rp_tag
 | LPAREN rp RPAREN  # rp_paren
 | rp '[' filter ']' # rp_filter
 | rp DOUBLESLASH rp # rp_double_slash
-| rp SLASH rp       # rp_slash // should I use slash? here or start another alternative?
+| rp SLASH rp       # rp_slash
 | rp ',' rp         # rp_comma
 ;
 
@@ -148,10 +148,10 @@ RETURN: 'return' ;
 UNDERSCORE: '_' ;
 
 //NEWLINE:'\r'? '\n' ;     // return newlines to parser (is end-statement signal)
-WS  :   [ \t\n]+ -> skip ; // toss out whitespace
+WS  :   [ \t\r\n]+ -> skip ; // toss out whitespace
 
 FILENAME: '"' [a-zA-Z0-9./_]* '"' ;
-STRING: '"' [a-zA-Z0-9./_,:;=()&^ %"'$#@!~`\\|?<>]* '"' ;
+STRING: '"' [a-zA-Z0-9./_,:;=()&^ %'$#@!~`\\|?<>]* '"' ;
 NAMESTRING: [a-zA-Z0-9_-]+ ;
 
 DOUBLESLASH: '//' ;

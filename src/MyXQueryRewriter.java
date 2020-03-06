@@ -67,7 +67,6 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
                 }
                 tmpResCodeMap.put("where", tmpResCodeMap.get("where").substring(1));//delete the first ','
                 keySet.remove(k);
-
             }
         }
 
@@ -131,9 +130,6 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
         String rightTableID = (String) tableIDPair.b;
         List<Pair<String, String>> tmpEquations = equationsMap.get(tableIDPair);
         //contact first & second table
-//        System.out.println("----------");
-//        System.out.println(leftTableID);
-//        System.out.println(rightTableID);
         concatCode(leftTableID);
         concatCode(rightTableID);
         //merge them and save to the new key
@@ -251,10 +247,6 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
             String forClause = child + " in " + ctx.xq(i).getText();
             //if parent is root: tableID++
             if (parent != null) {  //parent is not root
-                //add parent-child pair to tree
-//                if (!tree.containsKey(parent)){ //parent must have appeared before
-//                    tree.put(parent,new ArrayList<String>());
-//                }
                 String tmpTableID = tableIDMap.get(parent);
                 if (!tree.containsKey(parent)) tree.put(parent, new ArrayList<>());
                 tree.get(parent).add(child); // TODO: deduplicate
@@ -275,7 +267,6 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
                 resCodeMap.put(tableID + "", new HashMap<>());
                 resCodeMap.get(tableID + "").put("for", forClause);
                 resCodeMap.get(tableID + "").put("return", returnClause);
-
             }
         }
         return "ABC";

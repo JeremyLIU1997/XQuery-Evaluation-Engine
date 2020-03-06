@@ -21,17 +21,20 @@ if __name__ == '__main__':
 	for case in cases:
 		if case.endswith(".py") \
 		or case.startswith(".") \
-		or "join" in case.lower() \
 		or not os.path.isfile(testdir + "/" + case) \
 		or case == "toy.txt":
 			continue
 		total += 1
 		print(separator)
 		print(case + ": \n")
-
-		if system("java -jar " + jarfile + " " + testdir + "/" + case + " -x") != 0:
-			failures += 1
-			faillist.append(case)
+		if "rewrite" in case.lower():
+			if system("java -jar " + jarfile + " " + testdir + "/" + case + " -r") != 0:
+				failures += 1
+				faillist.append(case)
+		else:
+			if system("java -jar " + jarfile + " " + testdir + "/" + case + " -x") != 0:
+				failures += 1
+				faillist.append(case)
 
 	print("\n\n\n*********** Summary ***********")
 	print("* Failures: " + str(failures) + "/" + str(total))
