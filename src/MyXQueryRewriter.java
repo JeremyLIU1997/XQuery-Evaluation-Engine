@@ -59,11 +59,15 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
             if (k.a.toString().equals("-1")) {
                 int tableID = Integer.parseInt(k.b.toString());
                 HashMap<String, String> tmpResCodeMap = resCodeMap.get(tableID + "");
+                List<Pair<String,String>> tmpEquations = equationsMap.get(k);
                 if (!tmpResCodeMap.containsKey("where"))
-                    tmpResCodeMap.put("where", "\"" + k.a.toString() + "\" eq " + k.b.toString());
-                else
-                    tmpResCodeMap.put("where", tmpResCodeMap.get("where") + ", \"" + k.a.toString() + "\" eq " + k.b.toString());//note ','
+                    tmpResCodeMap.put("where","");
+                for (Pair<String,String> equation: tmpEquations){
+                    tmpResCodeMap.put("where", tmpResCodeMap.get("where") + ", " + equation.a + " eq " + equation.b);//note ','
+                }
+                tmpResCodeMap.put("where", tmpResCodeMap.get("where").substring(1));//delete the first ','
                 keySet.remove(k);
+
             }
         }
         //0. deal with equations within one component
@@ -130,7 +134,7 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
         //return clause
         String returnClause = (String) this.visitReturnClause(ctx.returnClause());
 
-        return res + "\n" + returnClause;
+        return res + "\nreturn " + returnClause;
     }
 
     //merge the code (join two groups)
@@ -139,9 +143,9 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
         String rightTableID = (String) tableIDPair.b;
         List<Pair<String, String>> tmpEquations = equationsMap.get(tableIDPair);
         //contact first & second table
-        System.out.println("----------");
-        System.out.println(leftTableID);
-        System.out.println(rightTableID);
+//        System.out.println("----------");
+//        System.out.println(leftTableID);
+//        System.out.println(rightTableID);
         concatCode(leftTableID);
         concatCode(rightTableID);
         //merge them and save to the new key
@@ -151,8 +155,8 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
         String joinArg3 = "[";
         String joinArg4 = "[";
         for (Pair equation : tmpEquations) {
-            joinArg3 += equation.a + ", ";
-            joinArg4 += equation.b + ", ";
+            joinArg3 += equation.a.toString().substring(1) + ", ";
+            joinArg4 += equation.b.toString().substring(1) + ", ";
         }
         joinArg3 = joinArg3.substring(0, joinArg3.length() - 2) + "]";
         joinArg4 = joinArg4.substring(0, joinArg4.length() - 2) + "]";
@@ -178,11 +182,11 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
         }
         //for the second type
         else {
-            res = res + "join (";
-            res = res + tmpResCode.containsKey("joinArg1") + ",\n\n"
-                    + tmpResCode.containsKey("joinArg2") + ",\n\n"
-                    + tmpResCode.containsKey("joinArg3") + ", "
-                    + tmpResCode.containsKey("joinArg4") + ",\n\n";
+            res = res + "join (\n";
+            res = res + tmpResCode.get("joinArg1") + ",\n\n"
+                    + tmpResCode.get("joinArg2") + ",\n\n"
+                    + tmpResCode.get("joinArg3") + ", "
+                    + tmpResCode.get("joinArg4") + "\n\n";
             res = res + "\n)";
         }
         tmpResCode.put("res", res);
@@ -198,8 +202,8 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
             HashMap tmpRes = resCodeMap.get(k);
             if (tmpRes.containsKey("joinArg1")) { //this group was joined before
                 res = res + "$tuple" + count + " in " + concatCode(k) + ",\n";
+                tmpRes.put("count",count+"");
                 count++;
-                tmpRes.put("count",count);
             }
             else{
                 res = res + tmpRes.get("for") + ",\n" + "where" + tmpRes.get("where") + ",\n";
@@ -210,7 +214,7 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
 
     @Override
     public Object visitReturnClause(XQueryParser.ReturnClauseContext ctx) {
-        Set<Character> endOfVar = new HashSet<>(Arrays.asList('/', '<', ','));
+        Set<Character> endOfVar = new HashSet<>(Arrays.asList('/', '<', ',','}'));
         String text = ctx.xq().getText();
         String res = "";
         int startInd = 0;
@@ -218,14 +222,17 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
             int ind = text.indexOf('$', startInd);
             //modify result
             res += text.substring(startInd, ind);
-            //update pointer
-            startInd = ind + 1;
+
             //locate the variable
             int i = ind + 1;
-            while (!endOfVar.contains(text.charAt(i))) {
-                i++;
+            while (!endOfVar.contains(text.charAt(++i))) {
+                //i++;
             }
             String var = text.substring(ind, i);
+            //update pointer
+            startInd = i;
+            char c = text.charAt(i);
+
             //formulate the new variable
             if (!tableIDMap.containsKey(var)) {
                 res += var;
@@ -240,6 +247,7 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
             String newVar = "$tuple" + count + "/" + var.substring(1) + "/*";
             res += newVar;
         }
+        res += text.substring(startInd);
         return res;
     }
 
