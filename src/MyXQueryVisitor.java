@@ -646,6 +646,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         return key;
     }
 
+    // TODO: join4.txt NullPointer bug
     @Override
     public Object visitJoinClause(XQueryParser.JoinClauseContext ctx) {
         List<Node> smallist = (List<Node>)this.visit(ctx.xq(0));

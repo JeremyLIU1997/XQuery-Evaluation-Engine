@@ -5,10 +5,11 @@ from os import listdir
 from os import system
 import os
 import sys
+import getpass
 
 if __name__ == '__main__':
-	testdir = "/Users/LeLe/IdeaProjects/XQuery-Evaluation-Engine/Tests"
-	jarfile = "/Users/LeLe/IdeaProjects/XQuery-Evaluation-Engine/out/artifacts/XQuery_Evaluation_Engine_jar/XQuery-Evaluation-Engine.jar"
+	testdir = "/Users/" + getpass.getuser() +"/IdeaProjects/XQuery-Evaluation-Engine/Tests"
+	jarfile = "/Users/" + getpass.getuser() +"/IdeaProjects/XQuery-Evaluation-Engine/out/artifacts/XQuery_Evaluation_Engine_jar/XQuery-Evaluation-Engine.jar"
 
 	cases = listdir()
 	cases.sort()
