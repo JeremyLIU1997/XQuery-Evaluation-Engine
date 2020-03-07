@@ -25,6 +25,9 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
     }
 
     @Override
+    public Object visitAp_double_slash(XQueryParser.Ap_double_slashContext ctx) {return null;}
+
+    @Override
     //TODO: see if xq_slash only contains a situation "var/rp"
     public Object visitXq_double_slash_rp(XQueryParser.Xq_double_slash_rpContext ctx) {
         return ctx.xq().getText();
@@ -170,7 +173,7 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
             res = res + tmpResCode.get("joinArg1") + ",\n\n"
                     + tmpResCode.get("joinArg2") + ",\n\n"
                     + tmpResCode.get("joinArg3") + ", "
-                    + tmpResCode.get("joinArg4") + "\n\n";
+                    + tmpResCode.get("joinArg4");
             res = res + "\n)";
         }
         tmpResCode.put("res", res);

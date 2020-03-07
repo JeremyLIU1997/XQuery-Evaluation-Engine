@@ -1,4 +1,4 @@
-// Generated from XQuery.g4 by ANTLR 4.7.2
+// Generated from XQuery.g4 by ANTLR 4.7.1
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**

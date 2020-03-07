@@ -409,6 +409,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
 
     @Override
     public Object visitForClause(XQueryParser.ForClauseContext ctx) {
+
         ArrayList<Node> out = new ArrayList<>();
         XQueryParser.Xq_FLWRContext parent = (XQueryParser.Xq_FLWRContext) ctx.parent;
         Deque<NodeWithDepth> stack = new ArrayDeque<>();

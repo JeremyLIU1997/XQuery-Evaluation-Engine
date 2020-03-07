@@ -1,0 +1,100 @@
+for $p in "123"
+ let $p:="789"
+ where some $p in "456" satisfies $p="456"
+ return $p
+
+for $p in doc("./etc/j_caesar.xml")//(ACT,PERSONAE)/TITLE
+let $b := $p/text()
+return $b
+
+for $t in doc("./etc/j_caesar.xml")//PERSONA
+    for $p in doc("./etc/j_caesar.xml")//SPEAKER
+        where $t=$s
+        return $t
+
+let $p := doc("./etc/j_caesar.xml")/PLAY/PERSONAE/PGROUP/PERSONA
+where $p/./text() = $p/text()
+return $p
+
+################samples############
+
+<acts> { for $a in doc("./etc/j_caesar.xml")//ACT
+              where empty ( for $sp in $a/SCENE/SPEECH/SPEAKER
+                                      where $sp/text() = "CASCA"
+                                     return <speaker> {$sp/text()}</speaker>
+                                     )
+              return <act>{$a/TITLE/text()}</act>
+}</acts>
+
+
+<result>{  for $a in (for $s in doc("./etc/j_caesar.xml")//ACT return $s),
+                     $sc in (for $t in $a/SCENE return $t),
+                     $sp in (for $d in $sc/SPEECH return $d)
+                 where $sp/LINE/text() = "Et tu, Brute! Then fall, Caesar."
+                 return <who>{$sp/SPEAKER/text()}</who>,
+                           <when>{
+                                           <act>{$a/TITLE/text()}</act>,
+                                           <scene>{$sc/TITLE/text()}</scene>
+                           }</when>
+}
+</result>
+
+
+##### 5 ##### similar to 2
+
+<result>{
+for $a in doc("./etc/j_caesar.xml")//ACT,
+    $sc in $a/SCENE,
+    $sp in $sc/SPEECH
+where $sp/LINE/text() = "Et tu, Brute! Then fall, Caesar."
+return <who>{$sp/SPEAKER/text()}</who>,
+       <when>{<act>{$a/TITLE/text()}</act>,
+             <scene>{$sc/TITLE/text()}</scene>}
+       </when>
+}</result>
+
+
+### 6 ###
+
+for $s in doc("./etc/j_caesar.xml")//SPEAKER,
+    $a in doc("./etc/j_caesar.xml")//ACT
+       where some $s1 in $a//SPEAKER satisfies $s1 eq $s
+                return <when>{$a/TITLE/text()}</when>
+
+
+
+for $s in doc("./etc/j_caesar.xml")//SPEAKER
+return <speaks>{<who>{$s/text()}</who>,
+                for $a in document("j_caesar.xml")//ACT
+                where some $s1 in $a//SPEAKER satisfies $s1 eq $s
+                return <when>{$a/TITLE/text()}</when>}
+       </speaks>
+
+
+### 7 ###
+
+for $a in doc("j_caesar.xml")//ACT
+where some $b in document("j_caesar.xml")//ACT satisfies $a eq $b
+return <test>{$a/TITLE/text()}
+</test>
+
+for $s in doc("j_caesar.xml")//SPEAKER
+return <speaks>{<who>{$s/text()}</who>,
+                for $a in doc("j_caesar.xml")//ACT
+                where some $s1 in $a//SPEAKER, $s2 in $a//TITLE satisfies (($s1 eq $s) and ($s2/text() = "ACT IV"))
+                return <when> {$a/TITLE/text()}</when> }
+       </speaks>
+
+
+<result> { for $a in doc("./etc/j_caesar.xml")//ACT
+ return  <scenes> {
+				for $b in $a//SCENE
+  					where empty (
+									for $sp in $b/SPEECH/SPEAKER where $sp/text() = "CASCA"
+									return $sp
+								)
+  					return $b/TITLE
+					}
+   		</scenes>
+}
+</result>
