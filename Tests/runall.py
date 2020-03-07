@@ -29,7 +29,7 @@ if __name__ == '__main__':
 		print(separator)
 		print(case + ": \n")
 		if "rewrite" in case.lower():
-			if system("java -jar " + jarfile + " " + testdir + "/" + case + " -r") != 0:
+			if system("java -jar " + jarfile + " " + testdir + "/" + case + " -rx") != 0:
 				failures += 1
 				faillist.append(case)
 		else:

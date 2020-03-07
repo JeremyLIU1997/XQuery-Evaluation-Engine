@@ -1,0 +1,371 @@
+<?xml version="1.0"?>
+<!DOCTYPE PLAY SYSTEM "play.dtd">
+
+<PLAY>
+    <TITLE>The Tragedy of Julius Caesar</TITLE>
+
+    <FM>
+        <P>Text placed in the public domain by Moby Lexical Tools, 1992.</P>
+        <P>SGML markup by Jon Bosak, 1992-1994.</P>
+        <P>XML version by Jon Bosak, 1996-1998.</P>
+        <P>This work may be freely copied and distributed worldwide.</P>
+    </FM>
+
+
+    <PERSONAE>
+        <TITLE  nmb="1"  mlb="2">1</TITLE>
+        <TITLE  nmb="1"  cnm="4">2</TITLE>
+        <TITLE  nmb="1"  rnm="5">3</TITLE>
+
+        <PERSONA>JULIUS CAESAR</PERSONA>
+
+        <PGROUP>
+            <PERSONA>OCTAVIUS CAESAR</PERSONA>
+            <PERSONA>MARCUS ANTONIUS</PERSONA>
+            <PERSONA>M. AEMILIUS LEPIDUS</PERSONA>
+            <GRPDESCR>triumvirs after death of Julius Caesar.</GRPDESCR>
+        </PGROUP>
+
+
+        <PGROUP>
+            <PERSONA>CICERO</PERSONA>
+            <PERSONA>PUBLIUS</PERSONA>
+            <PERSONA>POPILIUS LENA</PERSONA>
+            <GRPDESCR>senators.</GRPDESCR>
+        </PGROUP>
+
+
+        <PGROUP>
+            <PERSONA>MARCUS BRUTUS</PERSONA>
+            <PERSONA>CASSIUS</PERSONA>
+            <PERSONA>CASCA</PERSONA>
+            <PERSONA>TREBONIUS</PERSONA>
+            <PERSONA>LIGARIUS</PERSONA>
+            <PERSONA>DECIUS BRUTUS</PERSONA>
+            <PERSONA>METELLUS CIMBER</PERSONA>
+            <PERSONA>CINNA</PERSONA>
+            <GRPDESCR>conspirators against Julius Caesar.</GRPDESCR>
+        </PGROUP>
+
+
+        <PGROUP>
+            <PERSONA>FLAVIUS</PERSONA>
+            <PERSONA>MARULLUS</PERSONA>
+            <GRPDESCR>tribunes.</GRPDESCR>
+        </PGROUP>
+
+        <PERSONA>ARTEMIDORUS Of Cnidos, a teacher of rhetoric.</PERSONA>
+        <PERSONA>A Soothsayer</PERSONA>
+        <PERSONA>CINNA, a poet.</PERSONA>
+        <PERSONA>Another Poet</PERSONA>
+
+        <PGROUP>
+            <PERSONA>LUCILIUS</PERSONA>
+            <PERSONA>TITINIUS</PERSONA>
+            <PERSONA>MESSALA</PERSONA>
+            <PERSONA>Young CATO</PERSONA>
+            <PERSONA>VOLUMNIUS</PERSONA>
+            <GRPDESCR>friends to Brutus and Cassius.</GRPDESCR>
+        </PGROUP>
+
+
+        <PGROUP>
+            <PERSONA>VARRO</PERSONA>
+            <PERSONA>CLITUS</PERSONA>
+            <PERSONA>CLAUDIUS</PERSONA>
+            <PERSONA>STRATO</PERSONA>
+            <PERSONA>LUCIUS</PERSONA>
+            <PERSONA>DARDANIUS</PERSONA>
+            <GRPDESCR>servants to Brutus.</GRPDESCR>
+        </PGROUP>
+
+        <PERSONA>PINDARUS, servant to Cassius.</PERSONA>
+        <PERSONA>CALPURNIA, wife to Caesar.</PERSONA>
+        <PERSONA>PORTIA, wife to Brutus.</PERSONA>
+        <PERSONA>Senators, Citizens, Guards, Attendants, &amp;c.</PERSONA>
+    </PERSONAE>
+
+    <SCNDESCR>SCENE Rome: the neighbourhood of Sardis: the neighbourhood of Philippi.</SCNDESCR>
+
+    <PLAYSUBT>JULIUS CAESAR</PLAYSUBT>
+
+    <ACT>
+        <TITLE>ACT I</TITLE>
+
+        <SCENE>
+            <TITLE>SCENE I. Rome. A street.</TITLE>
+            <STAGEDIR>Enter FLAVIUS, MARULLUS, and certain Commoners</STAGEDIR>
+
+            <SPEECH>
+                <SPEAKER>FLAVIUS</SPEAKER>
+                <LINE>Hence! home, you idle creatures get you home:</LINE>
+                <LINE>Is this a holiday? what! know you not,</LINE>
+                <LINE>Being mechanical, you ought not walk</LINE>
+                <LINE>Upon a labouring day without the sign</LINE>
+                <LINE>Of your profession? Speak, what trade art thou?</LINE>
+            </SPEECH>
+
+            <SPEECH>
+                <SPEAKER>First Commoner</SPEAKER>
+                <LINE>Why, sir, a carpenter.</LINE>
+            </SPEECH>
+
+            <SPEECH>
+                <SPEAKER>MARULLUS</SPEAKER>
+                <LINE>Where is thy leather apron and thy rule?</LINE>
+                <LINE>What dost thou with thy best apparel on?</LINE>
+                <LINE>You, sir, what trade are you?</LINE>
+            </SPEECH>
+
+            <SPEECH>
+                <SPEAKER>Second Commoner</SPEAKER>
+                <LINE>Truly, sir, in respect of a fine workman, I am but,</LINE>
+                <LINE>as you would say, a cobbler.</LINE>
+            </SPEECH>
+
+            <SPEECH>
+                <SPEAKER>MARULLUS</SPEAKER>
+                <LINE>But what trade art thou? answer me directly.</LINE>
+            </SPEECH>
+
+            <SPEECH>
+                <SPEAKER>Second Commoner</SPEAKER>
+                <LINE>A trade, sir, that, I hope, I may use with a safe</LINE>
+                <LINE>conscience; which is, indeed, sir, a mender of bad soles.</LINE>
+            </SPEECH>
+
+            <SPEECH>
+                <SPEAKER>MARULLUS</SPEAKER>
+                <LINE>What trade, thou knave? thou naughty knave, what trade?</LINE>
+            </SPEECH>
+
+            <SPEECH>
+                <SPEAKER>Second Commoner</SPEAKER>
+                <LINE>Nay, I beseech you, sir, be not out with me: yet,</LINE>
+                <LINE>if you be out, sir, I can mend you.</LINE>
+            </SPEECH>
+
+            <SPEECH>
+                <SPEAKER>MARULLUS</SPEAKER>
+                <LINE>What meanest thou by that? mend me, thou saucy fellow!</LINE>
+            </SPEECH>
+
+            <SPEECH>
+                <SPEAKER>Second Commoner</SPEAKER>
+                <LINE>Why, sir, cobble you.</LINE>
+            </SPEECH>
+
+            <SPEECH>
+                <SPEAKER>FLAVIUS</SPEAKER>
+                <LINE>Thou art a cobbler, art thou?</LINE>
+            </SPEECH>
+
+            <SPEECH>
+                <SPEAKER>Second Commoner</SPEAKER>
+                <LINE>Truly, sir, all that I live by is with the awl: I</LINE>
+                <LINE>meddle with no tradesman's matters, nor women's</LINE>
+                <LINE>matters, but with awl. I am, indeed, sir, a surgeon</LINE>
+                <LINE>to old shoes; when they are in great danger, I</LINE>
+                <LINE>recover them. As proper men as ever trod upon</LINE>
+                <LINE>neat's leather have gone upon my handiwork.</LINE>
+            </SPEECH>
+
+
+            <STAGEDIR>Exeunt</STAGEDIR>
+        </SCENE>
+
+        <SCENE>
+            <TITLE>SCENE II. A public place.</TITLE>
+            <STAGEDIR>Flourish. Enter CAESAR; ANTONY, for the course;
+                CALPURNIA, PORTIA, DECIUS BRUTUS, CICERO, BRUTUS,
+                CASSIUS, and CASCA; a great crowd following, among
+                them a Soothsayer
+            </STAGEDIR>
+
+
+
+
+            <STAGEDIR>Flourish</STAGEDIR>
+
+            <SPEECH>
+                <SPEAKER>Soothsayer</SPEAKER>
+                <LINE>Caesar!</LINE>
+            </SPEECH>
+
+            <SPEECH>
+                <SPEAKER>CAESAR</SPEAKER>
+                <LINE>Ha! who calls?</LINE>
+            </SPEECH>
+
+            <SPEECH>
+                <SPEAKER>CASCA</SPEAKER>
+                <LINE>Bid every noise be still: peace yet again!</LINE>
+            </SPEECH>
+
+
+
+
+            <STAGEDIR>Sennet. Exeunt all except BRUTUS and CASSIUS</STAGEDIR>
+
+            <SPEECH>
+                <SPEAKER>CASSIUS</SPEAKER>
+                <LINE>Will you go see the order of the course?</LINE>
+            </SPEECH>
+
+            <SPEECH>
+                <SPEAKER>BRUTUS</SPEAKER>
+                <LINE>Not I.</LINE>
+            </SPEECH>
+
+            <SPEECH>
+                <SPEAKER>CASSIUS</SPEAKER>
+                <LINE>I pray you, do.</LINE>
+            </SPEECH>
+
+            <SPEECH>
+                <SPEAKER>BRUTUS</SPEAKER>
+                <LINE>I am not gamesome: I do lack some part</LINE>
+                <LINE>Of that quick spirit that is in Antony.</LINE>
+                <LINE>Let me not hinder, Cassius, your desires;</LINE>
+                <LINE>I'll leave you.</LINE>
+            </SPEECH>
+
+
+
+            <STAGEDIR>Flourish, and shout</STAGEDIR>
+
+            <SPEECH>
+                <SPEAKER>BRUTUS</SPEAKER>
+                <LINE>What means this shouting? I do fear, the people</LINE>
+                <LINE>Choose Caesar for their king.</LINE>
+            </SPEECH>
+
+            <SPEECH>
+                <SPEAKER>CASSIUS</SPEAKER>
+                <LINE>Ay, do you fear it?</LINE>
+                <LINE>Then must I think you would not have it so.</LINE>
+            </SPEECH>
+
+
+            <STAGEDIR>Shout. Flourish</STAGEDIR>
+
+            <SPEECH>
+                <SPEAKER>BRUTUS</SPEAKER>
+                <LINE>Another general shout!</LINE>
+                <LINE>I do believe that these applauses are</LINE>
+                <LINE>For some new honours that are heap'd on Caesar.</LINE>
+            </SPEECH>
+
+
+            <STAGEDIR>Sennet. Exeunt CAESAR and all his Train, but CASCA</STAGEDIR>
+
+            <SPEECH>
+                <SPEAKER>CASCA</SPEAKER>
+                <LINE>You pull'd me by the cloak; would you speak with me?</LINE>
+            </SPEECH>
+
+            <SPEECH>
+                <SPEAKER>BRUTUS</SPEAKER>
+                <LINE>Ay, Casca; tell us what hath chanced to-day,</LINE>
+                <LINE>That Caesar looks so sad.</LINE>
+            </SPEECH>
+
+            <SPEECH>
+                <SPEAKER>CASCA</SPEAKER>
+                <LINE>Why, you were with him, were you not?</LINE>
+            </SPEECH>
+
+            <SPEECH>
+                <SPEAKER>BRUTUS</SPEAKER>
+                <LINE>I should not then ask Casca what had chanced.</LINE>
+            </SPEECH>
+        </SCENE>
+
+        <SCENE>
+            <TITLE>SCENE III. The same. A street.</TITLE>
+            <STAGEDIR>Thunder and lightning. Enter from opposite sides,
+                CASCA, with his sword drawn, and CICERO
+            </STAGEDIR>
+
+            <SPEECH>
+                <SPEAKER>CICERO</SPEAKER>
+                <LINE>Good even, Casca: brought you Caesar home?</LINE>
+                <LINE>Why are you breathless? and why stare you so?</LINE>
+            </SPEECH>
+
+            <SPEECH>
+                <SPEAKER>CASCA</SPEAKER>
+                <LINE>Are not you moved, when all the sway of earth</LINE>
+                <LINE>Shakes like a thing unfirm? O Cicero,</LINE>
+                <LINE>I have seen tempests, when the scolding winds</LINE>
+                <LINE>Have rived the knotty oaks, and I have seen</LINE>
+                <LINE>The ambitious ocean swell and rage and foam,</LINE>
+                <LINE>To be exalted with the threatening clouds:</LINE>
+                <LINE>But never till to-night, never till now,</LINE>
+                <LINE>Did I go through a tempest dropping fire.</LINE>
+                <LINE>Either there is a civil strife in heaven,</LINE>
+                <LINE>Or else the world, too saucy with the gods,</LINE>
+                <LINE>Incenses them to send destruction.</LINE>
+            </SPEECH>
+
+            <SPEECH>
+                <SPEAKER>CICERO</SPEAKER>
+                <LINE>Why, saw you any thing more wonderful?</LINE>
+            </SPEECH>
+
+
+
+            <SPEECH>
+                <SPEAKER>CASCA</SPEAKER>
+                <LINE>'Tis Caesar that you mean; is it not, Cassius?</LINE>
+            </SPEECH>
+
+            <SPEECH>
+                <SPEAKER>CASSIUS</SPEAKER>
+                <LINE>Let it be who it is: for Romans now</LINE>
+                <LINE>Have thews and limbs like to their ancestors;</LINE>
+                <LINE>But, woe the while! our fathers' minds are dead,</LINE>
+                <LINE>And we are govern'd with our mothers' spirits;</LINE>
+                <LINE>Our yoke and sufferance show us womanish.</LINE>
+            </SPEECH>
+
+            <SPEECH>
+                <SPEAKER>CASCA</SPEAKER>
+                <LINE>Indeed, they say the senators tomorrow</LINE>
+                <LINE>Mean to establish Caesar as a king;</LINE>
+                <LINE>And he shall wear his crown by sea and land,</LINE>
+                <LINE>In every place, save here in Italy.</LINE>
+            </SPEECH>
+
+            <SPEECH>
+                <SPEAKER>CASSIUS</SPEAKER>
+                <LINE>I know where I will wear this dagger then;</LINE>
+                <LINE>Cassius from bondage will deliver Cassius:</LINE>
+                <LINE>Therein, ye gods, you make the weak most strong;</LINE>
+                <LINE>Therein, ye gods, you tyrants do defeat:</LINE>
+                <LINE>Nor stony tower, nor walls of beaten brass,</LINE>
+                <LINE>Nor airless dungeon, nor strong links of iron,</LINE>
+                <LINE>Can be retentive to the strength of spirit;</LINE>
+                <LINE>But life, being weary of these worldly bars,</LINE>
+                <LINE>Never lacks power to dismiss itself.</LINE>
+                <LINE>If I know this, know all the world besides,</LINE>
+                <LINE>That part of tyranny that I do bear</LINE>
+                <LINE>I can shake off at pleasure.</LINE>
+            </SPEECH>
+
+
+            <STAGEDIR>Thunder still</STAGEDIR>
+
+            <SPEECH>
+                <SPEAKER>CASCA</SPEAKER>
+                <LINE>So can I:</LINE>
+                <LINE>So every bondman in his own hand bears</LINE>
+                <LINE>The power to cancel his captivity.</LINE>
+            </SPEECH>
+
+
+            <STAGEDIR>Exeunt</STAGEDIR>
+        </SCENE>
+
+    </ACT>
+</PLAY>

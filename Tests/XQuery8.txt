@@ -1,4 +1,5 @@
-for $a in doc("j_caesar.xml")//ACT
-where some $b in doc("j_caesar.xml")//ACT satisfies $a eq $b
-return <test>{$a/TITLE/text()}
+for $a in doc(../etc/j_caesar.xml")//ACT
+where some $b in doc("../etc/j_caesar.xml")//ACT satisfies $a eq $b
+return <test>
+{$a/TITLE/text()}
 </test>

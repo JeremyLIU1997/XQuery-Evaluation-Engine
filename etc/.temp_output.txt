@@ -1,0 +1,44 @@
+for $tuple0 in join (
+join (
+for $ee in doc("./etc/small.xml")//PGROUP,
+ $persona6 in $ee/PERSONA/text(),
+ $persona7 in $ee/PERSONA/text(),
+ $persona8 in $ee/PERSONA/text()
+return <tuple>{ 
+<ee>{$ee}</ee>,
+<persona6>{$persona6}</persona6>,
+<persona7>{$persona7}</persona7>,
+<persona8>{$persona8}</persona8>
+ }</tuple>,
+
+for $pg in doc("./etc/small.xml")//PGROUP,
+ $persona1 in $pg/PERSONA/text(),
+ $persona2 in $pg/PERSONA/text(),
+ $persona5 in $pg/PERSONA/text()
+return <tuple>{ 
+<pg>{$pg}</pg>,
+<persona1>{$persona1}</persona1>,
+<persona2>{$persona2}</persona2>,
+<persona5>{$persona5}</persona5>
+ }</tuple>,
+
+[persona6, persona7, persona8], [persona1, persona2, persona5]
+
+
+),
+
+for $dk in doc("./etc/small.xml")//PGROUP,
+ $persona3 in $dk/PERSONA/text(),
+ $persona4 in $dk/PERSONA/text()
+where  "CICERO" eq $persona3
+return <tuple>{ 
+<dk>{$dk}</dk>,
+<persona3>{$persona3}</persona3>,
+<persona4>{$persona4}</persona4>
+ }</tuple>,
+
+[persona8], [persona3]
+
+
+)
+return <tuple>{<name>{$tuple0/persona3/*}</name>,<persona1>{$tuple0/persona1/*}</persona1>,<persona2>{$tuple0/persona2/*}</persona2>}</tuple>

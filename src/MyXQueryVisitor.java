@@ -633,26 +633,26 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
     private int stringToInt(String s) {
         int code = 0;
         for (int i = 0; i < s.length(); i++)
-            code += s.charAt(i) * (i+1);
+            code += s.charAt(i) * (i + 1);
         return code;
     }
 
-    private int getHashKey(Node tuple, HashMap<String,Integer> attris) {
+    private int getHashKey(Node tuple, HashMap<String, Integer> attris) {
         NodeList children = tuple.getChildNodes();
         int key = 0;
         for (int i = 0; i < children.getLength(); i++)
-                if (attris.containsKey(children.item(i).getNodeName()))
-                    key += stringToInt(children.item(i).getChildNodes().item(0).getNodeName()) + children.item(i).getChildNodes().item(0).getChildNodes().getLength();
+            if (attris.containsKey(children.item(i).getNodeName()) && children.item(i).getChildNodes().getLength() != 0)
+                key += stringToInt(children.item(i).getChildNodes().item(0).getNodeName()) + children.item(i).getChildNodes().item(0).getChildNodes().getLength();
         return key;
     }
 
     // TODO: join4.txt NullPointer bug
     @Override
     public Object visitJoinClause(XQueryParser.JoinClauseContext ctx) {
-        List<Node> smallist = (List<Node>)this.visit(ctx.xq(0));
-        List<Node> biglist = (List<Node>)this.visit(ctx.xq(1));
-        String[] smallattri = (String[])this.visitAttributeList(ctx.attributeList(0));
-        String[] bigattri = (String[])this.visitAttributeList(ctx.attributeList(1));
+        List<Node> smallist = (List<Node>) this.visit(ctx.xq(0));
+        List<Node> biglist = (List<Node>) this.visit(ctx.xq(1));
+        String[] smallattri = (String[]) this.visitAttributeList(ctx.attributeList(0));
+        String[] bigattri = (String[]) this.visitAttributeList(ctx.attributeList(1));
 
         List<Node> swap1;
         String[] swap2;
@@ -669,7 +669,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         /* construct attribute map for biglist */
         HashMap<String, Integer> bigattrimap = new HashMap<>();
         for (int i = 0; i < bigattri.length; i++)
-            bigattrimap.put(bigattri[i],i);
+            bigattrimap.put(bigattri[i], i);
 
         /* construct hashmap for biglist */
         HashMap<Integer, List<Node>> joinmap = new HashMap<>();
@@ -689,17 +689,17 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         /* construct attribute map for smallist */
         HashMap<String, Integer> smallattrimap = new HashMap<>();
         for (int i = 0; i < smallattri.length; i++)
-            smallattrimap.put(smallattri[i],i);
+            smallattrimap.put(smallattri[i], i);
 
         /* join process */
         for (int i = 0; i < smallist.size(); i++) {
             Node smalltuple = smallist.get(i);
-            int key = getHashKey(smalltuple,smallattrimap);
+            int key = getHashKey(smalltuple, smallattrimap);
             List<Node> bucket = joinmap.get(key);
             if (bucket == null)
                 continue;
 
-            for (Node bigtuple: bucket) {
+            for (Node bigtuple : bucket) {
                 NodeList children = bigtuple.getChildNodes();
                 HashMap<Integer, Node> tupleCompareMap = new HashMap<>();
                 Node child;
@@ -719,7 +719,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
                     child = children.item(j);
                     tag = child.getNodeName();
                     if (smallattrimap.containsKey(tag))
-                        if ( ! child.getChildNodes().item(0).isEqualNode( tupleCompareMap.get(smallattrimap.get(tag)).getChildNodes().item(0) )) {
+                        if (!child.getChildNodes().item(0).isEqualNode(tupleCompareMap.get(smallattrimap.get(tag)).getChildNodes().item(0))) {
                             breakflag = true;
                             break;
                         }
@@ -730,9 +730,9 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
                         Document newDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
                         Node newElem = newDoc.createElement("tuple");
                         for (int j = 0; j < smalltuple.getChildNodes().getLength(); j++)
-                            newElem.appendChild( newDoc.importNode(smalltuple.getChildNodes().item(j).cloneNode(true),true) );
+                            newElem.appendChild(newDoc.importNode(smalltuple.getChildNodes().item(j).cloneNode(true), true));
                         for (int j = 0; j < bigtuple.getChildNodes().getLength(); j++)
-                            newElem.appendChild( newDoc.importNode(bigtuple.getChildNodes().item(j).cloneNode(true),true) );
+                            newElem.appendChild(newDoc.importNode(bigtuple.getChildNodes().item(j).cloneNode(true), true));
                         out.add(newElem);
                     } catch (ParserConfigurationException e) {
                         e.printStackTrace();

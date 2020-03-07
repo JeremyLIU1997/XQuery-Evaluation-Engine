@@ -1,14 +1,23 @@
 for
-$act in doc("j_caesar.xml")//ACT,
-$title in $act/SCENE/TITLE,
-$speaker1 in $act//SPEAKER/text(),
-$speaker2 in $act//SPEAKER/text(),
-$pg in $act//PGROUP,
-$persona1 in $pg/PERSONA/text(),
-$persona2 in $pg/PERSONA/text()
-where
-$speaker1 eq $persona1
-and
-$speaker2 eq $persona2
-return<tuple>
-{<scene>{$title/text()}</scene>,<persona1>{$persona1}</persona1>,<persona2>{$persona2}</persona2>}</tuple>
+        $ee in doc("./etc/small.xml")//PGROUP,
+        $persona6 in $ee/PERSONA/text(),
+        $persona7 in $ee/PERSONA/text(),
+        $persona8 in $ee/PERSONA/text(),
+    $pg in doc("./etc/small.xml")//PGROUP,
+    $persona1 in $pg/PERSONA/text(),
+    $persona2 in $pg/PERSONA/text(),
+    $persona5 in $pg/PERSONA/text(),
+        $dk in doc("./etc/small.xml")//PGROUP,
+        $persona3 in $dk/PERSONA/text(),
+        $persona4 in $dk/PERSONA/text()
+
+where $persona6 eq $persona1 and $persona7 eq $persona2 and $persona8 eq $persona5
+and $persona8 eq $persona3 and $persona3 = "CICERO"
+
+return
+    <tuple>{
+        <name>{$persona3}</name>,
+        <persona1>{$persona1}</persona1>,
+        <persona2>{$persona2}</persona2>
+
+    }</tuple>

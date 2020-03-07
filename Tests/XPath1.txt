@@ -1,1 +1,0 @@
-doc("../etc/j_caesar.xml")//ACT/SCENE/SPEECH/SPEAKER
