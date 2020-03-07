@@ -1,1 +1,14 @@
-for$actindoc("j_caesar.xml")//ACT,$titlein$act/SCENE/TITLE,$speaker1in$act//SPEAKER/text(),$speaker2in$act//SPEAKER/text(),$pgin$act//PGROUP,$persona1in$pg/PERSONA/text(),$persona2in$pg/PERSONA/text()where$speaker1eq$persona1and$speaker2eq$persona2return<tuple>{<scene>{$title/text()}</scene>,<persona1>{$persona1}</persona1>,<persona2>{$persona2}</persona2>}</tuple>
+for
+$act in doc("j_caesar.xml")//ACT,
+$title in $act/SCENE/TITLE,
+$speaker1 in $act//SPEAKER/text(),
+$speaker2 in $act//SPEAKER/text(),
+$pg in $act//PGROUP,
+$persona1 in $pg/PERSONA/text(),
+$persona2 in $pg/PERSONA/text()
+where
+$speaker1 eq $persona1
+and
+$speaker2 eq $persona2
+return<tuple>
+{<scene>{$title/text()}</scene>,<persona1>{$persona1}</persona1>,<persona2>{$persona2}</persona2>}</tuple>
