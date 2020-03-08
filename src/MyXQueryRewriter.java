@@ -9,8 +9,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.util.*;
 
-//TODO: modify main function
-
 public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
 
     private HashMap<String, List<String>> tree = new HashMap<>(); // parent -> child
@@ -185,6 +183,7 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
     private String formOutput() {
         String res = "for ";
         int count = 0;
+        String where = "";
         for (String k : resCodeMap.keySet()) {
             HashMap tmpRes = resCodeMap.get(k);
             if (tmpRes.containsKey("joinArg1")) { //this group was joined before
@@ -192,12 +191,15 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
                 tmpRes.put("count",count+"");
                 count++;
             }
-            else{//TODO: the location of where clause can be wrong
+            else{
                 res = res + tmpRes.get("for") + ",\n";
-                if (tmpRes.containsKey("where")) res = res.substring(0,res.length()-2)  + "\nwhere" + tmpRes.get("where") + ",\n";
+                if (tmpRes.containsKey("where"))
+                    where += tmpRes.get("where") + " and";
             }
         }
-        return res.substring(0, res.length() - 2);
+        if (!where.equals(""))
+            res = res.substring(0,res.length()-2)  + "\nwhere" + where.substring(0,where.length()-4);
+        return res;
     }
 
     @Override
