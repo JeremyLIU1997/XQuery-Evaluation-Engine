@@ -641,13 +641,16 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
     private int getHashKey(Node tuple, HashMap<String, Integer> attris) {
         NodeList children = tuple.getChildNodes();
         int key = 0;
+
         for (int i = 0; i < children.getLength(); i++)
             if (attris.containsKey(children.item(i).getNodeName()) && children.item(i).getChildNodes().getLength() != 0)
                 key += stringToInt(children.item(i).getChildNodes().item(0).getNodeName()) + children.item(i).getChildNodes().item(0).getChildNodes().getLength();
+
         return key;
     }
 
-    // TODO: join4.txt NullPointer bug
+    // TODO: rewrite4.txt rewrite text()/* bug.
+    // TODO: rewrite1.txt redundant comma
     @Override
     public Object visitJoinClause(XQueryParser.JoinClauseContext ctx) {
         List<Node> smallist = (List<Node>) this.visit(ctx.xq(0));
@@ -735,6 +738,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
                         for (int j = 0; j < bigtuple.getChildNodes().getLength(); j++)
                             newElem.appendChild(newDoc.importNode(bigtuple.getChildNodes().item(j).cloneNode(true), true));
                         out.add(newElem);
+
                     } catch (ParserConfigurationException e) {
                         e.printStackTrace();
                         System.out.println("ParserConfigurationException in join(), exit.");

@@ -17,15 +17,17 @@ public class Main {
 
         boolean xmlOutput = false;
         boolean rewriteFlag = false;
+        boolean noEvalFlag = false;
 
         for (int i = 1; i < args.length; i++)
             if (args[i].charAt(0) == '-') {
-                if (args[i].contains("x"))
+                if (args[i].contains("x")) // xml output format
                     xmlOutput = true;
-                if (args[i].contains("r"))
+                if (args[i].contains("r")) // rewrite
                     rewriteFlag = true;
+                if (args[i].contains("s")) // stop after rewriting
+                    noEvalFlag = true;
             }
-
 
         // if rewriter
         if (rewriteFlag) {
@@ -55,7 +57,6 @@ public class Main {
 
             tempOutput.write(rewrite_output);
             tempOutput.close();
-
         }
 
         // reading input and lexing/parsing
@@ -64,7 +65,11 @@ public class Main {
         XQueryLexer lexer = new XQueryLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         XQueryParser parser = new XQueryParser(tokens);
-        ParseTree tree = parser.xq();
+        ParseTree tree = parser.xq(); // check if syntax correct
+
+        if (noEvalFlag) // if noEval flag set, abort.
+            System.exit(0);
+
         // if evaluate query
         MyXQueryVisitor visitor = new MyXQueryVisitor();
         List<Node> result = (List<Node>)visitor.visit(tree);
