@@ -47,7 +47,7 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
     @Override
     public Object visitXq_FLWR(XQueryParser.Xq_FLWRContext ctx) {
         this.visit(ctx.forClause());
-        this.visit(ctx.whereClause());
+        if (ctx.whereClause() != null) this.visit(ctx.whereClause());
 
         //join
         //0. deal with equations within one component and contains constant string //TODO: how to deal with (-1,-1)
@@ -66,9 +66,9 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
                 if (!tmpResCodeMap.containsKey("where"))
                     tmpResCodeMap.put("where","");
                 for (Pair<String,String> equation: tmpEquations){
-                    tmpResCodeMap.put("where", tmpResCodeMap.get("where") + ", " + equation.a + " eq " + equation.b);//note ','
+                    tmpResCodeMap.put("where", tmpResCodeMap.get("where") + " and " + equation.a + " eq " + equation.b);//note ','
                 }
-                tmpResCodeMap.put("where", tmpResCodeMap.get("where").substring(1));//delete the first ','
+                tmpResCodeMap.put("where", tmpResCodeMap.get("where").substring(4));//delete the first ' and'
                 keySet.remove(k);
             }
         }
@@ -192,9 +192,9 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
                 tmpRes.put("count",count+"");
                 count++;
             }
-            else{
+            else{//TODO: the location of where clause can be wrong
                 res = res + tmpRes.get("for") + ",\n";
-                if (tmpRes.containsKey("where")) res = res  + "where" + tmpRes.get("where") + ",\n";
+                if (tmpRes.containsKey("where")) res = res.substring(0,res.length()-2)  + "\nwhere" + tmpRes.get("where") + ",\n";
             }
         }
         return res.substring(0, res.length() - 2);
