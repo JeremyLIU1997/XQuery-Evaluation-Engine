@@ -18,28 +18,54 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
     private HashMap<Pair<String, String>, List<Pair<String, String>>> equationsMap = new HashMap<>(); // (groupID, groupID) -> (var, var)
 
     @Override
+    public Object visitXq_ap(XQueryParser.Xq_apContext ctx) {
+        return this.visit(ctx.ap());
+    }
+
+    @Override
     public Object visitAp_slash(XQueryParser.Ap_slashContext ctx) {
+        this.visit(ctx.rp());
         return null;
     }
 
     @Override
-    public Object visitAp_double_slash(XQueryParser.Ap_double_slashContext ctx) {return null;}
+    public Object visitAp_double_slash(XQueryParser.Ap_double_slashContext ctx) {
+        this.visit(ctx.rp());
+        return null;
+    }
 
     @Override
     //TODO: see if xq_slash only contains a situation "var/rp"
     public Object visitXq_double_slash_rp(XQueryParser.Xq_double_slash_rpContext ctx) {
+        this.visit(ctx.rp());
         return ctx.xq().getText();
     }
 
     @Override
     //TODO: see if xq_slash only contains a situation "var/rp"
     public Object visitXq_slash_rp(XQueryParser.Xq_slash_rpContext ctx) {
+        this.visit(ctx.rp());
         return ctx.xq().getText();
     }
 
     @Override
-    public Object visitXq_ap(XQueryParser.Xq_apContext ctx) {
-        return this.visit(ctx.ap());
+    public Object visitRp_slash(XQueryParser.Rp_slashContext ctx) { // TO BE REFACTORED
+        this.visit(ctx.rp(1));
+        return null;
+    }
+
+    @Override
+    public Object visitRp_double_slash(XQueryParser.Rp_double_slashContext ctx) {
+        this.visit(ctx.rp(1));
+        return null;
+    }
+
+    String tmpVarName;//used for visitRp_text
+    HashSet<String> textVarSet = new HashSet<>();
+    @Override
+    public Object visitRp_text(XQueryParser.Rp_textContext ctx) {
+        textVarSet.add(tmpVarName);
+        return null;
     }
 
     @Override
@@ -66,7 +92,8 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
                 for (Pair<String,String> equation: tmpEquations){
                     tmpResCodeMap.put("where", tmpResCodeMap.get("where") + " and " + equation.a + " eq " + equation.b);//note ','
                 }
-                tmpResCodeMap.put("where", tmpResCodeMap.get("where").substring(4));//delete the first ' and'
+                if (tmpResCodeMap.get("where").startsWith(" and"))
+                    tmpResCodeMap.put("where", tmpResCodeMap.get("where").substring(4));//delete the first ' and'
                 keySet.remove(k);
             }
         }
@@ -95,21 +122,45 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
             tmpKeySet = new HashSet(keySet);
             for (Pair k : tmpKeySet) {
                 boolean tobeMerge = false;
+                boolean tobereversed=false;
                 Pair<String, String> newPair = null;
                 if (k.a.equals(leftTableID) || k.a.equals(rightTableID)) {
                     tobeMerge = true;
-                    newPair = newTableID.compareTo((String) k.b) < 0 ?
-                            new Pair<>(newTableID, (String) k.b) : new Pair<>((String) k.b, newTableID);
+                    //newPair = newTableID.compareTo((String) k.b) < 0 ? new Pair<>(newTableID, (String) k.b) : new Pair<>((String) k.b, newTableID);
+                    if (newTableID.compareTo((String) k.b) < 0){
+                        newPair = new Pair<>(newTableID, (String) k.b);
+                    }
+                    else{
+                        newPair = new Pair<>((String) k.b, newTableID);
+                        //reverse the equation
+                        tobereversed = true;
+                    }
                 } else if (k.b.equals(leftTableID) || k.b.equals(rightTableID)) {
                     tobeMerge = true;
+
                     newPair = newTableID.compareTo((String) k.a) < 0 ?
                             new Pair<>(newTableID, (String) k.a) : new Pair<>((String) k.a, newTableID);
+                    if (newTableID.compareTo((String) k.a) < 0){
+                        newPair = new Pair<>(newTableID, (String) k.a);
+                        //reverse the equation
+                        tobereversed = true;
+                    }
+                    else{
+                        newPair = new Pair<>((String) k.a, newTableID);
+                    }
                 }
                 if (tobeMerge) {
+                    List<Pair<String,String>> tmpEquations = new ArrayList<>();
+                    if (tobereversed) {
+                        for (Pair p: equationsMap.get(k)){
+                            tmpEquations.add(new Pair<>((String)p.b,(String)p.a));
+                        }
+                    }
+                    else tmpEquations = equationsMap.get(k);
                     if (!keySet.contains(newPair))
-                        equationsMap.put(newPair, equationsMap.get(k));
+                        equationsMap.put(newPair, tmpEquations);
                     else {//concat two list
-                        equationsMap.get(newPair).addAll(equationsMap.get(k));
+                        equationsMap.get(newPair).addAll(tmpEquations);
                     }
                     keySet.remove(k);
                 }
@@ -198,8 +249,8 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
             }
         }
         if (!where.equals(""))
-            res = res.substring(0,res.length()-2)  + "\nwhere" + where.substring(0,where.length()-4);
-        return res;
+            res = res.substring(0,res.length()-2)  + "\nwhere" + where.substring(0,where.length()-4)+",\n";
+        return res.substring(0,res.length()-2);
     }
 
     @Override
@@ -234,7 +285,9 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
                 res += var;
                 continue; //this group didn't join
             }
-            String newVar = "$tuple" + count + "/" + var.substring(1) + "/*";
+            String newVar = textVarSet.contains(var)?
+                    "$tuple" + count + "/" + var.substring(1) + "/text()":
+                    "$tuple" + count + "/" + var.substring(1) + "/*";
             res += newVar;
         }
         res += text.substring(startInd);
@@ -246,6 +299,7 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
         int tableID = -1;
         for (int i = 0; i < ctx.var().size(); ++i) {
             String child = ctx.var(i).getText();
+            tmpVarName = child;
             String parent = (String) this.visit(ctx.xq(i));
             String returnClause = "<" + child.substring(1)
                     + ">{" + child + "}</" + child.substring(1) + ">";
