@@ -30,7 +30,6 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         } // end of try
         catch (Exception e) {
             System.out.println("File open error, exit.");
-            e.printStackTrace();
             System.exit(1);
         }
         return null;
@@ -649,14 +648,12 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         return key;
     }
 
-    // TODO: rewrite4.txt rewrite text()/* bug.
-    // TODO: rewrite1.txt redundant comma
     @Override
     public Object visitJoinClause(XQueryParser.JoinClauseContext ctx) {
         List<Node> smallist = (List<Node>) this.visit(ctx.xq(0));
         List<Node> biglist = (List<Node>) this.visit(ctx.xq(1));
-        String[] smallattri = (String[]) this.visitAttributeList(ctx.attributeList(0));
-        String[] bigattri = (String[]) this.visitAttributeList(ctx.attributeList(1));
+        String[] smallattri = (String[]) this.visit(ctx.attributeList(0));
+        String[] bigattri = (String[]) this.visit(ctx.attributeList(1));
 
         List<Node> swap1;
         String[] swap2;
@@ -722,11 +719,19 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
                 for (int j = 0; j < children.getLength(); j++) {
                     child = children.item(j);
                     tag = child.getNodeName();
-                    if (smallattrimap.containsKey(tag))
+                    if (smallattrimap.containsKey(tag)) {
+                        if (child.getChildNodes().getLength() == 0 && tupleCompareMap.get(smallattrimap.get(tag)).getChildNodes().getLength() == 0)
+                            continue;
+
+                        if (child.getChildNodes().getLength() == 0 || tupleCompareMap.get(smallattrimap.get(tag)).getChildNodes().getLength() == 0) {
+                            breakflag = true;
+                            break;
+                        }
                         if (!child.getChildNodes().item(0).isEqualNode(tupleCompareMap.get(smallattrimap.get(tag)).getChildNodes().item(0))) {
                             breakflag = true;
                             break;
                         }
+                    }
                 }
                 /* test passes, join the tuples and add to output */
                 if (!breakflag) {
