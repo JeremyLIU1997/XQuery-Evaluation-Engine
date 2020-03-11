@@ -257,20 +257,20 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
         String text = ctx.xq().getText();
         String res = "";
         int startInd = 0;
-        while (text.indexOf('$', startInd) != -1) {
+        while (startInd < text.length() && text.indexOf('$', startInd) != -1) {
             int ind = text.indexOf('$', startInd);
             //modify result
             res += text.substring(startInd, ind);
 
             //locate the variable
-            int i = ind + 1;
+            int i = ind;
             while (i<text.length()-1 && !endOfVar.contains(text.charAt(++i))) {
                 //i++;
             }
             String var = text.substring(ind, i);
             //update pointer
             startInd = i;
-            char c = text.charAt(i);
+            //char c = text.charAt(i);
 
             //formulate the new variable
             if (!tableIDMap.containsKey(var)) {
