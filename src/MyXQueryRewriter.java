@@ -35,14 +35,12 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
     }
 
     @Override
-    //TODO: see if xq_slash only contains a situation "var/rp"
     public Object visitXq_double_slash_rp(XQueryParser.Xq_double_slash_rpContext ctx) {
         this.visit(ctx.rp());
         return ctx.xq().getText();
     }
 
     @Override
-    //TODO: see if xq_slash only contains a situation "var/rp"
     public Object visitXq_slash_rp(XQueryParser.Xq_slash_rpContext ctx) {
         this.visit(ctx.rp());
         return ctx.xq().getText();
@@ -266,7 +264,7 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
 
             //locate the variable
             int i = ind + 1;
-            while (!endOfVar.contains(text.charAt(++i))) {
+            while (i<text.length()-1 && !endOfVar.contains(text.charAt(++i))) {
                 //i++;
             }
             String var = text.substring(ind, i);
