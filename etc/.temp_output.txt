@@ -32,6 +32,5 @@ return <tuple>{
  }</tuple>,
 
 [sa, spa, spec, spea], [sb, spc, speb, sped]
-),
-
+)
 return <result>{<title>{$tuple0/sa/*/TITLE/text()}</title>,<speaker>{$tuple0/spa/*/*}</speaker>}</result>

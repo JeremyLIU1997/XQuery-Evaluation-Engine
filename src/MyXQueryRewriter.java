@@ -58,7 +58,7 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
         return null;
     }
 
-    String tmpVarName;//used for visitRp_text
+    String tmpVarName; //used for visitRp_text
     HashSet<String> textVarSet = new HashSet<>();
     @Override
     public Object visitRp_text(XQueryParser.Rp_textContext ctx) {
@@ -72,7 +72,7 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
         if (ctx.whereClause() != null) this.visit(ctx.whereClause());
 
         //join
-        //0. deal with equations within one component and contains constant string //TODO: how to deal with (-1,-1)
+        //0. deal with equations within one component and contains constant string // TODO: how to deal with (-1,-1)
         //1. traverse all key in equationsMap
         //2. every time join two group, delete the key and merge related keys
         //3. loop until all the key are deleted
