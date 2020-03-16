@@ -13,11 +13,11 @@ XQ → Var | StringConstant | ap
 xq:
   var                   # xq_var
 | stringconst           # xq_str
-| ap                    # xq_ap
 | '(' xq ')'            # xq_paren
-| xq ',' xq             # xq_comma
+| ap                    # xq_ap
 | xq DOUBLESLASH rp     # xq_double_slash_rp
 | xq SLASH rp           # xq_slash_rp
+| xq ',' xq             # xq_comma
 | '<' tagname '>' '{' xq '}' '<' SLASH tagname '>'   # xq_constructor
 | forClause letClause? whereClause? returnClause     # xq_FLWR
 | letClause             # xq_let

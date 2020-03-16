@@ -395,26 +395,26 @@ public class XQueryParser extends Parser {
 				stringconst();
 				}
 				break;
-			case T__9:
-				{
-				_localctx = new Xq_apContext(_localctx);
-				_ctx = _localctx;
-				_prevctx = _localctx;
-				setState(35);
-				ap();
-				}
-				break;
 			case LPAREN:
 				{
 				_localctx = new Xq_parenContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(36);
+				setState(35);
 				match(LPAREN);
-				setState(37);
+				setState(36);
 				xq(0);
-				setState(38);
+				setState(37);
 				match(RPAREN);
+				}
+				break;
+			case T__9:
+				{
+				_localctx = new Xq_apContext(_localctx);
+				_ctx = _localctx;
+				_prevctx = _localctx;
+				setState(39);
+				ap();
 				}
 				break;
 			case T__1:
@@ -513,11 +513,11 @@ public class XQueryParser extends Parser {
 						_localctx = new Xq_commaContext(new XqContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_xq);
 						setState(64);
-						if (!(precpred(_ctx, 7))) throw new FailedPredicateException(this, "precpred(_ctx, 7)");
+						if (!(precpred(_ctx, 5))) throw new FailedPredicateException(this, "precpred(_ctx, 5)");
 						setState(65);
 						match(T__0);
 						setState(66);
-						xq(8);
+						xq(6);
 						}
 						break;
 					case 2:
@@ -525,7 +525,7 @@ public class XQueryParser extends Parser {
 						_localctx = new Xq_double_slash_rpContext(new XqContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_xq);
 						setState(67);
-						if (!(precpred(_ctx, 6))) throw new FailedPredicateException(this, "precpred(_ctx, 6)");
+						if (!(precpred(_ctx, 7))) throw new FailedPredicateException(this, "precpred(_ctx, 7)");
 						setState(68);
 						match(DOUBLESLASH);
 						setState(69);
@@ -537,7 +537,7 @@ public class XQueryParser extends Parser {
 						_localctx = new Xq_slash_rpContext(new XqContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_xq);
 						setState(70);
-						if (!(precpred(_ctx, 5))) throw new FailedPredicateException(this, "precpred(_ctx, 5)");
+						if (!(precpred(_ctx, 6))) throw new FailedPredicateException(this, "precpred(_ctx, 6)");
 						setState(71);
 						match(SLASH);
 						setState(72);
@@ -2464,11 +2464,11 @@ public class XQueryParser extends Parser {
 	private boolean xq_sempred(XqContext _localctx, int predIndex) {
 		switch (predIndex) {
 		case 0:
-			return precpred(_ctx, 7);
-		case 1:
-			return precpred(_ctx, 6);
-		case 2:
 			return precpred(_ctx, 5);
+		case 1:
+			return precpred(_ctx, 7);
+		case 2:
+			return precpred(_ctx, 6);
 		}
 		return true;
 	}
@@ -2530,14 +2530,14 @@ public class XQueryParser extends Parser {
 		"\2\6[\3\2\2\2\bf\3\2\2\2\nh\3\2\2\2\fk\3\2\2\2\16y\3\2\2\2\20\u0087\3"+
 		"\2\2\2\22\u008a\3\2\2\2\24\u00ba\3\2\2\2\26\u00d5\3\2\2\2\30\u00e3\3\2"+
 		"\2\2\32\u0110\3\2\2\2\34\u011d\3\2\2\2\36\u011f\3\2\2\2 \u0121\3\2\2\2"+
-		"\"#\b\2\1\2#A\5\n\6\2$A\5\b\5\2%A\5\26\f\2&\'\7\'\2\2\'(\5\2\2\2()\7("+
-		"\2\2)A\3\2\2\2*+\7\4\2\2+,\5\36\20\2,-\7\5\2\2-.\7\6\2\2./\5\2\2\2/\60"+
+		"\"#\b\2\1\2#A\5\n\6\2$A\5\b\5\2%&\7\'\2\2&\'\5\2\2\2\'(\7(\2\2(A\3\2\2"+
+		"\2)A\5\26\f\2*+\7\4\2\2+,\5\36\20\2,-\7\5\2\2-.\7\6\2\2./\5\2\2\2/\60"+
 		"\7\7\2\2\60\61\7\4\2\2\61\62\7&\2\2\62\63\5\36\20\2\63\64\7\5\2\2\64A"+
 		"\3\2\2\2\65\67\5\f\7\2\668\5\16\b\2\67\66\3\2\2\2\678\3\2\2\28:\3\2\2"+
 		"\29;\5\20\t\2:9\3\2\2\2:;\3\2\2\2;<\3\2\2\2<=\5\22\n\2=A\3\2\2\2>A\5\16"+
-		"\b\2?A\5\4\3\2@\"\3\2\2\2@$\3\2\2\2@%\3\2\2\2@&\3\2\2\2@*\3\2\2\2@\65"+
-		"\3\2\2\2@>\3\2\2\2@?\3\2\2\2AM\3\2\2\2BC\f\t\2\2CD\7\3\2\2DL\5\2\2\nE"+
-		"F\f\b\2\2FG\7%\2\2GL\5\30\r\2HI\f\7\2\2IJ\7&\2\2JL\5\30\r\2KB\3\2\2\2"+
+		"\b\2?A\5\4\3\2@\"\3\2\2\2@$\3\2\2\2@%\3\2\2\2@)\3\2\2\2@*\3\2\2\2@\65"+
+		"\3\2\2\2@>\3\2\2\2@?\3\2\2\2AM\3\2\2\2BC\f\7\2\2CD\7\3\2\2DL\5\2\2\bE"+
+		"F\f\t\2\2FG\7%\2\2GL\5\30\r\2HI\f\b\2\2IJ\7&\2\2JL\5\30\r\2KB\3\2\2\2"+
 		"KE\3\2\2\2KH\3\2\2\2LO\3\2\2\2MK\3\2\2\2MN\3\2\2\2N\3\3\2\2\2OM\3\2\2"+
 		"\2PQ\7\27\2\2QR\7\'\2\2RS\5\2\2\2ST\7\3\2\2TU\5\2\2\2UV\7\3\2\2VW\5\6"+
 		"\4\2WX\7\3\2\2XY\5\6\4\2YZ\7(\2\2Z\5\3\2\2\2[\\\7)\2\2\\a\5 \21\2]^\7"+
