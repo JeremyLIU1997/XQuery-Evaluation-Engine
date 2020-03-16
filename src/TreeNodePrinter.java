@@ -1,8 +1,6 @@
 import org.w3c.dom.*;
 import javax.swing.tree.TreeNode;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 
 public class TreeNodePrinter {
 
