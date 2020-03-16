@@ -16,10 +16,12 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
     private List<String> rootVarList = new ArrayList<>(); // store root variables for each tree
     private HashMap<String, HashMap<String, String>> resCodeMap = new HashMap<>(); // tableID -> code
     private HashMap<Pair<String, String>, List<Pair<String, String>>> equationsMap = new HashMap<>(); // (groupID, groupID) -> (var, var)
-    private String joinShapeFlag = "B";
+    private String joinShapeFlag = "B"; //"L"
 
     public void setJoinShapeFlag(String joinShapeFlag){
-        this.joinShapeFlag = joinShapeFlag;
+        Set<String> joinShapeFlagSet = new HashSet<>(Arrays.asList("B","L","b","l"));
+        if (joinShapeFlagSet.contains(joinShapeFlag))
+            this.joinShapeFlag = joinShapeFlag;
     }
 
     @Override
