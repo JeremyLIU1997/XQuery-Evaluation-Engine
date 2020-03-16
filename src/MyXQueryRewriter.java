@@ -16,6 +16,11 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
     private List<String> rootVarList = new ArrayList<>(); // store root variables for each tree
     private HashMap<String, HashMap<String, String>> resCodeMap = new HashMap<>(); // tableID -> code
     private HashMap<Pair<String, String>, List<Pair<String, String>>> equationsMap = new HashMap<>(); // (groupID, groupID) -> (var, var)
+    private String joinShapeFlag = "B";
+
+    public void setJoinShapeFlag(String joinShapeFlag){
+        this.joinShapeFlag = joinShapeFlag;
+    }
 
     @Override
     public Object visitXq_ap(XQueryParser.Xq_apContext ctx) {
@@ -98,19 +103,22 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
 
         while (!keySet.isEmpty()) {//one join each loop
             //1. 2. 3.
-            Iterator it = keySet.iterator();
-            Pair tableIDPair = (Pair) it.next();
+//            Iterator it = keySet.iterator();
+//            Pair tableIDPair = (Pair) it.next();
+
+            //find the first pair to join
+            Pair tableIDPair = findPairToJoin(keySet);
 
             String leftTableID = (String) tableIDPair.a;
             String rightTableID = (String) tableIDPair.b;
             String newTableID = leftTableID + "," + rightTableID;
 
-            //modify variable groupID (traverse all variable)
-            tableIDMap.forEach((k, v) -> {
-                if (v.equals(leftTableID) || v.equals(rightTableID)) {
-                    tableIDMap.put(k, newTableID);
-                }
-            });
+            //modify variable groupID for each var (traverse all     variable)
+                tableIDMap.forEach((k, v) -> {
+                    if (v.equals(leftTableID) || v.equals(rightTableID)) {
+                        tableIDMap.put(k, newTableID);
+                    }
+                });
 
             //2. merge the code
             mergeCode(tableIDPair, newTableID);
@@ -125,7 +133,9 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
                 if (k.a.equals(leftTableID) || k.a.equals(rightTableID)) {
                     tobeMerge = true;
                     //newPair = newTableID.compareTo((String) k.b) < 0 ? new Pair<>(newTableID, (String) k.b) : new Pair<>((String) k.b, newTableID);
-                    if (newTableID.compareTo((String) k.b) < 0){
+
+                    //if (newTableID.compareTo((String) k.b) < 0){
+                    if (newTableID.split(",").length >= k.b.toString().split(",").length){
                         newPair = new Pair<>(newTableID, (String) k.b);
                     }
                     else{
@@ -136,9 +146,10 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
                 } else if (k.b.equals(leftTableID) || k.b.equals(rightTableID)) {
                     tobeMerge = true;
 
-                    newPair = newTableID.compareTo((String) k.a) < 0 ?
-                            new Pair<>(newTableID, (String) k.a) : new Pair<>((String) k.a, newTableID);
-                    if (newTableID.compareTo((String) k.a) < 0){
+//                    newPair = newTableID.compareTo((String) k.a) < 0 ?
+//                            new Pair<>(newTableID, (String) k.a) : new Pair<>((String) k.a, newTableID);
+                    //if (newTableID.compareTo((String) k.a) < 0){
+                    if (newTableID.split(",").length >= k.a.toString().split(",").length){
                         newPair = new Pair<>(newTableID, (String) k.a);
                         //reverse the equation
                         tobereversed = true;
@@ -173,6 +184,41 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
 
         return res + "\nreturn " + returnClause;
     }
+
+
+    private Pair<String,String> findPairToJoin(Set keySet){
+        Pair<String,String> tableIDPair = null;
+        //Iterator it = keySet.iterator();
+        //Pair tableIDPair = (Pair) it.next();
+        int maxTableNum = 0;
+        int minTableNum = Integer.MAX_VALUE;
+        int globalTableNum = joinShapeFlag.equals("B")? Integer.MAX_VALUE:0;
+        for (Object obj:keySet){
+            Pair<String,String> tmpTableIDpair = (Pair) obj;
+            int tableNum = tmpTableIDpair.a.split(",").length + tmpTableIDpair.b.split(",").length;
+
+            if (joinShapeFlag.equals("B") && tableNum < globalTableNum ||
+            joinShapeFlag.equals("L") && tableNum > globalTableNum){
+                globalTableNum = tableNum;
+                tableIDPair = tmpTableIDpair;
+
+            }
+//            if (joinShapeFlag.equals("B")){
+//                if (tableNum < minTableNum){
+//                    minTableNum = tableNum;
+//                    tableIDPair = tmpTableIDpair;
+//                }
+//            }
+//            else{//left join
+//                if (tableNum > maxTableNum){
+//                    maxTableNum = tableNum;
+//                    tableIDPair = tmpTableIDpair;
+//                }
+//            }
+        }
+        return tableIDPair;
+    }
+
 
     //merge the code (join two groups)
     private void mergeCode(Pair tableIDPair, String newTableID) {
