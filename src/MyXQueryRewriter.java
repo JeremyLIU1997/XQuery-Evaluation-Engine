@@ -3,10 +3,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
+import java.lang.Math;
+
 import java.util.*;
 
 public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
@@ -16,10 +14,11 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
     private List<String> rootVarList = new ArrayList<>(); // store root variables for each tree
     private HashMap<String, HashMap<String, String>> resCodeMap = new HashMap<>(); // tableID -> code
     private HashMap<Pair<String, String>, List<Pair<String, String>>> equationsMap = new HashMap<>(); // (groupID, groupID) -> (var, var)
-    private String joinShapeFlag = "B"; //"L"
+    private String joinShapeFlag = "B"; // "L"
+    private int tableAmt = 0;
 
-    public void setJoinShapeFlag(String joinShapeFlag){
-        Set<String> joinShapeFlagSet = new HashSet<>(Arrays.asList("B","L","b","l"));
+    public void setJoinShapeFlag(String joinShapeFlag) {
+        Set<String> joinShapeFlagSet = new HashSet<>(Arrays.asList("B", "L", "b", "l"));
         if (joinShapeFlagSet.contains(joinShapeFlag))
             this.joinShapeFlag = joinShapeFlag;
     }
@@ -67,6 +66,7 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
 
     String tmpVarName; //used for visitRp_text
     HashSet<String> textVarSet = new HashSet<>();
+
     @Override
     public Object visitRp_text(XQueryParser.Rp_textContext ctx) {
         textVarSet.add(tmpVarName);
@@ -91,10 +91,10 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
             if (k.a.toString().equals("-1") || k.a.toString().equals(k.b.toString())) {
                 int tableID = Integer.parseInt(k.b.toString());
                 HashMap<String, String> tmpResCodeMap = resCodeMap.get(tableID + "");
-                List<Pair<String,String>> tmpEquations = equationsMap.get(k);
+                List<Pair<String, String>> tmpEquations = equationsMap.get(k);
                 if (!tmpResCodeMap.containsKey("where"))
-                    tmpResCodeMap.put("where","");
-                for (Pair<String,String> equation: tmpEquations){
+                    tmpResCodeMap.put("where", "");
+                for (Pair<String, String> equation : tmpEquations) {
                     tmpResCodeMap.put("where", tmpResCodeMap.get("where") + " and " + equation.a + " eq " + equation.b);//note ','
                 }
                 if (tmpResCodeMap.get("where").startsWith(" and"))
@@ -115,32 +115,31 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
             String rightTableID = (String) tableIDPair.b;
             String newTableID = leftTableID + "," + rightTableID;
 
-            //modify variable groupID for each var (traverse all     variable)
-                tableIDMap.forEach((k, v) -> {
-                    if (v.equals(leftTableID) || v.equals(rightTableID)) {
-                        tableIDMap.put(k, newTableID);
-                    }
-                });
+            // modify variable groupID for each var (traverse all     variable)
+            tableIDMap.forEach((k, v) -> {
+                if (v.equals(leftTableID) || v.equals(rightTableID)) {
+                    tableIDMap.put(k, newTableID);
+                }
+            });
 
-            //2. merge the code
+            // 2. merge the code
             mergeCode(tableIDPair, newTableID);
 
-            //2. merge the related keys
+            // 2. merge the related keys
             keySet.remove(tableIDPair);
             tmpKeySet = new HashSet(keySet);
             for (Pair k : tmpKeySet) {
                 boolean tobeMerge = false;
-                boolean tobereversed=false;
+                boolean tobereversed = false;
                 Pair<String, String> newPair = null;
                 if (k.a.equals(leftTableID) || k.a.equals(rightTableID)) {
                     tobeMerge = true;
                     //newPair = newTableID.compareTo((String) k.b) < 0 ? new Pair<>(newTableID, (String) k.b) : new Pair<>((String) k.b, newTableID);
 
                     //if (newTableID.compareTo((String) k.b) < 0){
-                    if (newTableID.split(",").length >= k.b.toString().split(",").length){
+                    if (newTableID.split(",").length >= k.b.toString().split(",").length) {
                         newPair = new Pair<>(newTableID, (String) k.b);
-                    }
-                    else{
+                    } else {
                         newPair = new Pair<>((String) k.b, newTableID);
                         //reverse the equation
                         tobereversed = true;
@@ -151,23 +150,21 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
 //                    newPair = newTableID.compareTo((String) k.a) < 0 ?
 //                            new Pair<>(newTableID, (String) k.a) : new Pair<>((String) k.a, newTableID);
                     //if (newTableID.compareTo((String) k.a) < 0){
-                    if (newTableID.split(",").length >= k.a.toString().split(",").length){
+                    if (newTableID.split(",").length >= k.a.toString().split(",").length) {
                         newPair = new Pair<>(newTableID, (String) k.a);
                         //reverse the equation
                         tobereversed = true;
-                    }
-                    else{
+                    } else {
                         newPair = new Pair<>((String) k.a, newTableID);
                     }
                 }
                 if (tobeMerge) {
-                    List<Pair<String,String>> tmpEquations = new ArrayList<>();
+                    List<Pair<String, String>> tmpEquations = new ArrayList<>();
                     if (tobereversed) {
-                        for (Pair p: equationsMap.get(k)){
-                            tmpEquations.add(new Pair<>((String)p.b,(String)p.a));
+                        for (Pair p : equationsMap.get(k)) {
+                            tmpEquations.add(new Pair<>((String) p.b, (String) p.a));
                         }
-                    }
-                    else tmpEquations = equationsMap.get(k);
+                    } else tmpEquations = equationsMap.get(k);
                     if (!keySet.contains(newPair))
                         equationsMap.put(newPair, tmpEquations);
                     else {//concat two list
@@ -188,19 +185,19 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
     }
 
 
-    private Pair<String,String> findPairToJoin(Set keySet){
-        Pair<String,String> tableIDPair = null;
+    private Pair<String, String> findPairToJoin(Set keySet) {
+        Pair<String, String> tableIDPair = null;
         //Iterator it = keySet.iterator();
         //Pair tableIDPair = (Pair) it.next();
         int maxTableNum = 0;
         int minTableNum = Integer.MAX_VALUE;
-        int globalTableNum = joinShapeFlag.equals("B")? Integer.MAX_VALUE:0;
-        for (Object obj:keySet){
-            Pair<String,String> tmpTableIDpair = (Pair) obj;
+        int globalTableNum = joinShapeFlag.equals("B") ? Integer.MAX_VALUE : 0;
+        for (Object obj : keySet) {
+            Pair<String, String> tmpTableIDpair = (Pair) obj;
             int tableNum = tmpTableIDpair.a.split(",").length + tmpTableIDpair.b.split(",").length;
 
             if (joinShapeFlag.equals("B") && tableNum < globalTableNum ||
-            joinShapeFlag.equals("L") && tableNum > globalTableNum){
+                    joinShapeFlag.equals("L") && tableNum > globalTableNum) {
                 globalTableNum = tableNum;
                 tableIDPair = tmpTableIDpair;
 
@@ -221,27 +218,60 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
         return tableIDPair;
     }
 
-    private List<Pair<String,String>> generateBushyTree(){
+    private List<Pair<String, String>> generateBushyTree() {
 
         return new ArrayList<>();
     }
 
-    private int[] unrank(int rank){
-        return new int[3];
+    private int rank(int[] tableIdArr) {
+        int rank = 0;
+        for (int id : tableIdArr)
+            rank += Math.pow(2, id);
+        return rank;
     }
 
-    private int[] getComplement(int rank, int n){
-        return new int[3];
+    private Integer[] unrank(int rank) {
+        List<Integer> out = new LinkedList<>();
+
+        int i = 0;
+        while (rank != 0) {
+            if (rank % 2 == 1)
+                out.add(i);
+
+            rank /= 2;
+            i++;
+        }
+
+        return (Integer[]) out.toArray();
     }
 
-    private int rank(int[] tableIdArr){return 0;}
-
-
-
-    private List<Pair<String,String>> createJoinSequence(Pair<Integer, Integer>[] dp){
-        return new ArrayList<>();
+    private Integer[] getComplement(int rank, int n) {
+        return unrank((int) Math.pow(2, n) - 1 - rank);
     }
 
+
+    // wrapper func for overloaded createJoinSequence
+    private List<Pair<String, String>> createJoinSequence(Pair<Integer, Integer>[] dp) {
+        List<Pair<String, String>> out = new LinkedList<Pair<String, String>>();
+        this.createJoinSequence(dp, (int) Math.pow(2, this.tableAmt) - 1, out);
+        return out;
+    }
+
+    // create an explicit join sequence ID-to-ID from the dp array
+    private String createJoinSequence(Pair<Integer, Integer>[] dp, int index, List<Pair<String, String>> out) {
+        // base case, primitive table
+        if (dp[index].a.equals((dp[index].b)))
+            return dp[index].a + ",";
+
+        int left = dp[index].a;
+        int right = dp[index].b;
+
+        String leftString = createJoinSequence(dp, left, out), rightString = createJoinSequence(dp, right, out);
+        out.add(new Pair<>(leftString,rightString));
+
+        return leftString + rightString;
+
+    }
 
 
     //merge the code (join two groups)
@@ -307,23 +337,22 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
             HashMap tmpRes = resCodeMap.get(k);
             if (tmpRes.containsKey("joinArg1")) { //this group was joined before
                 res = res + "$tuple" + count + " in " + concatCode(k) + ",\n";
-                tmpRes.put("count",count+"");
+                tmpRes.put("count", count + "");
                 count++;
-            }
-            else{
+            } else {
                 res = res + tmpRes.get("for") + ",\n";
                 if (tmpRes.containsKey("where"))
                     where += tmpRes.get("where") + " and";
             }
         }
         if (!where.equals(""))
-            res = res.substring(0,res.length()-2)  + "\nwhere" + where.substring(0,where.length()-4)+",\n";
-        return res.substring(0,res.length()-2);
+            res = res.substring(0, res.length() - 2) + "\nwhere" + where.substring(0, where.length() - 4) + ",\n";
+        return res.substring(0, res.length() - 2);
     }
 
     @Override
     public Object visitReturnClause(XQueryParser.ReturnClauseContext ctx) {
-        Set<Character> endOfVar = new HashSet<>(Arrays.asList('/', '<', ',','}'));
+        Set<Character> endOfVar = new HashSet<>(Arrays.asList('/', '<', ',', '}'));
         String text = ctx.xq().getText();
         String res = "";
         int startInd = 0;
@@ -334,7 +363,7 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
 
             //locate the variable
             int i = ind;
-            while (i<text.length()-1 && !endOfVar.contains(text.charAt(++i))) {
+            while (i < text.length() - 1 && !endOfVar.contains(text.charAt(++i))) {
                 //i++;
             }
             String var = text.substring(ind, i);
@@ -353,8 +382,8 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
                 res += var;
                 continue; //this group didn't join
             }
-            String newVar = textVarSet.contains(var)?
-                    "$tuple" + count + "/" + var.substring(1) + "/text()":
+            String newVar = textVarSet.contains(var) ?
+                    "$tuple" + count + "/" + var.substring(1) + "/text()" :
                     "$tuple" + count + "/" + var.substring(1) + "/*";
             res += newVar;
         }

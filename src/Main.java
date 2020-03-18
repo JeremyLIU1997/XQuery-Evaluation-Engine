@@ -45,8 +45,14 @@ public class Main {
         ParseTree tree = parser.xq();
 
         String rewrite_output;
-        // try to rewrite, if error, abandon rewrite.
-        try {
+        // TODO: modify this part of the logic to identify rewritability with listener.
+        // rewritability check
+        ParseTreeWalker walker = new ParseTreeWalker();
+        MyXQueryListener rewriteChecker = new MyXQueryListener();
+        walker.walk(rewriteChecker,tree);
+
+        // rewritable
+        if (rewriteChecker.isRewritable()) {
             MyXQueryRewriter rewriter = new MyXQueryRewriter();
             rewriter.setJoinShapeFlag("L");
             if (bushyFlag)
@@ -54,14 +60,19 @@ public class Main {
             rewrite_output = (String)rewriter.visit(tree);
             System.out.println("******* Rewrite Result *******");
             System.out.println(rewrite_output);
-            System.out.println("******************************");
+            System.out.println("******************************\n");
         }
-        catch (Exception e) {
-            System.out.println("Not rewritable, abandon rewriting.");
-            rewrite_output = inputFile; // if not rewritable, rewrite result is original query.
+        // if not rewritable, rewrite result is original query.
+        else {
+            System.out.println("----- Syntax is not rewritable -----");
+            rewrite_output = "";
+            int character;
+            is = new FileInputStream(inputFile);
+            while ((character = is.read()) != -1)
+                rewrite_output += (char) character;
         }
 
-        inputFile = "./etc/eval_output.txt";
+        inputFile = "./output/rewrite_output.txt";
         FileWriter tempOutput;
         try {
             tempOutput = new FileWriter(inputFile, false);
@@ -73,7 +84,6 @@ public class Main {
 
         tempOutput.write(rewrite_output);
         tempOutput.close();
-        System.out.println("Rewrite output written in project_root/etc/rewrite_result.txt");
 
         // reading new input and lexing/parsing (from rewrite result)
         is = new FileInputStream(inputFile);
@@ -95,7 +105,7 @@ public class Main {
 
         /* writing evaluation result to file */
         FileWriter evalOutputFile;
-        inputFile = "./etc/eval_output.txt";
+        inputFile = "./output/eval_output.txt";
         try {
             evalOutputFile = new FileWriter(inputFile, false);
         }
@@ -107,9 +117,11 @@ public class Main {
         evalOutputFile.close();
 
         // write to file
-        System.out.println("Evaluation output written in project_root/etc/eval_result.txt");
+        System.out.println("\n***** Rewrite output written in ``project_root/output/rewrite_output.txt`` *****");
+        System.out.println("***** Evaluation output written in ``project_root/output/eval_output.txt`` *****\n");
         PrintStream fileOut = new PrintStream(inputFile);
         System.setOut(fileOut); // redirect output to file
+        System.out.println("\nNumber of nodes: " + result.size());
         for (Node node: result)
             printer.prettyPrint(node, "");
 

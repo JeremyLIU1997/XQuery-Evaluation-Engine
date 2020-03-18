@@ -1,2 +1,15 @@
-for $s in doc("./etc/j_caesar.xml")//SPEAKER
-return $s
+for $tuple in join (
+    for $b in doc("./etc/book.xml")//book,
+        $tb in $b/title
+    return <tuple> {
+                <b> {$b} </b>,
+                <tb> {$tb} </tb>
+           } </tuple>,
+    for $a in doc("./etc/book.xml")//book,
+        $ta in $a/title
+    return <tuple> {
+                <a> {$a} </a >,
+                <ta> {$ta} </ta>
+           } </tuple>,
+    [tb], [ta] )
+return $tuple

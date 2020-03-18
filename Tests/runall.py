@@ -14,7 +14,7 @@ if __name__ == '__main__':
 	cases = listdir()
 	cases.sort()
 
-	separator = "\n========================"
+	separator = "\n========================================================================"
 
 	failures = 0
 	faillist = []
@@ -28,17 +28,18 @@ if __name__ == '__main__':
 		total += 1
 		print(separator)
 		print(case + ": \n")
-		if "rewrite" in case.lower():
-			if system("java -jar " + jarfile + " " + testdir + "/" + case + " -rx") != 0:
-				failures += 1
-				faillist.append(case)
-		else:
-			if system("java -jar " + jarfile + " " + testdir + "/" + case + " -x") != 0:
-				failures += 1
-				faillist.append(case)
+		print("******** Left Deep ********")
+		if system("java -jar " + jarfile + " " + testdir + "/" + case + " -L") != 0:
+			failures += 1
+			faillist.append(case + " --- L")
+		print("******** Bushy ********")
+		if system("java -jar " + jarfile + " " + testdir + "/" + case + " -B") != 0:
+			failures += 1
+			faillist.append(case + " --- B")
+		
 
 	print("\n\n\n*********** Summary ***********")
-	print("* Failures: " + str(failures) + "/" + str(total))
+	print("* Failures: " + str(failures) + "/" + str(total*2))
 	for i in range(len(faillist)):
 		print("# " + str(i+1) + ":\t" + faillist[i])
 		
