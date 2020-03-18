@@ -221,6 +221,28 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
         return tableIDPair;
     }
 
+    private List<Pair<String,String>> generateBushyTree(){
+
+        return new ArrayList<>();
+    }
+
+    private int[] unrank(int rank){
+        return new int[3];
+    }
+
+    private int[] getComplement(int rank, int n){
+        return new int[3];
+    }
+
+    private int rank(int[] tableIdArr){return 0;}
+
+
+
+    private List<Pair<String,String>> createJoinSequence(Pair<Integer, Integer>[] dp){
+        return new ArrayList<>();
+    }
+
+
 
     //merge the code (join two groups)
     private void mergeCode(Pair tableIDPair, String newTableID) {
