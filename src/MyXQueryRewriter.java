@@ -335,22 +335,25 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
         return rank;
     }
 
-    private Integer[] unrank(int rank) {
-        List<Integer> out = new LinkedList<>();
+    private int[] unrank(int rank) {
+        List<Integer> temp = new LinkedList<>();
 
         int i = 0;
         while (rank != 0) {
             if (rank % 2 == 1)
-                out.add(i);
+                temp.add(i);
 
             rank /= 2;
             i++;
         }
-
-        return (Integer[]) out.toArray();
+        int[] out = new int[temp.size()];
+        Iterator<Integer> iter = temp.iterator();
+        for (i = 0; i < temp.size(); i++)
+            out[i] = iter.next();
+        return out;
     }
 
-    private Integer[] getComplement(int rank, int n) {
+    private int[] getComplement(int rank, int n) {
         return unrank((int) Math.pow(2, n) - 1 - rank);
     }
 
