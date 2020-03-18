@@ -14,5 +14,11 @@ for $a in doc("../etc/j_caesar.xml")//ACT,
     $speb in $sb//SPEECH,
     $spec in $sc//SPEECH,
     $sped in $sd//SPEECH
-where $spb="FLAVIUS" and $spd="FLAVIUS" and $sb eq $sc and $sa eq $sd and $spa eq $spc and $speb eq $spec and $spea eq $sped
+where $spb="FLAVIUS"
+and $spd="FLAVIUS"
+and $sb eq $sc
+and $sa eq $sd
+and $spa eq $spc
+and $speb eq $spec
+and $spea eq $sped
 return <result>{ <title>{$sa/TITLE/text()}</title> }</result>

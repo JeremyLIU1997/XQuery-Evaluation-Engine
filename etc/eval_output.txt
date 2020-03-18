@@ -1,0 +1,84 @@
+for $tuple0 in join (
+join (
+join (
+join (
+for $b in doc("j_caesar.xml")//ACT,
+ $sb in $b//SCENE
+return <tuple>{ 
+<b>{$b}</b>,
+<sb>{$sb}</sb>
+ }</tuple>,
+
+for $d in doc("j_caesar.xml")//ACT,
+ $sd in $d//SCENE
+return <tuple>{ 
+<d>{$d}</d>,
+<sd>{$sd}</sd>
+ }</tuple>,
+
+[sb], [sd]
+),
+
+join (
+for $a in doc("j_caesar.xml")//ACT,
+ $sa in $a//SCENE
+return <tuple>{ 
+<a>{$a}</a>,
+<sa>{$sa}</sa>
+ }</tuple>,
+
+for $g in doc("j_caesar.xml")//ACT,
+ $sg in $g//SCENE
+return <tuple>{ 
+<g>{$g}</g>,
+<sg>{$sg}</sg>
+ }</tuple>,
+
+[sa], [sg]
+),
+
+[sb], [sa]
+),
+
+join (
+for $c in doc("j_caesar.xml")//ACT,
+ $sc in $c//SCENE
+return <tuple>{ 
+<c>{$c}</c>,
+<sc>{$sc}</sc>
+ }</tuple>,
+
+for $e in doc("j_caesar.xml")//ACT,
+ $se in $e//SCENE
+return <tuple>{ 
+<e>{$e}</e>,
+<se>{$se}</se>
+ }</tuple>,
+
+[sc], [se]
+),
+
+[sb], [sc]
+),
+
+join (
+for $f in doc("j_caesar.xml")//ACT,
+ $sf in $f//SCENE
+return <tuple>{ 
+<f>{$f}</f>,
+<sf>{$sf}</sf>
+ }</tuple>,
+
+for $h in doc("j_caesar.xml")//ACT,
+ $sh in $h//SCENE
+return <tuple>{ 
+<h>{$h}</h>,
+<sh>{$sh}</sh>
+ }</tuple>,
+
+[sf], [sh]
+),
+
+[sa], [sf]
+)
+return <result>{<title>{$tuple0/sa/*/TITLE/text()}</title>}</result>

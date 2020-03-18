@@ -5,5 +5,5 @@ for $a in doc("../etc/j_caesar.xml")//ACT,
     $spa in $sa//SPEAKER,
     $spb in $sb//SPEAKER/text(),
     $spc in $sb//SPEAKER
-where $spb="FLAVIUS" and $sa eq $sb and $spa eq $spc
+where $spb eq "FLAVIUS" and $spb eq "FLAVIUS" and $sa eq $sb and $spa eq $spc
 return <result>{ <title>{$sa/TITLE/text()}</title> }</result>
