@@ -75,7 +75,6 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
         return null;
     }
 
-
     String getNewTableID(String leftTableID, String rightTableID) {
         String[] leftTableIDArr = leftTableID.split(",");
         String[] rightTableIDArr = rightTableID.split(",");
@@ -303,18 +302,15 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
                 if (checkConnection(subset1, subset2)) {
                     int dpInd1 = rank(subset1);
                     int dpInd2 = rank(subset2);
-                    if (dp_treeHeight[dpInd1] == Integer.MAX_VALUE || dp_treeHeight[dpInd2] == Integer.MAX_VALUE) continue;
+                    if (dp_treeHeight[dpInd1] == -1 || dp_treeHeight[dpInd2] == -1) continue;
                     int newHeight = Math.max(dp_treeHeight[dpInd1], dp_treeHeight[dpInd2]) + 1;
                     if (dp_treeHeight[i] > newHeight) {
                         dp_treeHeight[i] = newHeight;
-                        dp_indexPair[i] = dpInd1<dpInd2? new Pair<>(dpInd1, dpInd2):new Pair<>(dpInd2,dpInd1);
+                        dp_indexPair[i] = new Pair<>(dpInd1, dpInd2);
                     }
-                    //System.out.println("ok");
                 }
-                //System.out.println("ok");
             }
         }
-
         return createJoinSequence(dp_indexPair);
     }
 
@@ -322,8 +318,7 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
         Set keySet = equationsMap.keySet();
         for (int i = 0; i < subset1.length; ++i) {
             for (int j = 0; j < subset2.length; ++j) {
-                //String key = "("+Math.min(subset1[i], subset2[j]) + "," + Math.max(subset1[i], subset2[j])+")";
-                Pair<String,String> key = new Pair<>(Math.min(subset1[i], subset2[j])+"",Math.max(subset1[i], subset2[j])+"");
+                String key = Math.min(subset1[i], subset2[j]) + "," + Math.max(subset1[i], subset2[j]);
                 if (keySet.contains(key)) return true;
             }
         }
@@ -377,12 +372,15 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
         int right = dp[index].b;
 
         String leftString = createJoinSequence(dp, left, out), rightString = createJoinSequence(dp, right, out);
-        out.add(new Pair<>(leftString.substring(0,leftString.length()-1), rightString.substring(0,rightString.length()-1)));
+        if (leftString.compareTo(rightString) > 0) {
+            String temp = leftString;
+            leftString = rightString;
+            rightString = temp;
+        }
 
+        out.add(new Pair<>(leftString.substring(0, leftString.length() - 1), rightString.substring(0, rightString.length() - 1)));
         return leftString + rightString;
-
     }
-
 
     //merge the code (join two groups)
     private void mergeCode(Pair tableIDPair, String newTableID) {

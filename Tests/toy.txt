@@ -1,15 +1,14 @@
-for $tuple in join (
-    for $b in doc("./etc/book.xml")//book,
-        $tb in $b/title
-    return <tuple> {
-                <b> {$b} </b>,
-                <tb> {$tb} </tb>
-           } </tuple>,
-    for $a in doc("./etc/book.xml")//book,
-        $ta in $a/title
-    return <tuple> {
-                <a> {$a} </a >,
-                <ta> {$ta} </ta>
-           } </tuple>,
-    [tb], [ta] )
-return $tuple
+for $a in doc("../etc/j_caesar.xml")//ACT,
+$b in doc("../etc/j_caesar.xml")//ACT,
+$c in doc("../etc/j_caesar.xml")//ACT,
+ $d in doc("../etc/j_caesar.xml")//ACT,
+    $sa in $a//SCENE,
+    $sb in $b//SCENE,
+    $sc in $c//SCENE,
+    $sd in $d//SCENE,
+    $spa in $sa//SPEAKER,
+    $spb in $sb//SPEAKER/text(),
+    $spc in $sc//SPEAKER,
+    $spd in $sd//SPEAKER
+where $spb="FLAVIUS" and $sb eq $sc and $sa eq $sd and $spa eq $spc
+return <result>{ <title>{$sa/TITLE/text()}</title> }</result>
