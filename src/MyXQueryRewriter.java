@@ -16,7 +16,7 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
     private List<String> rootVarList = new ArrayList<>(); // store root variables for each tree
     private HashMap<String, HashMap<String, String>> resCodeMap = new HashMap<>(); // tableID -> code
     private HashMap<Pair<String, String>, List<Pair<String, String>>> equationsMap = new HashMap<>(); // (groupID, groupID) -> (var, var)
-    private String joinShapeFlag = "B"; // "L"
+    private String joinShapeFlag = "L"; // "L"
     private int tableAmt = 0;
 
     public void setJoinShapeFlag(String joinShapeFlag) {
@@ -210,7 +210,6 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
         }
         //formulate the output (traverse resCodeMap keySet)
         String res = formOutput();
-
         //return clause
         String returnClause = (String) this.visitReturnClause(ctx.returnClause());
 
@@ -253,12 +252,12 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
 
     private Pair<String, String> findPairToJoin_L(Set keySet) {
         Pair<String, String> tableIDPair = null;
-        int globalTableNum = Integer.MAX_VALUE;
+        int globalTableNum = 0;
         for (Object obj : keySet) {
             Pair<String, String> tmpTableIDpair = (Pair) obj;
             int tableNum = tmpTableIDpair.a.split(",").length + tmpTableIDpair.b.split(",").length;
 
-            if (tableNum < globalTableNum) {
+            if (tableNum > globalTableNum) {
                 globalTableNum = tableNum;
                 tableIDPair = tmpTableIDpair;
             }
