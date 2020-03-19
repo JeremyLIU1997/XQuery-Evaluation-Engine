@@ -75,22 +75,22 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
         return null;
     }
 
-    String getNewTableID(String leftTableID, String rightTableID){
+
+    String getNewTableID(String leftTableID, String rightTableID) {
         String[] leftTableIDArr = leftTableID.split(",");
         String[] rightTableIDArr = rightTableID.split(",");
-        String res="";
-        int pointer1=0, pointer2=0;
+        String res = "";
+        int pointer1 = 0, pointer2 = 0;
         int leftLen = leftTableIDArr.length;
         int rightLen = rightTableIDArr.length;
 
-        while (pointer1<leftLen || pointer2<rightLen){
-            if (pointer2>=rightLen || pointer1 < leftLen &&
-                    Integer.parseInt(leftTableIDArr[pointer1])<= Integer.parseInt(rightTableIDArr[pointer2])){
-                res +=","+leftTableIDArr[pointer1];
+        while (pointer1 < leftLen || pointer2 < rightLen) {
+            if (pointer2 >= rightLen || pointer1 < leftLen &&
+                    Integer.parseInt(leftTableIDArr[pointer1]) <= Integer.parseInt(rightTableIDArr[pointer2])) {
+                res += "," + leftTableIDArr[pointer1];
                 pointer1++;
-            }
-            else{
-                res +=","+rightTableIDArr[pointer2];
+            } else {
+                res += "," + rightTableIDArr[pointer2];
                 pointer2++;
             }
         }
@@ -127,8 +127,8 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
             }
         }
 
-        int loopCount=0;
-        List<Pair<String,String>> joinSeq=null;
+        int loopCount = 0;
+        List<Pair<String, String>> joinSeq = null;
         if (joinShapeFlag.equals("B")) joinSeq = generateBushyTree();
         while (!keySet.isEmpty()) {//one join each loop
             //1. 2. 3.
@@ -138,20 +138,20 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
             // find the first pair to join
             //Pair tableIDPair = findPairToJoin(keySet);
             Pair tableIDPair = null;
-            if (joinShapeFlag.equals("B")) tableIDPair = findPairToJoin_B(joinSeq,loopCount);
+            if (joinShapeFlag.equals("B")) tableIDPair = findPairToJoin_B(joinSeq, loopCount);
             else tableIDPair = findPairToJoin_L(keySet);
 
             String leftTableID = (String) tableIDPair.a;
             String rightTableID = (String) tableIDPair.b;
             //String newTableID = leftTableID + "," + rightTableID;
-            String newTableID = getNewTableID(leftTableID,rightTableID);
+            String newTableID = getNewTableID(leftTableID, rightTableID);
 
             //modify variable groupID for each var (traverse all     variable)
-                tableIDMap.forEach((k, v) -> {
-                    if (v.equals(leftTableID) || v.equals(rightTableID)) {
-                        tableIDMap.put(k, newTableID);
-                    }
-                });
+            tableIDMap.forEach((k, v) -> {
+                if (v.equals(leftTableID) || v.equals(rightTableID)) {
+                    tableIDMap.put(k, newTableID);
+                }
+            });
 
             // 2. merge the code
             mergeCode(tableIDPair, newTableID);
@@ -250,14 +250,14 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
         return tableIDPair;
     }
 
-    private Pair<String,String> findPairToJoin_L(Set keySet){
-        Pair<String,String> tableIDPair = null;
+    private Pair<String, String> findPairToJoin_L(Set keySet) {
+        Pair<String, String> tableIDPair = null;
         int globalTableNum = Integer.MAX_VALUE;
-        for (Object obj:keySet){
-            Pair<String,String> tmpTableIDpair = (Pair) obj;
+        for (Object obj : keySet) {
+            Pair<String, String> tmpTableIDpair = (Pair) obj;
             int tableNum = tmpTableIDpair.a.split(",").length + tmpTableIDpair.b.split(",").length;
 
-            if (tableNum < globalTableNum){
+            if (tableNum < globalTableNum) {
                 globalTableNum = tableNum;
                 tableIDPair = tmpTableIDpair;
             }
@@ -265,63 +265,65 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
         return tableIDPair;
     }
 
-    private Pair<String,String> findPairToJoin_B(List<Pair<String,String>> joinSeq, int loopCount){
+    private Pair<String, String> findPairToJoin_B(List<Pair<String, String>> joinSeq, int loopCount) {
         return joinSeq.get(loopCount);
     }
 
-    private List<Pair<String,String>> generateBushyTree(){
-        int dpLength = (int) Math.pow(2,tableAmt);
+    private List<Pair<String, String>> generateBushyTree() {
+        int dpLength = (int) Math.pow(2, tableAmt);
         int dp_treeHeight[] = new int[dpLength];
-        Pair<Integer,Integer>[] dp_indexPair = new Pair[dpLength];
+        Pair<Integer, Integer>[] dp_indexPair = new Pair[dpLength];
 
         // init
-        for (int i=0; i<tableAmt; ++i){
+        for (int i = 0; i < dpLength; ++i) {
             dp_treeHeight[i] = Integer.MAX_VALUE;
         }
-        for (int i=0; i<tableAmt; ++i){
+        for (int i = 0; i < tableAmt; ++i) {
             int dpInd = rank(new int[]{i});
-            dp_indexPair[dpInd] = new Pair<>(i,i);
+            dp_indexPair[dpInd] = new Pair<>(i, i);
             dp_treeHeight[dpInd] = 0;
         }
 
-        for (int i=1; i<dpLength; ++i){
+        for (int i = 1; i < dpLength; ++i) {
             int[] subset = unrank(i);
-            int combinationAmt = (int) Math.pow(2,subset.length);
-            for (int j=1; j<combinationAmt; ++j){
+            int combinationAmt = (int) Math.pow(2, subset.length);
+            for (int j = 1; j < combinationAmt; ++j) {
                 int[] subsetIndexArr1 = unrank(j);
-                int[] subsetIndexArr2 = getComplement(j,subset.length);
+                int[] subsetIndexArr2 = getComplement(j, subset.length);
                 int[] subset1 = new int[subsetIndexArr1.length];
                 int[] subset2 = new int[subsetIndexArr2.length];
 
-                for (int k=0; k<subsetIndexArr1.length; ++k){
+                for (int k = 0; k < subsetIndexArr1.length; ++k) {
                     subset1[k] = subset[subsetIndexArr1[k]];
                 }
-                for (int k=0; k<subsetIndexArr2.length; ++k){
+                for (int k = 0; k < subsetIndexArr2.length; ++k) {
                     subset2[k] = subset[subsetIndexArr2[k]];
                 }
 
-                if (checkConnection(subset1,subset2)){
+                if (checkConnection(subset1, subset2)) {
                     int dpInd1 = rank(subset1);
                     int dpInd2 = rank(subset2);
-                    if (dp_treeHeight[dpInd1]==-1 || dp_treeHeight[dpInd2]==-1) continue;
-                    int newHeight = Math.max(dp_treeHeight[dpInd1],dp_treeHeight[dpInd2])+1;
-                    if (dp_treeHeight[i] > newHeight){
+                    if (dp_treeHeight[dpInd1] == Integer.MAX_VALUE || dp_treeHeight[dpInd2] == Integer.MAX_VALUE) continue;
+                    int newHeight = Math.max(dp_treeHeight[dpInd1], dp_treeHeight[dpInd2]) + 1;
+                    if (dp_treeHeight[i] > newHeight) {
                         dp_treeHeight[i] = newHeight;
-                        dp_indexPair[i] = new Pair<>(dpInd1,dpInd2);
+                        dp_indexPair[i] = dpInd1<dpInd2? new Pair<>(dpInd1, dpInd2):new Pair<>(dpInd2,dpInd1);
                     }
+                    //System.out.println("ok");
                 }
-
+                //System.out.println("ok");
             }
         }
 
         return createJoinSequence(dp_indexPair);
     }
 
-    private boolean checkConnection(int[] subset1, int[] subset2){
+    private boolean checkConnection(int[] subset1, int[] subset2) {
         Set keySet = equationsMap.keySet();
-        for (int i=0; i<subset1.length; ++i){
-            for (int j=0; j<subset2.length; ++j){
-                String key=Math.min(subset1[i],subset2[i]) +","+Math.max(subset1[i],subset2[i]);
+        for (int i = 0; i < subset1.length; ++i) {
+            for (int j = 0; j < subset2.length; ++j) {
+                //String key = "("+Math.min(subset1[i], subset2[j]) + "," + Math.max(subset1[i], subset2[j])+")";
+                Pair<String,String> key = new Pair<>(Math.min(subset1[i], subset2[j])+"",Math.max(subset1[i], subset2[j])+"");
                 if (keySet.contains(key)) return true;
             }
         }
@@ -375,7 +377,7 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
         int right = dp[index].b;
 
         String leftString = createJoinSequence(dp, left, out), rightString = createJoinSequence(dp, right, out);
-        out.add(new Pair<>(leftString,rightString));
+        out.add(new Pair<>(leftString.substring(0,leftString.length()-1), rightString.substring(0,rightString.length()-1)));
 
         return leftString + rightString;
 
@@ -533,7 +535,7 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
                 resCodeMap.get(tableID + "").put("return", returnClause);
             }
         }
-        tableAmt = tableID+1;
+        tableAmt = tableID + 1;
         return "ABC";
     }
 
