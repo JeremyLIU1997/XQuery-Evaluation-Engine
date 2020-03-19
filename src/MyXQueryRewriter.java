@@ -379,7 +379,7 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
         }
 
         out.add(new Pair<>(leftString.substring(0, leftString.length() - 1), rightString.substring(0, rightString.length() - 1)));
-        return leftString + rightString;
+        return getNewTableID(leftString, rightString);
     }
 
     //merge the code (join two groups)
