@@ -1,7 +1,9 @@
-for $a in doc("../etc/j_caesar.xml")//ACT,
-$b in doc("../etc/j_caesar.xml")//ACT,
-$c in doc("../etc/j_caesar.xml")//ACT,
- $d in doc("../etc/j_caesar.xml")//ACT,
+for $a in doc("./etc/small.xml")//ACT,
+$b in doc("./etc/small.xml")//ACT,
+$c in doc("./etc/small.xml")//ACT,
+ $d in doc("./etc/small.xml")//ACT,
+ $e in doc("./etc/small.xml")//ACT,
+ $f in doc("./etc/small.xml")//ACT,
     $sa in $a//SCENE,
     $sb in $b//SCENE,
     $sc in $c//SCENE,
@@ -10,5 +12,5 @@ $c in doc("../etc/j_caesar.xml")//ACT,
     $spb in $sb//SPEAKER/text(),
     $spc in $sc//SPEAKER,
     $spd in $sd//SPEAKER
-where $spb="FLAVIUS" and $sb eq $sc and $sa eq $sd and $spa eq $spc
+where $spb="FLAVIUS" and $sb eq $sc and $sa eq $sd and $spa eq $spc and $e = $f
 return <result>{ <title>{$sa/TITLE/text()}</title> }</result>

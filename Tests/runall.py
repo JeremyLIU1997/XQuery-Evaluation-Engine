@@ -1,6 +1,4 @@
 #!/usr/local/bin/python3
-
-
 from os import listdir
 from os import system
 import os
@@ -23,17 +21,19 @@ if __name__ == '__main__':
 		if case.endswith(".py") \
 		or case.startswith(".") \
 		or not os.path.isfile(testdir + "/" + case) \
-		or case == "toy.txt":
+		or case == "toy.txt" \
+		or case == "eval_output.txt" \
+		or case == "rewrite_output.txt":
 			continue
 		total += 1
 		print(separator)
 		print(case + ": \n")
 		print("******** Left Deep ********")
-		if system("java -jar " + jarfile + " " + testdir + "/" + case + " -L") != 0:
+		if system("java -jar " + jarfile + " " + testdir + "/" + case + " -Ls") != 0:
 			failures += 1
 			faillist.append(case + " --- L")
 		print("******** Bushy ********")
-		if system("java -jar " + jarfile + " " + testdir + "/" + case + " -B") != 0:
+		if system("java -jar " + jarfile + " " + testdir + "/" + case + " -Bs") != 0:
 			failures += 1
 			faillist.append(case + " --- B")
 		
