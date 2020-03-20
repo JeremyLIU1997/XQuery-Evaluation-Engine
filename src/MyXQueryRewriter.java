@@ -408,12 +408,6 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
         // base case, primitive table
         if (dp[index].a.equals((dp[index].b)))
             return dp[index].a + ",";
-        System.out.println(index + ": " + dp[index]);
-        if (dp[index].a.equals((dp[index].b))) {
-            int ind = dp[index].a;
-            dp[index] = null;
-            return ind + ",";
-        }
 
         int left = dp[index].a;
         int right = dp[index].b;
@@ -425,7 +419,6 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
         }
 
         out.add(new Pair<>(leftString.substring(0, leftString.length() - 1), rightString.substring(0, rightString.length() - 1)));
-        dp[index] = null;
         return getNewTableID(leftString, rightString) + ",";
     }
 

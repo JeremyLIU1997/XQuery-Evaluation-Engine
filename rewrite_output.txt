@@ -1,5 +1,6 @@
 for $tuple0 in join (
 join (
+join (
 for $a in doc("./etc/small.xml")//ACT,
  $sa in $a//SCENE,
  $spa in $sa//SPEAKER
@@ -19,6 +20,23 @@ return <tuple>{
  }</tuple>,
 
 [sa], [sd]
+),
+
+join (
+for $e in doc("./etc/small.xml")//ACT
+return <tuple>{ 
+<e>{$e}</e>
+ }</tuple>,
+
+for $f in doc("./etc/small.xml")//ACT
+return <tuple>{ 
+<f>{$f}</f>
+ }</tuple>,
+
+[e], [f]
+),
+
+[], []
 ),
 
 join (
@@ -45,18 +63,5 @@ return <tuple>{
 ),
 
 [spa], [spc]
-),
-$tuple1 in join (
-for $e in doc("./etc/small.xml")//ACT
-return <tuple>{ 
-<e>{$e}</e>
- }</tuple>,
-
-for $f in doc("./etc/small.xml")//ACT
-return <tuple>{ 
-<f>{$f}</f>
- }</tuple>,
-
-[e], [f]
 )
 return <result>{<title>{$tuple0/sa/*/TITLE/text()}</title>}</result>

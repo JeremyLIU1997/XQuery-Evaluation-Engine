@@ -27,7 +27,7 @@ xq:
 joinClause:
 JOIN LPAREN xq ',' xq ',' attributeList ',' attributeList RPAREN;
 
-attributeList: '[' attriname (',' attriname)* ']' ;
+attributeList: '[' attriname* (',' attriname)* ']' ;
 
 stringconst:
   STRING
