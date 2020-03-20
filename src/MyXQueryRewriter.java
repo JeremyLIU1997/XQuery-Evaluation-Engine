@@ -362,14 +362,7 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
     // wrapper func for overloaded createJoinSequence
     private List<Pair<String, String>> createJoinSequence(Pair<Integer, Integer>[] dp) {
         List<Pair<String, String>> out = new LinkedList<Pair<String, String>>();
-        this.createJoinSequence(dp, (int) Math.pow(2, this.tableAmt) - 1, out);
-
-        int i = dp.length;
-        while (--i >= 0) {
-            if (dp[i] == null)
-                continue;
-            this.createJoinSequence(dp, i, out);
-        }
+        this.createJoinSequence(dp, dp.length - 1, out);
         return out;
     }
 
