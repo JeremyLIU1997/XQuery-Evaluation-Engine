@@ -85,7 +85,8 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
 
         while (pointer1 < leftLen || pointer2 < rightLen) {
             if (pointer2 >= rightLen || pointer1 < leftLen &&
-                    Integer.parseInt(leftTableIDArr[pointer1]) <= Integer.parseInt(rightTableIDArr[pointer2])) {
+                            Integer.parseInt(rightTableIDArr[pointer2])
+                                    >=Integer.parseInt(leftTableIDArr[pointer1])) {
                 res += "," + leftTableIDArr[pointer1];
                 pointer1++;
             } else {
@@ -279,7 +280,14 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
     }
 
     private List<Pair<String, String>> generateLeftTree(){
-        return new ArrayList<>();
+        List<Pair<String,String>> res = new ArrayList<>();
+        String leftTableID = "0";
+        for (int i=1; i<tableAmt; ++i){
+            res.add(new Pair<>(leftTableID,String.valueOf(i)));
+            leftTableID = leftTableID + "," + i;
+        }
+
+        return res;
     }
 
     private List<Pair<String, String>> generateBushyTree() {
@@ -343,7 +351,7 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
                 }
             }
         }
-        return createJoinSequence(dp_indexPair, dp_treeHeight);
+        return createJoinSequence(dp_indexPair);
     }
 
     private boolean checkConnection(int[] subset1, int[] subset2) {
