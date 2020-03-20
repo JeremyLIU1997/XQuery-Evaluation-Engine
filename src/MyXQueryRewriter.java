@@ -358,19 +358,43 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
         return unrank((int) Math.pow(2, n) - 1 - rank);
     }
 
-
+    private Set<Integer> alreadyJoinedTables;
     // wrapper func for overloaded createJoinSequence
     private List<Pair<String, String>> createJoinSequence(Pair<Integer, Integer>[] dp, int dp_treeHeight[]) {
         List<Pair<String, String>> out = new LinkedList<Pair<String, String>>();
-        this.createJoinSequence(dp, (int) Math.pow(2, this.tableAmt) - 1, out);
+        this.alreadyJoinedTables = new HashSet<>();
+
+        int i = dp.length;
+        while (--i >= 0) {
+            if (dp[i] == null)
+                continue;
+
+            boolean continueFlag = false;
+            for (int num: unrank(i))
+                if (alreadyJoinedTables.contains(num)) {
+                    continueFlag = true;
+                    break;
+                }
+            if (continueFlag)
+                continue;
+
+            for (int num: unrank(i))
+                this.alreadyJoinedTables.add(num);
+
+            this.createJoinSequence(dp, i, out);
+        }
+
         return out;
     }
 
     // create an explicit join sequence ID-to-ID from the dp array
     private String createJoinSequence(Pair<Integer, Integer>[] dp, int index, List<Pair<String, String>> out) {
         // base case, primitive table
-        if (dp[index].a.equals((dp[index].b)))
-            return dp[index].a + ",";
+        if (dp[index].a.equals((dp[index].b))) {
+            int ind = dp[index].a;
+            dp[index] = null;
+            return ind + ",";
+        }
 
         int left = dp[index].a;
         int right = dp[index].b;
@@ -383,6 +407,7 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
         }
 
         out.add(new Pair<>(leftString.substring(0, leftString.length() - 1), rightString.substring(0, rightString.length() - 1)));
+        dp[index] = null;
         return getNewTableID(leftString, rightString) + ",";
     }
 

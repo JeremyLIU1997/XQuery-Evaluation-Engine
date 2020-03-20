@@ -17,6 +17,7 @@ public class Main {
 
         boolean leftDeepFlag = false;
         boolean bushyFlag = false;
+        boolean noEvalFlag = false;
 
         for (int i = 1; i < args.length; i++)
             if (args[i].charAt(0) == '-') {
@@ -24,6 +25,8 @@ public class Main {
                     leftDeepFlag = true;
                 if (args[i].contains("b") || args[i].contains("B")) // rewriter bushy flag
                     bushyFlag = true;
+                if (args[i].contains("s") || args[i].contains("S")) // no evaluation flag
+                    noEvalFlag = true;
             }
 
         InputStream is;
@@ -64,7 +67,7 @@ public class Main {
         }
         // if not rewritable, rewrite result is original query.
         else {
-            System.out.println("----- Syntax is not rewritable -----");
+            // System.out.println("----- Syntax is not rewritable -----");
             rewrite_output = "";
             int character;
             is = new FileInputStream(inputFile);
@@ -72,7 +75,7 @@ public class Main {
                 rewrite_output += (char) character;
         }
 
-        inputFile = "./output/rewrite_output.txt";
+        inputFile = "./rewrite_output.txt";
         FileWriter tempOutput;
         try {
             tempOutput = new FileWriter(inputFile, false);
@@ -93,6 +96,9 @@ public class Main {
         parser = new XQueryParser(tokens);
         tree = parser.xq(); // check if syntax correct
 
+        if (noEvalFlag)
+            return;
+
         MyXQueryVisitor visitor = new MyXQueryVisitor();
         List<Node> result = (List<Node>)visitor.visit(tree);
 
@@ -105,7 +111,7 @@ public class Main {
 
         /* writing evaluation result to file */
         FileWriter evalOutputFile;
-        inputFile = "./output/eval_output.txt";
+        inputFile = "./eval_output.txt";
         try {
             evalOutputFile = new FileWriter(inputFile, false);
         }
@@ -117,8 +123,8 @@ public class Main {
         evalOutputFile.close();
 
         // write to file
-        System.out.println("\n***** Rewrite output written in ``project_root/output/rewrite_output.txt`` *****");
-        System.out.println("***** Evaluation output written in ``project_root/output/eval_output.txt`` *****\n");
+        System.out.println("\n***** Rewrite output written in ``./rewrite_output.txt`` *****");
+        System.out.println("***** Evaluation output written in ``./eval_output.txt`` *****\n");
         PrintStream fileOut = new PrintStream(inputFile);
         System.setOut(fileOut); // redirect output to file
         System.out.println("\nNumber of nodes: " + result.size());

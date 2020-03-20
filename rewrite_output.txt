@@ -1,0 +1,4 @@
+for $a in doc("d")//speaker,
+$b in doc("d")//sp
+where $a eq $a
+return $a
