@@ -387,38 +387,20 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
         return unrank((int) Math.pow(2, n) - 1 - rank);
     }
 
-    private Set<Integer> alreadyJoinedTables;
+
     // wrapper func for overloaded createJoinSequence
-    private List<Pair<String, String>> createJoinSequence(Pair<Integer, Integer>[] dp, int dp_treeHeight[]) {
+    private List<Pair<String, String>> createJoinSequence(Pair<Integer, Integer>[] dp) {
         List<Pair<String, String>> out = new LinkedList<Pair<String, String>>();
-        this.alreadyJoinedTables = new HashSet<>();
-
-        int i = dp.length;
-        while (--i >= 0) {
-            if (dp[i] == null)
-                continue;
-
-            boolean continueFlag = false;
-            for (int num: unrank(i))
-                if (alreadyJoinedTables.contains(num)) {
-                    continueFlag = true;
-                    break;
-                }
-            if (continueFlag)
-                continue;
-
-            for (int num: unrank(i))
-                this.alreadyJoinedTables.add(num);
-
-            this.createJoinSequence(dp, i, out);
-        }
-
+        this.createJoinSequence(dp, dp.length - 1, out);
         return out;
     }
 
     // create an explicit join sequence ID-to-ID from the dp array
     private String createJoinSequence(Pair<Integer, Integer>[] dp, int index, List<Pair<String, String>> out) {
         // base case, primitive table
+        if (dp[index].a.equals((dp[index].b)))
+            return dp[index].a + ",";
+        System.out.println(index + ": " + dp[index]);
         if (dp[index].a.equals((dp[index].b))) {
             int ind = dp[index].a;
             dp[index] = null;
@@ -427,7 +409,6 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
 
         int left = dp[index].a;
         int right = dp[index].b;
-
         String leftString = createJoinSequence(dp, left, out), rightString = createJoinSequence(dp, right, out);
         if (leftString.compareTo(rightString) > 0) {
             String temp = leftString;
@@ -439,6 +420,7 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
         dp[index] = null;
         return getNewTableID(leftString, rightString) + ",";
     }
+
 
     //merge the code (join two groups)
     private void mergeCode(Pair tableIDPair, String newTableID) {
