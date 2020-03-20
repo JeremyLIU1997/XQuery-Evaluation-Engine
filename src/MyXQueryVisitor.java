@@ -577,7 +577,6 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
         return false;
     }
 
-
     @Override
     public Object visitCond_eq(XQueryParser.Cond_eqContext ctx) {
         List<Node> list1 = (List<Node>) this.visit(ctx.xq(0));
@@ -586,7 +585,6 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
             for (int j = 0; j < list2.size(); j++)
                 if (list1.get(i).isEqualNode(list2.get(j)))
                     return true;
-
         return false;
     }
 

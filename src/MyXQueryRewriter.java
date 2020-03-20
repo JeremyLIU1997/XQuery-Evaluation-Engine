@@ -75,7 +75,7 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
         return null;
     }
 
-    String getNewTableID(String leftTableID, String rightTableID) {
+    private String getNewTableID(String leftTableID, String rightTableID) {
         String[] leftTableIDArr = leftTableID.split(",");
         String[] rightTableIDArr = rightTableID.split(",");
         String res = "";
@@ -83,18 +83,19 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
         int leftLen = leftTableIDArr.length;
         int rightLen = rightTableIDArr.length;
 
-        while (pointer1 < leftLen || pointer2 < rightLen) {
-            if (pointer2 >= rightLen || pointer1 < leftLen &&
-                            Integer.parseInt(rightTableIDArr[pointer2])
-                                    >=Integer.parseInt(leftTableIDArr[pointer1])) {
-                res += "," + leftTableIDArr[pointer1];
-                pointer1++;
-            } else {
-                res += "," + rightTableIDArr[pointer2];
-                pointer2++;
-            }
+        while (pointer1 < leftLen && pointer2 <  rightLen) {
+            if (Integer.parseInt(leftTableIDArr[pointer1]) < Integer.parseInt(rightTableIDArr[pointer2]))
+                res += leftTableIDArr[pointer1++] + ",";
+            else
+                res += rightTableIDArr[pointer2++] + ",";
         }
-        return res.substring(1);
+
+        while (pointer1 < leftLen)
+            res += leftTableIDArr[pointer1++] + ",";
+        while (pointer2 < rightLen)
+            res += rightTableIDArr[pointer2++] + ",";
+
+        return res.substring(0,res.length()-1);
     }
 
     @Override
@@ -103,7 +104,7 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
         if (ctx.whereClause() != null) this.visit(ctx.whereClause());
 
         //join
-        //0. deal with equations within one component and contains constant string // TODO: how to deal with (-1,-1)
+        //0. deal with equations within one component and contains constant string
         //1. traverse all key in equationsMap
         //2. every time join two group, delete the key and merge related keys
         //3. loop until all the key are deleted
@@ -554,7 +555,7 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
             if (parent != null) {  //parent is not root
                 String tmpTableID = tableIDMap.get(parent);
                 if (!tree.containsKey(parent)) tree.put(parent, new ArrayList<>());
-                tree.get(parent).add(child); // TODO: deduplicate
+                tree.get(parent).add(child);
                 //add child to tableIDMap
                 tableIDMap.put(child, tmpTableID);
                 //update the corresponding code in resCodeList

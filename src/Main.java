@@ -5,7 +5,6 @@ import org.w3c.dom.Node;
 import java.io.*;
 import java.util.*;
 
-
 public class Main {
     public static void main(String[] args) throws Exception {
         String inputFile = null;
@@ -33,8 +32,7 @@ public class Main {
         // reading input and lexing/parsing
         try {
             is = new FileInputStream(inputFile); // throws FileNotFound
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("Input query file not found. Exit.");
             System.exit(-1);
             return;
@@ -48,11 +46,10 @@ public class Main {
         ParseTree tree = parser.xq();
 
         String rewrite_output;
-        // TODO: modify this part of the logic to identify rewritability with listener.
         // rewritability check
         ParseTreeWalker walker = new ParseTreeWalker();
         MyXQueryListener rewriteChecker = new MyXQueryListener();
-        walker.walk(rewriteChecker,tree);
+        walker.walk(rewriteChecker, tree);
 
         // rewritable
         if (rewriteChecker.isRewritable()) {
@@ -60,7 +57,7 @@ public class Main {
             rewriter.setJoinShapeFlag("L");
             if (bushyFlag)
                 rewriter.setJoinShapeFlag("B");
-            rewrite_output = (String)rewriter.visit(tree);
+            rewrite_output = (String) rewriter.visit(tree);
             System.out.println("******* Rewrite Result *******");
             System.out.println(rewrite_output);
             System.out.println("******************************\n");
@@ -79,9 +76,8 @@ public class Main {
         FileWriter tempOutput;
         try {
             tempOutput = new FileWriter(inputFile, false);
-        }
-        catch (Exception e) {
-            inputFile  = "." + inputFile;
+        } catch (Exception e) {
+            inputFile = "." + inputFile;
             tempOutput = new FileWriter(inputFile, false);
         }
 
@@ -100,12 +96,12 @@ public class Main {
             return;
 
         MyXQueryVisitor visitor = new MyXQueryVisitor();
-        List<Node> result = (List<Node>)visitor.visit(tree);
+        List<Node> result = (List<Node>) visitor.visit(tree);
 
         /* printing results */
         System.out.println("\nNumber of nodes: " + result.size());
         TreeNodePrinter printer = new TreeNodePrinter();
-        for (Node node: result)
+        for (Node node : result)
             printer.prettyPrint(node, "");
 
 
@@ -114,9 +110,8 @@ public class Main {
         inputFile = "./eval_output.txt";
         try {
             evalOutputFile = new FileWriter(inputFile, false);
-        }
-        catch (Exception e) {
-            inputFile  = "." + inputFile;
+        } catch (Exception e) {
+            inputFile = "." + inputFile;
             evalOutputFile = new FileWriter(inputFile, false);
         }
         evalOutputFile.write(""); // empty the file for new writing
@@ -128,9 +123,8 @@ public class Main {
         PrintStream fileOut = new PrintStream(inputFile);
         System.setOut(fileOut); // redirect output to file
         System.out.println("\nNumber of nodes: " + result.size());
-        for (Node node: result)
+        for (Node node : result)
             printer.prettyPrint(node, "");
-
     }
 }
 
