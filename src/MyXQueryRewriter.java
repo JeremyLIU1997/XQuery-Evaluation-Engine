@@ -125,11 +125,18 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
                 keySet.remove(k);
             }
         }
-
+            //TODO
         int loopCount = 0;
         List<Pair<String, String>> joinSeq = null;
         if (joinShapeFlag.equals("B")) joinSeq = generateBushyTree();
-        while (!keySet.isEmpty()) {//one join each loop
+        else joinSeq = generateLeftTree();
+
+        //for test
+        //List<Pair<String, String>> joinSeq = Arrays.asList(new Pair[]{new Pair<>("0", "1"), new Pair<>("2", "3")});
+
+
+        //while (!keySet.isEmpty()) {//one join each loop
+        for (loopCount=0;loopCount<joinSeq.size(); ++loopCount){//one join each loop
             //1. 2. 3.
 //            Iterator it = keySet.iterator();
 //            Pair tableIDPair = (Pair) it.next();
@@ -137,8 +144,10 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
             // find the first pair to join
             //Pair tableIDPair = findPairToJoin(keySet);
             Pair tableIDPair = null;
-            if (joinShapeFlag.equals("B")) tableIDPair = findPairToJoin_B(joinSeq, loopCount);
-            else tableIDPair = findPairToJoin_L(keySet);
+            //TODO
+//            if (joinShapeFlag.equals("B")) tableIDPair = findPairToJoin_B(joinSeq, loopCount);
+//            else tableIDPair = findPairToJoin_L(keySet);
+            tableIDPair = joinSeq.get(loopCount);
 
             String leftTableID = (String) tableIDPair.a;
             String rightTableID = (String) tableIDPair.b;
@@ -205,7 +214,7 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
                     keySet.remove(k);
                 }
             }
-            loopCount++;
+            //loopCount++;
 
         }
         //formulate the output (traverse resCodeMap keySet)
@@ -269,19 +278,26 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
         return joinSeq.get(loopCount);
     }
 
+    private List<Pair<String, String>> generateLeftTree(){
+        return new ArrayList<>();
+    }
+
     private List<Pair<String, String>> generateBushyTree() {
         int dpLength = (int) Math.pow(2, tableAmt);
         int dp_treeHeight[] = new int[dpLength];
+        int dp_prodNum[] = new int[dpLength];
         Pair<Integer, Integer>[] dp_indexPair = new Pair[dpLength];
 
         // init
         for (int i = 0; i < dpLength; ++i) {
             dp_treeHeight[i] = Integer.MAX_VALUE;
+            dp_prodNum[i] = Integer.MAX_VALUE;
         }
         for (int i = 0; i < tableAmt; ++i) {
             int dpInd = rank(new int[]{i});
             dp_indexPair[dpInd] = new Pair<>(i, i);
             dp_treeHeight[dpInd] = 0;
+            dp_prodNum[dpInd] = 0;
         }
 
         for (int i = 1; i < dpLength; ++i) {
@@ -300,17 +316,30 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
                     subset2[k] = subset[subsetIndexArr2[k]];
                 }
 
-                if (checkConnection(subset1, subset2)) {
-                    int dpInd1 = rank(subset1);
-                    int dpInd2 = rank(subset2);
-                    if (dp_treeHeight[dpInd1] == Integer.MAX_VALUE || dp_treeHeight[dpInd2] == Integer.MAX_VALUE)
-                        continue;
-                    int newHeight = Math.max(dp_treeHeight[dpInd1], dp_treeHeight[dpInd2]) + 1;
-                    if (dp_treeHeight[i] > newHeight) {
-                        dp_treeHeight[i] = newHeight;
-                        dp_indexPair[i] = new Pair<>(dpInd1, dpInd2);
-                    }
-                    //System.out.println("ok");
+//                if (checkConnection(subset1, subset2)) {
+//                    int dpInd1 = rank(subset1);
+//                    int dpInd2 = rank(subset2);
+//                    if (dp_treeHeight[dpInd1] == Integer.MAX_VALUE || dp_treeHeight[dpInd2] == Integer.MAX_VALUE)
+//                        continue;
+//                    int newHeight = Math.max(dp_treeHeight[dpInd1], dp_treeHeight[dpInd2]) + 1;
+//                    if (dp_treeHeight[i] > newHeight) {
+//                        dp_treeHeight[i] = newHeight;
+//                        dp_indexPair[i] = new Pair<>(dpInd1, dpInd2);
+//                    }
+//                    //System.out.println("ok");
+//                }
+                int dpInd1 = rank(subset1);
+                int dpInd2 = rank(subset2);
+                if (dp_treeHeight[dpInd1] == Integer.MAX_VALUE || dp_treeHeight[dpInd2] == Integer.MAX_VALUE)
+                    continue;
+                int newHeight = Math.max(dp_treeHeight[dpInd1], dp_treeHeight[dpInd2]) + 1;
+                int newProdNum = checkConnection(subset1, subset2)?
+                        dp_prodNum[dpInd1]+dp_prodNum[dpInd2]:dp_prodNum[dpInd1]+dp_prodNum[dpInd2]+1;
+                if (dp_prodNum[i] > newProdNum //first compare cross prod num
+                        || dp_prodNum[i]==newProdNum && dp_treeHeight[i] > newHeight){ //next check height
+                    dp_treeHeight[i] = newHeight;
+                    dp_indexPair[i] = new Pair<>(dpInd1, dpInd2);
+                    dp_prodNum[i] = newProdNum;
                 }
             }
         }
@@ -415,7 +444,7 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
     private void mergeCode(Pair tableIDPair, String newTableID) {
         String leftTableID = (String) tableIDPair.a;
         String rightTableID = (String) tableIDPair.b;
-        List<Pair<String, String>> tmpEquations = equationsMap.get(tableIDPair);
+        List<Pair<String, String>> tmpEquations = equationsMap.getOrDefault(tableIDPair, new ArrayList<>());
         //contact first & second table
         concatCode(leftTableID);
         concatCode(rightTableID);
@@ -429,8 +458,8 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
             joinArg3 += equation.a.toString().substring(1) + ", ";
             joinArg4 += equation.b.toString().substring(1) + ", ";
         }
-        joinArg3 = joinArg3.substring(0, joinArg3.length() - 2) + "]";
-        joinArg4 = joinArg4.substring(0, joinArg4.length() - 2) + "]";
+        joinArg3 = joinArg3.substring(0, Math.max(joinArg3.length() - 2,1)) + "]";
+        joinArg4 = joinArg4.substring(0, Math.max(joinArg4.length() - 2,1)) + "]";
         tmpRes.put("joinArg3", joinArg3);
         tmpRes.put("joinArg4", joinArg4);
 
