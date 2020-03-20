@@ -314,7 +314,7 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
                 }
             }
         }
-        return createJoinSequence(dp_indexPair);
+        return createJoinSequence(dp_indexPair, dp_treeHeight);
     }
 
     private boolean checkConnection(int[] subset1, int[] subset2) {
@@ -360,7 +360,7 @@ public class MyXQueryRewriter extends XQueryBaseVisitor<Object> {
 
 
     // wrapper func for overloaded createJoinSequence
-    private List<Pair<String, String>> createJoinSequence(Pair<Integer, Integer>[] dp) {
+    private List<Pair<String, String>> createJoinSequence(Pair<Integer, Integer>[] dp, int dp_treeHeight[]) {
         List<Pair<String, String>> out = new LinkedList<Pair<String, String>>();
         this.createJoinSequence(dp, (int) Math.pow(2, this.tableAmt) - 1, out);
         return out;
