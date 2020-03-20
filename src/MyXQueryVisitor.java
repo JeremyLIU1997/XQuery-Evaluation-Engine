@@ -667,6 +667,35 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
             bigattri = swap2;
         }
 
+        List<Node> out = new ArrayList<>();
+
+        /* if cartesian product */
+        if (smallattri.length == 0) {
+            Document newDoc;
+            try {
+                newDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+            } catch (ParserConfigurationException e) {
+                e.printStackTrace();
+                System.out.println("ParserConfigurationException in join(), exit.");
+                System.exit(1);
+                return null;
+            }
+
+            for (int i = 0; i < smallist.size(); i++) {
+                for (int j = 0; j < biglist.size(); j++) {
+                    Node smalltuple = smallist.get(i);
+                    Node bigtuple = biglist.get(j);
+                    Node newElem = newDoc.createElement("tuple");
+                    for (int k = 0; k < smalltuple.getChildNodes().getLength(); k++)
+                        newElem.appendChild(newDoc.importNode(smalltuple.getChildNodes().item(k).cloneNode(true), true));
+                    for (int k = 0; k < bigtuple.getChildNodes().getLength(); k++)
+                        newElem.appendChild(newDoc.importNode(bigtuple.getChildNodes().item(k).cloneNode(true), true));
+                    out.add(newElem);
+                }
+            }
+            return out;
+        }
+
         /* construct attribute map for biglist */
         HashMap<String, Integer> bigattrimap = new HashMap<>();
         for (int i = 0; i < bigattri.length; i++)
@@ -686,7 +715,6 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
             }
         }
 
-        List<Node> out = new ArrayList<>();
         /* construct attribute map for smallist */
         HashMap<String, Integer> smallattrimap = new HashMap<>();
         for (int i = 0; i < smallattri.length; i++)
