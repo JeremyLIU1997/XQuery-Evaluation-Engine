@@ -17,6 +17,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<Object> {
     private List<Node> yet_to_visit = new ArrayList<>(); // to store DOM nodes yet to visit
 
     private Document openInputFile(String filename) {
+
         try {
             // create DOM document parser and parse input file
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();

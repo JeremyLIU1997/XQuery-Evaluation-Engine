@@ -1,16 +1,4 @@
-for $a in doc("./etc/small.xml")//ACT,
-$b in doc("./etc/small.xml")//ACT,
-$c in doc("./etc/small.xml")//ACT,
-$d in doc("./etc/small.xml")//ACT,
-$e in doc("./etc/small.xml")//ACT,
-$f in doc("./etc/small.xml")//ACT,
-    $sa in $a//SCENE,
-    $sb in $b//SCENE,
-    $sc in $c//SCENE,
-    $sd in $d//SCENE,
-    $spa in $sa//SPEAKER,
-    $spb in $sb//SPEAKER/text(),
-    $spc in $sc//SPEAKER,
-    $spd in $sd//SPEAKER
-where $spb="FLAVIUS" and $sb eq $sc and $sa eq $sd and $spa eq $spc and $e = $f
-return <result>{ <title>{$sa/TITLE/text()}</title> }</result>
+for $a in doc("./etc/j_caesar.xml")/sa,
+$b in $a/s
+where $a = $b
+return $a

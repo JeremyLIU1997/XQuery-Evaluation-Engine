@@ -1,0 +1,4 @@
+for $a in doc("j_caesar.xml")/sa,
+ $b in $a/s
+where $b eq $a
+return $a
