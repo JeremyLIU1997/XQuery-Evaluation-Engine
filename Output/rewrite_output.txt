@@ -1,15 +1,62 @@
-for $tuple in join (
-    for $b in doc("./etc/book.xml")//book,
-        $tb in $b/title
-    return <tuple> {
-                <b> {$b} </b>,
-                <tb> {$tb} </tb>
-           } </tuple>,
-    for $a in doc("./etc/book.xml")//book,
-        $ta in $a/title
-    return <tuple> {
-                <a> {$a} </a >,
-                <ta> {$ta} </ta>
-           } </tuple>,
-    [tb], [ta] )
-return $tuple
+for $tuple0 in join (
+join (
+join (
+for $a in doc("./etc/small.xml")//ACT,
+ $sa in $a//SCENE,
+ $spa in $sa//SPEAKER
+return <tuple>{ 
+<a>{$a}</a>,
+<sa>{$sa}</sa>,
+<spa>{$spa}</spa>
+ }</tuple>,
+
+for $d in doc("./etc/small.xml")//ACT,
+ $sd in $d//SCENE,
+ $spd in $sd//SPEAKER
+return <tuple>{ 
+<d>{$d}</d>,
+<sd>{$sd}</sd>,
+<spd>{$spd}</spd>
+ }</tuple>,
+
+[sa], [sd]
+),
+
+for $c in doc("./etc/small.xml")//ACT,
+ $sc in $c//SCENE,
+ $spc in $sc//SPEAKER
+return <tuple>{ 
+<c>{$c}</c>,
+<sc>{$sc}</sc>,
+<spc>{$spc}</spc>
+ }</tuple>,
+
+[spa], [spc]
+),
+
+for $b in doc("./etc/small.xml")//ACT,
+ $sb in $b//SCENE,
+ $spb in $sb//SPEAKER/text()
+where  "FLAVIUS" eq $spb
+return <tuple>{ 
+<b>{$b}</b>,
+<sb>{$sb}</sb>,
+<spb>{$spb}</spb>
+ }</tuple>,
+
+[sc], [sb]
+),
+$tuple1 in join (
+for $e in doc("./etc/small.xml")//ACT
+return <tuple>{ 
+<e>{$e}</e>
+ }</tuple>,
+
+for $f in doc("./etc/small.xml")//ACT
+return <tuple>{ 
+<f>{$f}</f>
+ }</tuple>,
+
+[e], [f]
+)
+return <result>{<title>{$tuple0/sa/*/TITLE/text()}</title>}</result>
